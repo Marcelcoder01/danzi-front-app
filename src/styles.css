@@ -1,1 +1,107 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primary Colors */
+  --color-primary: #1a1a2e;
+  --color-primary-light: #2a2a4e;
+  --color-primary-dark: #0a0a1e;
+
+  /* Secondary Colors */
+  --color-secondary: #16213e;
+  --color-secondary-light: #26315e;
+  --color-secondary-dark: #06112e;
+
+/* Accent Colors */
+--color-accent: #6c63a8;
+--color-accent-light: #8279bd;
+--color-accent-dark: #514989;
+
+  /* Background Colors */
+  --color-background: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f1f3f5;
+
+  /* Text Colors */
+  --color-text: #2d3748;
+  --color-text-muted: #718096;
+  --color-text-light: #a0aec0;
+  --color-text-on-primary: #ffffff;
+  --color-text-on-accent: #ffffff;
+
+  /* Border Colors */
+  --color-border: #e2e8f0;
+  --color-border-light: #edf2f7;
+  --color-border-dark: #cbd5e0;
+
+  /* Status Colors */
+  --color-success: #48bb78;
+  --color-success-light: #68d99a;
+  --color-success-dark: #38a169;
+
+  --color-warning: #ed8936;
+  --color-warning-light: #f6ad55;
+  --color-warning-dark: #dd6b20;
+
+  --color-error: #f56565;
+  --color-error-light: #fc8181;
+  --color-error-dark: #e53e3e;
+
+  --color-info: #4299e1;
+  --color-info-light: #63b3ed;
+  --color-info-dark: #3182ce;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+}
+
+* {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+/* DaisyUI Theme Override */
+:root {
+  --p: var(--color-primary);
+  --pf: var(--color-primary-light);
+  --s: var(--color-secondary);
+  --a: var(--color-accent);
+  --n: var(--color-text);
+  --b1: var(--color-surface);
+  --b2: var(--color-surface-alt);
+  --bc: var(--color-text);
+}
+

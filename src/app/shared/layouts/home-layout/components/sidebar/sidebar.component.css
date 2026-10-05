@@ -1,0 +1,42 @@
+nav a {
+  color: var(--color-text-light);
+  transition: all var(--transition-fast);
+}
+
+nav a:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+nav a.active {
+  background: var(--color-accent);
+  color: #ffffff !important;
+}
+
+nav button {
+  color: var(--color-error);
+  transition: all var(--transition-fast);
+}
+
+nav button:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Brand section */
+.brand-accent {
+  color: var(--color-accent);
+}
+
+.brand-text {
+  color: #ffffff;
+}
+
+.brand-muted {
+  color: var(--color-text-light);
+}
+
+/* Borders */
+.border-white-10 {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+

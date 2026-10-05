@@ -1,0 +1,39 @@
+<header
+  class="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between px-6 shadow-lg topbar-header"
+>
+  <div class="flex items-center gap-4">
+    <!-- Mobile Menu Button -->
+    <button
+      class="lg:hidden p-2 rounded-lg hover:bg-base-200 transition-colors"
+      (click)="menuClick.emit()"
+      aria-label="Toggle menu"
+    >
+      <fa-icon [icon]="faBars" size="lg"></fa-icon>
+    </button>
+
+    <!-- Desktop Sidebar Toggle Button -->
+    <button
+      class="hidden lg:flex p-2 rounded-lg hover:bg-base-200 transition-all hover:shadow-md toggle-btn-bg"
+      (click)="toggleCollapse.emit()"
+      aria-label="Toggle sidebar"
+    >
+      <fa-icon [icon]="faBarsStaggered" size="lg"></fa-icon>
+    </button>
+
+    <!-- Brand -->
+    <div class="flex items-center gap-3">
+      <span class="text-2xl brand-accent">✦</span>
+      <div>
+        <strong class="text-lg block brand-text">Academia</strong>
+        <small class="text-sm brand-muted">Admin baile</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right side content (placeholder for future user menu) -->
+  <div class="flex items-center gap-2">
+    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold shadow-md avatar-bg">
+      AD
+    </div>
+  </div>
+</header>

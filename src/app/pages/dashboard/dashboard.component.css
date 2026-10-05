@@ -1,0 +1,119 @@
+/* Text colors */
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-light {
+  color: var(--color-text-light);
+}
+
+.text-primary {
+  color: var(--color-text);
+}
+
+/* Card styles with neomorphism */
+.card-neo {
+  background: var(--color-surface);
+  box-shadow: 6px 6px 12px var(--color-border), -6px -6px 12px #ffffff;
+  border: 1px solid var(--color-border-light);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.card-neo:hover {
+  transform: translateY(-0.25rem);
+}
+
+/* Icon backgrounds */
+.icon-bg-primary {
+  background: rgba(26, 26, 46, 0.1);
+  color: var(--color-primary);
+}
+
+.icon-bg-secondary {
+  background: rgba(22, 33, 62, 0.1);
+  color: var(--color-secondary);
+}
+
+.icon-bg-accent {
+  background: rgba(108, 99, 168, 0.1);
+  color: var(--color-accent);
+}
+
+.icon-bg-success {
+  background: rgba(72, 187, 120, 0.1);
+  color: var(--color-success);
+}
+
+.icon-bg-warning {
+  background: rgba(237, 137, 54, 0.1);
+  color: var(--color-warning);
+}
+
+.icon-bg-error {
+  background: rgba(245, 101, 101, 0.1);
+  color: var(--color-error);
+}
+
+.icon-bg-info {
+  background: rgba(66, 153, 225, 0.1);
+  color: var(--color-info);
+}
+
+/* Badge styles */
+.badge-success {
+  background: rgba(72, 187, 120, 0.1);
+  color: var(--color-success);
+}
+
+.badge-warning {
+  background: rgba(237, 137, 54, 0.1);
+  color: var(--color-warning);
+}
+
+.badge-error {
+  background: rgba(245, 101, 101, 0.1);
+  color: var(--color-error);
+}
+
+.badge-info {
+  background: rgba(66, 153, 225, 0.1);
+  color: var(--color-info);
+}
+
+/* Button styles */
+.btn-primary-custom {
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  box-shadow: 0 4px 6px -1px rgba(108, 99, 168, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-primary-custom:hover {
+  box-shadow: 0 10px 15px -3px rgba(108, 99, 168, 0.3);
+}
+
+.btn-ghost-custom {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.btn-ghost-custom:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress bar gradient */
+.progress-gradient {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+}
+
+/* Progress bar background */
+.progress-bg {
+  background: var(--color-surface-alt);
+}
+
+/* Divider */
+.divider-custom {
+  border-color: var(--color-border-light);
+}

@@ -1,0 +1,26 @@
+
+
+.topbar-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.toggle-btn-bg {
+  background: var(--color-surface-alt);
+}
+
+.brand-accent {
+  color: var(--color-accent);
+}
+
+.brand-text {
+  color: var(--color-text);
+}
+
+.brand-muted {
+  color: var(--color-text-muted);
+}
+
+.avatar-bg {
+  background: var(--color-primary);
+}

@@ -1,0 +1,99 @@
+<div class="h-full flex flex-col p-4">
+  <!-- Brand -->
+  <div class="mb-6 pb-4 border-b border-white-10">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl brand-accent">✦</span>
+      <div [class.hidden]="isCollapsed">
+        <strong class="block text-lg brand-text">Academia</strong>
+        <small class="text-sm brand-muted">Admin baile</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 space-y-1">
+    <a
+      routerLink="/admin"
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
+      (click)="navigate.emit()"
+    >
+      <fa-icon [icon]="faGauge" size="lg"></fa-icon>
+      <span [class.hidden]="isCollapsed">Panel Principal</span>
+    </a>
+    <a
+      routerLink="/admin/students"
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
+      (click)="navigate.emit()"
+    >
+      <fa-icon [icon]="faUsers" size="lg"></fa-icon>
+      <span [class.hidden]="isCollapsed">Alumnos</span>
+    </a>
+    <a
+      routerLink="/admin/classes"
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
+      (click)="navigate.emit()"
+    >
+      <fa-icon [icon]="faMusic" size="lg"></fa-icon>
+      <span [class.hidden]="isCollapsed">Clases</span>
+    </a>
+    <a
+      routerLink="/admin/calendar"
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
+      (click)="navigate.emit()"
+    >
+      <fa-icon [icon]="faCalendar" size="lg"></fa-icon>
+      <span [class.hidden]="isCollapsed">Calendario</span>
+    </a>
+    <a
+      routerLink="/admin/attendance"
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
+      (click)="navigate.emit()"
+    >
+      <fa-icon [icon]="faSquareCheck" size="lg"></fa-icon>
+      <span [class.hidden]="isCollapsed">Asistencia</span>
+    </a>
+    <a
+      routerLink="/admin/payments"
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
+      (click)="navigate.emit()"
+    >
+      <fa-icon [icon]="faCreditCard" size="lg"></fa-icon>
+      <span [class.hidden]="isCollapsed">Pagos</span>
+    </a>
+    <a
+      routerLink="/admin/validations"
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
+      (click)="navigate.emit()"
+    >
+      <fa-icon [icon]="faShieldHalved" size="lg"></fa-icon>
+      <span [class.hidden]="isCollapsed">Validaciones</span>
+    </a>
+    <a
+      routerLink="/admin/settings"
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
+      (click)="navigate.emit()"
+    >
+      <fa-icon [icon]="faGear" size="lg"></fa-icon>
+      <span [class.hidden]="isCollapsed">Ajustes</span>
+    </a>
+  </nav>
+
+  <!-- Logout -->
+  <div class="pt-4 border-t border-white-10">
+    <button
+      class="flex items-center gap-3 px-5 py-3 w-full rounded-lg transition-colors"
+      (click)="logout()"
+    >
+      <fa-icon [icon]="faRightFromBracket" size="lg"></fa-icon>
+      <span [class.hidden]="isCollapsed">Cerrar Sesión</span>
+    </button>
+  </div>
+</div>

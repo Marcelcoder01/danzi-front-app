@@ -1,0 +1,9 @@
+/* Sidebar styles */
+.sidebar-bg {
+  background: var(--color-primary);
+}
+
+/* Main content background */
+.main-bg {
+  background: var(--color-background);
+}

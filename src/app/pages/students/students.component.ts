@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faPlus,
@@ -7,7 +7,8 @@ import {
   faFilter,
   faEdit,
   faTrash,
-  faEye
+  faEye,
+  faXmark
 } from '@fortawesome/free-solid-svg-icons';
 import { Student } from './interfaces/student.interface';
 import { StudentLevel } from './interfaces/student-level.enum';
@@ -17,7 +18,7 @@ import { StudentLevel } from './interfaces/student-level.enum';
   standalone: true,
   templateUrl: './students.component.html',
   styleUrl: './students.component.css',
-  imports: [CommonModule, FaIconComponent]
+  imports: [FormsModule, FaIconComponent]
 })
 export class StudentsComponent {
   faPlus = faPlus;
@@ -26,8 +27,16 @@ export class StudentsComponent {
   faEdit = faEdit;
   faTrash = faTrash;
   faEye = faEye;
+  faXmark = faXmark;
 
-  students: Student[] = [
+  isFiltersVisible = false;
+
+  filterStatus = '';
+  filterLevel = '';
+  filterPayment = '';
+  searchTerm = '';
+
+  allStudents: Student[] = [
     {
       id: '1',
       firstName: 'Laura',
@@ -125,6 +134,53 @@ export class StudentsComponent {
       startDate: '2023-12-15'
     }
   ];
+
+  get students(): Student[] {
+    return this.allStudents.filter(student => {
+      // Search term filter
+      if (this.searchTerm) {
+        const searchLower = this.searchTerm.toLowerCase();
+        const fullName = `${student.firstName} ${student.lastName} ${student.alias}`.toLowerCase();
+        if (!fullName.includes(searchLower) && !student.email?.toLowerCase().includes(searchLower)) {
+          return false;
+        }
+      }
+
+      // Status filter
+      if (this.filterStatus && student.status !== this.filterStatus) {
+        return false;
+      }
+
+      // Level filter
+      if (this.filterLevel) {
+        const levelGroup = this.getLevelGroup(student.level);
+        if (levelGroup !== this.filterLevel) {
+          return false;
+        }
+      }
+
+      // Payment filter
+      if (this.filterPayment === 'paid' && !student.hasPaid) {
+        return false;
+      }
+      if (this.filterPayment === 'pending' && student.hasPaid) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  toggleFilters() {
+    this.isFiltersVisible = !this.isFiltersVisible;
+  }
+
+  clearFilters() {
+    this.filterStatus = '';
+    this.filterLevel = '';
+    this.filterPayment = '';
+    this.searchTerm = '';
+  }
 
   getLevelLabel(level: StudentLevel): string {
     const levelMap: Record<StudentLevel, string> = {

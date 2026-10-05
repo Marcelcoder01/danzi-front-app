@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBars, faBarsStaggered, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faChevronRight, faChevronLeft, faBarsStaggered, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-topbar',
@@ -15,6 +15,9 @@ export class TopbarComponent {
   @Input() isCollapsed = false;
 
   faBars = faBars;
+  faChevronRight = faChevronRight;
+  faChevronLeft = faChevronLeft;
+
   faBarsStaggered = faBarsStaggered;
   faRightFromBracket = faRightFromBracket;
 }

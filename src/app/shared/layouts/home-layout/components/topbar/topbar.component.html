@@ -8,7 +8,11 @@
       (click)="menuClick.emit()"
       aria-label="Toggle menu"
     >
-      <fa-icon [icon]="faBars" size="lg"></fa-icon>
+      @if (isCollapsed) {
+        <fa-icon [icon]="faChevronRight" size="lg"></fa-icon>
+      } @else {
+        <fa-icon [icon]="faChevronLeft" size="lg"></fa-icon>
+      }
     </button>
 
     <!-- Desktop Sidebar Toggle Button -->
@@ -17,7 +21,11 @@
       (click)="toggleCollapse.emit()"
       aria-label="Toggle sidebar"
     >
-      <fa-icon [icon]="faBarsStaggered" size="lg"></fa-icon>
+    @if (isCollapsed) {
+      <fa-icon [icon]="faChevronRight" size="lg"></fa-icon>
+    } @else {
+      <fa-icon [icon]="faChevronLeft" size="lg"></fa-icon>
+    }
     </button>
 
     <!-- Brand -->

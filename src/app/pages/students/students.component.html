@@ -21,32 +21,95 @@
 
   <!-- Filters -->
   <div class="card-neo p-4 mb-6">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-3 flex-1">
-        <!-- Search -->
-        <div class="relative flex-1 max-w-md">
-          <fa-icon 
-            [icon]="faSearch" 
-            class="search-icon"
-          ></fa-icon>
-          <input
-            type="text"
-            placeholder="Buscar alumno..."
-            class="search-input"
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-3 flex-1">
+          <!-- Search -->
+          <div class="relative flex-1 max-w-md">
+            <fa-icon 
+              [icon]="faSearch" 
+              class="search-icon"
+            ></fa-icon>
+            <input
+              type="text"
+              placeholder="Buscar alumno..."
+              class="search-input"
+              [(ngModel)]="searchTerm"
+            >
+          </div>
+
+          <!-- Filter Toggle -->
+          <button 
+            class="btn-ghost-custom px-4 py-2 rounded-lg flex items-center gap-2"
+            (click)="toggleFilters()"
           >
+            <fa-icon [icon]="faFilter"></fa-icon>
+            Filtrar
+          </button>
         </div>
 
-        <!-- Filter -->
-        <button class="btn-ghost-custom px-4 py-2 rounded-lg flex items-center gap-2">
-          <fa-icon [icon]="faFilter"></fa-icon>
-          Filtrar
-        </button>
+        <!-- Results count -->
+        <div class="text-sm text-muted">
+          Mostrando <span class="font-semibold text-primary">{{ students.length }}</span> alumnos
+        </div>
       </div>
 
-      <!-- Results count -->
-      <div class="text-sm text-muted">
-        Mostrando <span class="font-semibold text-primary">{{ students.length }}</span> alumnos
-      </div>
+      <!-- Expanded Filters -->
+      @if (isFiltersVisible) {
+        <div class="pt-4 border-t divider-custom">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
+            <!-- Status Filter -->
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-muted mb-2">Estado</label>
+              <select 
+                class="filter-select"
+                [(ngModel)]="filterStatus"
+              >
+                <option value="">Todos</option>
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo</option>
+                <option value="paused">Pausado</option>
+              </select>
+            </div>
+
+            <!-- Level Filter -->
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-muted mb-2">Nivel</label>
+              <select 
+                class="filter-select"
+                [(ngModel)]="filterLevel"
+              >
+                <option value="">Todos</option>
+                <option value="Principiante">Principiante</option>
+                <option value="Intermedio">Intermedio</option>
+                <option value="Avanzado">Avanzado</option>
+              </select>
+            </div>
+
+            <!-- Payment Filter -->
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-muted mb-2">Pago</label>
+              <select 
+                class="filter-select"
+                [(ngModel)]="filterPayment"
+              >
+                <option value="">Todos</option>
+                <option value="paid">Pagado</option>
+                <option value="pending">Pendiente</option>
+              </select>
+            </div>
+
+            <!-- Clear Filters -->
+            <button 
+              class="clear-filters-btn flex items-center gap-2 text-sm"
+              (click)="clearFilters()"
+            >
+              <fa-icon [icon]="faXmark"></fa-icon>
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+      }
     </div>
   </div>
 
@@ -67,82 +130,85 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let student of students">
-            <!-- Name -->
-            <td>
-              <div class="flex items-center gap-3">
-                <div class="avatar-circle">
-                  {{ getInitials(student) }}
+          @for (student of students; track student.id) {
+            <tr>
+              <!-- Name -->
+              <td>
+                <div class="flex items-center gap-3">
+                  <div class="avatar-circle">
+                    {{ getInitials(student) }}
+                  </div>
+                  <div>
+                    <p class="font-semibold text-primary">{{ getDisplayName(student) }}</p>
+                    <p class="text-sm text-muted">{{ student.email }}</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="font-semibold text-primary">{{ getDisplayName(student) }}</p>
-                  <p class="text-sm text-muted">{{ student.email }}</p>
-                </div>
-              </div>
-            </td>
+              </td>
 
-            <!-- Contact -->
-            <td>
-              <p class="text-sm text-primary">{{ student.phone }}</p>
-            </td>
+              <!-- Contact -->
+              <td>
+                <p class="text-sm text-primary">{{ student.phone }}</p>
+              </td>
 
-            <!-- Level -->
-            <td>
-              <span class="level-badge">
-                {{ getLevelLabel(student.level) }}
-              </span>
-            </td>
+              <!-- Level -->
+              <td>
+                <span class="level-badge">
+                  {{ getLevelLabel(student.level) }}
+                </span>
+              </td>
 
-            <!-- Status -->
-            <td>
-              <span 
-                class="px-2 py-0.5 rounded-lg text-xs font-medium"
-                [ngClass]="getStatusClass(student.status)"
-              >
-                {{ getStatusText(student.status) }}
-              </span>
-            </td>
-
-            <!-- Payment -->
-            <td>
-              <div class="flex items-center gap-2">
+              <!-- Status -->
+              <td>
                 <span 
-                  class="w-2 h-2 rounded-full"
-                  [ngClass]="student.hasPaid ? 'bg-green-500' : 'bg-red-500'"
-                ></span>
-                <span class="text-sm text-primary">{{ student.hasPaid ? 'Pagado' : 'Pendiente' }}</span>
-              </div>
-            </td>
+                  class="px-2 py-0.5 rounded-lg text-xs font-medium"
+                  [class]="getStatusClass(student.status)"
+                >
+                  {{ getStatusText(student.status) }}
+                </span>
+              </td>
 
-            <!-- Start Date -->
-            <td>
-              <p class="text-sm text-muted">{{ student.startDate }}</p>
-            </td>
+              <!-- Payment -->
+              <td>
+                <div class="flex items-center gap-2">
+                  <span 
+                    class="w-2 h-2 rounded-full"
+                    [class.bg-green-500]="student.hasPaid"
+                    [class.bg-red-500]="!student.hasPaid"
+                  ></span>
+                  <span class="text-sm text-primary">{{ student.hasPaid ? 'Pagado' : 'Pendiente' }}</span>
+                </div>
+              </td>
 
-            <!-- Actions -->
-            <td class="text-right">
-              <div class="flex items-center justify-end gap-2">
-                <button 
-                  class="action-btn action-btn-view"
-                  title="Ver"
-                >
-                  <fa-icon [icon]="faEye" class="text-sm"></fa-icon>
-                </button>
-                <button 
-                  class="action-btn action-btn-edit"
-                  title="Editar"
-                >
-                  <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
-                </button>
-                <button 
-                  class="action-btn action-btn-delete"
-                  title="Eliminar"
-                >
-                  <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
+              <!-- Start Date -->
+              <td>
+                <p class="text-sm text-muted">{{ student.startDate }}</p>
+              </td>
+
+              <!-- Actions -->
+              <td class="text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <button 
+                    class="action-btn action-btn-view"
+                    title="Ver"
+                  >
+                    <fa-icon [icon]="faEye" class="text-sm"></fa-icon>
+                  </button>
+                  <button 
+                    class="action-btn action-btn-edit"
+                    title="Editar"
+                  >
+                    <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
+                  </button>
+                  <button 
+                    class="action-btn action-btn-delete"
+                    title="Eliminar"
+                  >
+                    <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>

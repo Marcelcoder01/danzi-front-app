@@ -1,21 +1,24 @@
 <div class="h-full flex flex-col p-4">
   <!-- Brand -->
-  <div class="mb-6 pb-4 border-b border-white-10">
-    <div class="flex items-center gap-3">
-      <span class="text-2xl brand-accent">✦</span>
-      <div [class.hidden]="isCollapsed">
-        <strong class="block text-lg brand-text">Academia</strong>
-        <small class="text-sm brand-muted">Admin baile</small>
-      </div>
+  <div class="mb-4 pb-2 lg:mb-3 lg:pb-1 xl:mb-2 xl:pb-1 border-b border-white/10">
+    <div class="flex items-center justify-center">
+      <img
+        src="/assets/img/00-LOGO-BLANCO-PNG.png"
+        alt="Danzi Logo"
+        [class]="
+          isCollapsed
+            ? 'h-12 w-auto object-contain scale-110'
+            : 'h-28 w-auto object-contain scale-125 lg:h-32 xl:h-36'
+        "
+      />
     </div>
   </div>
-
   <!-- Navigation -->
   <nav class="flex-1 space-y-1">
     <a
       routerLink="/admin"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{exact: true}"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
       (click)="navigate.emit()"
     >
@@ -25,7 +28,7 @@
     <a
       routerLink="/admin/students"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{exact: true}"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
       (click)="navigate.emit()"
     >
@@ -35,7 +38,7 @@
     <a
       routerLink="/admin/classes"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{exact: true}"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
       (click)="navigate.emit()"
     >
@@ -45,7 +48,7 @@
     <a
       routerLink="/admin/calendar"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{exact: true}"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
       (click)="navigate.emit()"
     >
@@ -55,7 +58,7 @@
     <a
       routerLink="/admin/attendance"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{exact: true}"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
       (click)="navigate.emit()"
     >
@@ -65,7 +68,7 @@
     <a
       routerLink="/admin/payments"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{exact: true}"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
       (click)="navigate.emit()"
     >
@@ -75,7 +78,7 @@
     <a
       routerLink="/admin/validations"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{exact: true}"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
       (click)="navigate.emit()"
     >
@@ -85,7 +88,7 @@
     <a
       routerLink="/admin/settings"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{exact: true}"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
       (click)="navigate.emit()"
     >

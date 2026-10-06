@@ -21,18 +21,18 @@
       (click)="toggleCollapse.emit()"
       aria-label="Toggle sidebar"
     >
-    @if (isCollapsed) {
-      <fa-icon [icon]="faChevronRight" size="lg"></fa-icon>
-    } @else {
-      <fa-icon [icon]="faChevronLeft" size="lg"></fa-icon>
-    }
+      @if (isCollapsed) {
+        <fa-icon [icon]="faChevronRight" size="lg"></fa-icon>
+      } @else {
+        <fa-icon [icon]="faChevronLeft" size="lg"></fa-icon>
+      }
     </button>
 
     <!-- Brand -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2">
       <span class="text-2xl brand-accent">✦</span>
       <div>
-        <strong class="text-lg block brand-text">Academia</strong>
+        <strong class="text-lg block brand-text">Bienvenido Maxi</strong>
         <small class="text-sm brand-muted">Admin baile</small>
       </div>
     </div>
@@ -40,7 +40,9 @@
 
   <!-- Right side content (placeholder for future user menu) -->
   <div class="flex items-center gap-2">
-    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold shadow-md avatar-bg">
+    <div
+      class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold shadow-md avatar-bg"
+    >
       AD
     </div>
   </div>

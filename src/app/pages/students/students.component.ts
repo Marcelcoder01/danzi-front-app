@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Student } from './interfaces/student.interface';
 import { StudentLevel } from './interfaces/student-level.enum';
+import { StudentsService } from './services/students.service';
 
 @Component({
   selector: 'app-students',
@@ -28,13 +29,16 @@ export class StudentsComponent {
   faTrash = faTrash;
   faEye = faEye;
   faXmark = faXmark;
-
+  studentsService = inject(StudentsService);
   isFiltersVisible = false;
 
   filterStatus = '';
   filterLevel = '';
   filterPayment = '';
+  filterRole = '';
   searchTerm = '';
+
+  constructor() {}
 
   allStudents: Student[] = [
     {
@@ -46,6 +50,7 @@ export class StudentsComponent {
       phone: '+34 612 345 678',
       level: StudentLevel.C3,
       status: 'active',
+      role: 'follower',
       hasPaid: true,
       startDate: '2024-01-15'
     },
@@ -58,6 +63,7 @@ export class StudentsComponent {
       phone: '+34 623 456 789',
       level: StudentLevel.B2,
       status: 'active',
+      role: 'leader',
       hasPaid: true,
       startDate: '2024-02-20'
     },
@@ -70,6 +76,7 @@ export class StudentsComponent {
       phone: '+34 634 567 890',
       level: StudentLevel.A1,
       status: 'active',
+      role: 'follower',
       hasPaid: true,
       startDate: '2024-03-10'
     },
@@ -82,6 +89,7 @@ export class StudentsComponent {
       phone: '+34 645 678 901',
       level: StudentLevel.B1,
       status: 'inactive',
+      role: 'leader',
       hasPaid: false,
       startDate: '2023-11-05'
     },
@@ -94,6 +102,7 @@ export class StudentsComponent {
       phone: '+34 656 789 012',
       level: StudentLevel.C2,
       status: 'active',
+      role: 'mixed',
       hasPaid: true,
       startDate: '2023-09-12'
     },
@@ -106,6 +115,7 @@ export class StudentsComponent {
       phone: '+34 667 890 123',
       level: StudentLevel.A2,
       status: 'paused',
+      role: 'leader',
       hasPaid: false,
       startDate: '2024-04-01'
     },
@@ -118,6 +128,7 @@ export class StudentsComponent {
       phone: '+34 678 901 234',
       level: StudentLevel.B3,
       status: 'active',
+      role: 'follower',
       hasPaid: true,
       startDate: '2024-01-28'
     },
@@ -130,6 +141,7 @@ export class StudentsComponent {
       phone: '+34 689 012 345',
       level: StudentLevel.C1,
       status: 'active',
+      role: 'mixed',
       hasPaid: true,
       startDate: '2023-12-15'
     }
@@ -153,7 +165,7 @@ export class StudentsComponent {
 
       // Level filter
       if (this.filterLevel) {
-        const levelGroup = this.getLevelGroup(student.level);
+        const levelGroup = this.studentsService.getLevelGroup(student.level);
         if (levelGroup !== this.filterLevel) {
           return false;
         }
@@ -164,6 +176,11 @@ export class StudentsComponent {
         return false;
       }
       if (this.filterPayment === 'pending' && student.hasPaid) {
+        return false;
+      }
+
+      // Role filter
+      if (this.filterRole && student.role !== this.filterRole) {
         return false;
       }
 
@@ -179,66 +196,9 @@ export class StudentsComponent {
     this.filterStatus = '';
     this.filterLevel = '';
     this.filterPayment = '';
+    this.filterRole = '';
     this.searchTerm = '';
   }
 
-  getLevelLabel(level: StudentLevel): string {
-    const levelMap: Record<StudentLevel, string> = {
-      [StudentLevel.A1]: 'Principiante A1',
-      [StudentLevel.A2]: 'Principiante A2',
-      [StudentLevel.A3]: 'Principiante A3',
-      [StudentLevel.B1]: 'Intermedio B1',
-      [StudentLevel.B2]: 'Intermedio B2',
-      [StudentLevel.B3]: 'Intermedio B3',
-      [StudentLevel.C1]: 'Avanzado C1',
-      [StudentLevel.C2]: 'Avanzado C2',
-      [StudentLevel.C3]: 'Avanzado C3'
-    };
-    return levelMap[level] || level;
-  }
 
-  getLevelGroup(level: StudentLevel): 'Principiante' | 'Intermedio' | 'Avanzado' {
-    if (level.startsWith('A')) return 'Principiante';
-    if (level.startsWith('B')) return 'Intermedio';
-    return 'Avanzado';
-  }
-
-  getStatusClass(status: string): string {
-    switch (status) {
-      case 'active':
-        return 'badge-success';
-      case 'inactive':
-        return 'badge-warning';
-      case 'paused':
-        return 'badge-info';
-      default:
-        return '';
-    }
-  }
-
-  getStatusText(status: string): string {
-    switch (status) {
-      case 'active':
-        return 'Activo';
-      case 'inactive':
-        return 'Inactivo';
-      case 'paused':
-        return 'Pausado';
-      default:
-        return status;
-    }
-  }
-
-  getInitials(student: Student): string {
-    if (student.firstName && student.lastName) {
-      return `${student.firstName.charAt(0)}${student.lastName.charAt(0)}`;
-    }
-    return student.firstName?.charAt(0) || '?';
-  }
-
-  getDisplayName(student: Student): string {
-    if (student.alias) return student.alias;
-    if (student.lastName) return `${student.firstName} ${student.lastName}`;
-    return student.firstName;
-  }
 }

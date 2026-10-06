@@ -1,7 +1,4 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
-import { adminGuard } from './core/guards/admin.guard';
-import { AuthLayoutComponent } from './shared/layouts/auth-layout/auth-layout.component';
 import { HomeLayoutComponent } from './shared/layouts/home-layout/home-layout.component';
 import { LoginComponent } from './auth/login/login.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -15,10 +12,10 @@ import { SettingsComponent } from './pages/settings/settings.component';
 import { UnauthorizedComponent } from './auth/unauthorized/unauthorized.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/admin', pathMatch: 'full' },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
     path: 'login',
-    component: AuthLayoutComponent,
+    component: LoginComponent,
     children: [
       { path: '', component: LoginComponent }
     ]

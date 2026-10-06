@@ -4,7 +4,20 @@ module.exports = {
     "./src/**/*.{html,ts}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        'login-enter': {
+          'from': {
+            opacity: '0',
+            transform: 'translateY(12px) scale(.98)',
+          },
+          'to': {
+            opacity: '1',
+            transform: 'none',
+          },
+        },
+      },
+    },
   },
   plugins: [
     require("daisyui"),

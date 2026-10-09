@@ -1,0 +1,365 @@
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.detail-header {
+  padding: 14px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  border-bottom: 1px solid #f0f2f7;
+}
+.detail-level {
+  margin-left: auto;
+  padding: 3px 7px;
+  border-radius: 5px;
+  color: var(--color-accent);
+  background: #efecfa;
+}
+.profile-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px;
+}
+.avatar.large {
+  width: 55px;
+  height: 55px;
+  font-size: 18px;
+}
+.profile-heading p {
+  color: var(--color-text-muted);
+  font-size: 10px;
+  margin-top: 4px;
+}
+.profile-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid #eceef5;
+}
+.profile-tabs button {
+  padding: 10px 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid transparent;
+}
+.profile-tabs .active {
+  color: var(--color-accent);
+  border-color: var(--color-accent-light);
+}
+.profile-content {
+  padding: 16px;
+}
+.enrollment {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  background: #f6f7fb;
+  border: 1px solid #eef0f7;
+  border-radius: 9px;
+  font-size: 10px;
+}
+.enrollment strong {
+  font-size: 12px;
+}
+.enrollment small {
+  font-size: 9px;
+  color: var(--color-text-muted);
+}
+.recovery-notice {
+  margin-top: 12px;
+  padding: 12px;
+  background: #eef9f3;
+  border-radius: 9px;
+  font-size: 10px;
+  line-height: 1.7;
+}
+.recovery-notice strong {
+  color: #248457;
+}
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.profile-stats > div {
+  display: grid;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 10px 2px;
+  text-align: center;
+}
+.profile-stats strong {
+  font-size: 21px;
+  line-height: 1;
+}
+.profile-stats small {
+  font-size: 8px;
+}
+.profile-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  justify-items: center;
+  gap: 8px 3px;
+}
+.calendar-weekday {
+  font-size: 9px;
+  color: var(--color-text-muted);
+}
+.calendar-day {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 600;
+}
+.calendar-day.present {
+  background: #16ae6a;
+  color: white;
+}
+.calendar-day.recovered {
+  background: #3487fb;
+  color: white;
+}
+.calendar-day.absent {
+  background: #fb5d6d;
+  color: white;
+}
+.calendar-day.justified {
+  background: #f3a044;
+  color: white;
+}
+.off-day {
+  color: #a6afc0;
+}
+.profile-cta {
+  width: 100%;
+  margin-top: 20px;
+  font-size: 10px;
+}
+.history-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 0;
+  border-bottom: 1px solid #f0f2f7;
+  text-align: left;
+  font-size: 10px;
+}
+.history-row > span:nth-child(2) {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+}
+.history-row small {
+  color: var(--color-text-muted);
+  font-size: 9px;
+}
+.history-row .recovery-text {
+  color: #2984f8;
+}
+@media (max-width: 639px) {
+  .profile-content {
+    padding: 20px;
+  }
+}
+@media (max-width: 639px) {
+  .profile-heading {
+    padding: 24px 20px;
+  }
+}
+h2,
+h3,
+p {
+  margin: 0;
+}
+h2 {
+  font-size: 16px;
+  font-weight: 700;
+}
+h3 {
+  margin: 20px 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+button {
+  font: inherit;
+}
+button {
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+button:focus-visible {
+  outline: 3px solid var(--color-accent-light);
+  outline-offset: 3px;
+}
+.surface {
+  background: white;
+  border: 1px solid var(--color-border-light);
+  border-radius: 14px;
+  box-shadow:
+    5px 5px 15px #1a1a2e08,
+    -4px -4px 12px #ffffffdc;
+}
+.icon-button {
+  display: grid;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  background: white;
+  color: var(--color-accent-dark);
+}
+.icon-button:hover,
+.secondary-button:hover {
+  background: #eeedf5;
+}
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 11px 16px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.secondary-button {
+  color: var(--color-accent-dark);
+  background: #efecfa;
+  border: 1px solid #ddd7f4;
+}
+.student-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  text-align: left;
+}
+.avatar {
+  display: grid;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+  background: #eeecf8;
+  color: #6c63a8;
+}
+.avatar.lilac {
+  background: #eae3f6;
+  color: #77629b;
+}
+.avatar.peach {
+  background: #f9e4da;
+  color: #b47655;
+}
+.avatar.mint {
+  background: #dbeee8;
+  color: #39806e;
+}
+.avatar.sky {
+  background: #e0e9f5;
+  color: #557ba5;
+}
+.student-copy {
+  display: grid;
+  min-width: 0;
+}
+.student-copy strong {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.student-copy small {
+  margin-top: 3px;
+  color: var(--color-text-muted);
+  font-size: 9px;
+}
+.present {
+  color: #149961;
+  background: #eaf8f0;
+}
+.recovered {
+  color: #2984f8;
+  background: #eaf2ff;
+}
+.justified {
+  color: #e78830;
+  background: #fff3e7;
+}
+.absent {
+  color: #f25768;
+  background: #fff0f2;
+}
+.pending {
+  color: #929caf;
+  background: #f0f2f6;
+}
+.status-dot.present {
+  color: white;
+  background: #16ae6a;
+}
+.status-dot.recovered {
+  color: white;
+  background: #3487fb;
+}
+.status-dot.absent {
+  color: white;
+  background: #fb5d6d;
+}
+.status-dot.justified {
+  color: white;
+  background: #f3a044;
+}
+.status-dot {
+  display: inline-grid;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 9px;
+}
+.status-dot.pending {
+  font-size: 5px;
+}
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+}
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+h3 {
+  margin: 20px 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+h2 {
+  font-size: 16px;
+  font-weight: 700;
+}
+:host {
+  display: block;
+}

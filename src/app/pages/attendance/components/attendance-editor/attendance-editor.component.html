@@ -1,0 +1,69 @@
+<dialog #markDialog class="mark-dialog" aria-labelledby="mark-title">
+  <div class="editor-heading">
+    <div>
+      <p class="eyebrow">REGISTRAR ASISTENCIA</p>
+      <h2 id="mark-title">{{ editingStudent ? fullName(editingStudent) : '' }}</h2>
+      <p class="subtitle">{{ editingSession ? formatDate(editingSession.date, true) : '' }}</p>
+    </div>
+    <button
+      type="button"
+      class="icon-button"
+      aria-label="Cerrar registro"
+      (click)="markDialog.close()"
+    >
+      <fa-icon [icon]="icons.absent"></fa-icon>
+    </button>
+  </div>
+  <div class="editor-statuses">
+    @for (status of statuses; track status) {
+      <button
+        type="button"
+        [class]="status"
+        [class.chosen]="editorStatus === status"
+        [attr.aria-pressed]="editorStatus === status"
+        (click)="editorStatus = status"
+      >
+        <span class="status-dot" [class]="status"><fa-icon [icon]="icons[status]"></fa-icon></span
+        >{{ statusLabels[status] }}
+      </button>
+    }
+  </div>
+  @if (editorStatus === 'recovered') {
+    <label class="field"
+      ><span>Clase en la que recuperó</span
+      ><select [(ngModel)]="recoverySessionId">
+        <option value="">Selecciona una sesión</option>
+        @for (session of recoveryOptions; track session.id) {
+          <option [value]="session.id">{{ recoveryLabel(session) }}</option>
+        }
+      </select></label
+    >
+    <p class="helper">Otro grupo del mismo nivel y mes. Solo sesiones ya celebradas.</p>
+    @if (!recoveryOptions.length) {
+      <p class="notice">No hay sesiones compatibles disponibles para recuperar esta falta.</p>
+    }
+  }
+  @if (editorStatus === 'justified') {
+    <label class="field"
+      ><span>Motivo (opcional)</span
+      ><textarea
+        [(ngModel)]="note"
+        rows="3"
+        maxlength="300"
+        placeholder="Añade una nota sobre la justificación..."
+      ></textarea>
+    </label>
+  }
+  @if (editorError) {
+    <p class="editor-error" role="alert">{{ editorError }}</p>
+  }
+  <button
+    type="button"
+    class="primary-button editor-apply"
+    [disabled]="editorStatus === 'recovered' && !recoveryOptions.length"
+    (click)="applyEditor()"
+  >
+    Aplicar cambio
+  </button>
+  <p class="helper">Después pulsa Guardar asistencia para conservarlo.</p>
+</dialog>

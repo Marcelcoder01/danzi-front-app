@@ -1,0 +1,139 @@
+<div class="detail-header">
+  @if (dialog) {
+    <button
+      type="button"
+      class="icon-button"
+      aria-label="Volver a asistencias"
+      (click)="close.emit()"
+    >
+      <fa-icon [icon]="icons.back"></fa-icon>
+    </button>
+  }
+  <span>Alumno</span>
+  <span class="detail-level">{{ selectedStudent.level }}</span>
+</div>
+<div class="profile-heading">
+  <span class="avatar large" [class]="selectedStudent.avatarColor">{{
+    initials(selectedStudent)
+  }}</span>
+  <div>
+    <h2 [id]="dialog ? 'student-dialog-title' : 'student-inspector-title'">
+      {{ fullName(selectedStudent) }}
+    </h2>
+    <p>{{ levelLabel(selectedStudent) }}</p>
+  </div>
+</div>
+<div class="profile-tabs" role="tablist" aria-label="Información del alumno">
+  <button
+    type="button"
+    role="tab"
+    [attr.aria-selected]="detailTab === 'summary'"
+    [class.active]="detailTab === 'summary'"
+    (click)="detailTab = 'summary'"
+  >
+    Resumen
+  </button>
+  <button
+    type="button"
+    role="tab"
+    [attr.aria-selected]="detailTab === 'calendar'"
+    [class.active]="detailTab === 'calendar'"
+    (click)="detailTab = 'calendar'"
+  >
+    Calendario
+  </button>
+  <button
+    type="button"
+    role="tab"
+    [attr.aria-selected]="detailTab === 'history'"
+    [class.active]="detailTab === 'history'"
+    (click)="detailTab = 'history'"
+  >
+    Historial
+  </button>
+</div>
+<div class="profile-content">
+  @if (detailTab === 'summary') {
+    <div class="enrollment">
+      <span>Clase inscrita</span><strong>{{ enrolledClass(selectedStudent).name }}</strong
+      ><small>{{ classSchedule(selectedStudent) }}</small>
+    </div>
+    <div class="recovery-notice">
+      <strong><fa-icon [icon]="icons.info"></fa-icon> Recuperaciones del mismo nivel</strong>
+      <p>
+        Puede recuperar en otra clase {{ selectedStudent.level }}, de cualquier estilo, dentro del
+        mismo mes.
+      </p>
+    </div>
+    <h3>Resumen de {{ monthLabel }}</h3>
+    <div class="profile-stats">
+      @for (status of summaryStatuses; track status) {
+        <div [class]="status">
+          <strong>{{ studentCounts(selectedStudent)[status] }}</strong
+          ><small>{{ statusLabels[status] }}</small>
+        </div>
+      }
+    </div>
+  }
+  @if (detailTab !== 'history') {
+    <h3>Calendario del mes</h3>
+    <div class="profile-calendar" aria-label="Calendario de asistencia del alumno">
+      @for (label of ['L', 'M', 'X', 'J', 'V', 'S', 'D']; track $index) {
+        <span class="calendar-weekday">{{ label }}</span>
+      }
+      @for (pad of calendarPadding; track $index) {
+        <span></span>
+      }
+      @for (day of days; track day.date) {
+        @if (daySession(selectedStudent, day.date); as session) {
+          <button
+            type="button"
+            class="calendar-day"
+            [class]="dayStatus(selectedStudent, day.date)"
+            [disabled]="day.date > attendance.today"
+            [title]="statusLabels[dayStatus(selectedStudent, day.date)]"
+            [attr.aria-label]="
+              formatDate(day.date) + ': ' + statusLabels[dayStatus(selectedStudent, day.date)]
+            "
+            (click)="openEditor(selectedStudent, session)"
+          >
+            {{ day.day }}
+          </button>
+        } @else {
+          <span class="calendar-day off-day">{{ day.day }}</span>
+        }
+      }
+    </div>
+  }
+  @if (detailTab === 'history') {
+    <h3>Asistencia de {{ monthLabel }}</h3>
+    <div class="history-list">
+      @for (row of history(selectedStudent); track row.session.id) {
+        <button
+          type="button"
+          class="history-row"
+          [disabled]="row.session.date > attendance.today"
+          (click)="openEditor(selectedStudent, row.session)"
+        >
+          <span class="status-dot" [class]="row.record.status"
+            ><fa-icon [icon]="icons[row.record.status]"></fa-icon
+          ></span>
+          <span
+            ><strong>{{ formatDate(row.session.date) }}</strong
+            ><small>{{ statusLabels[row.record.status] }}</small>
+            @if (row.record.recoverySessionId) {
+              <small class="recovery-text">{{ recoveryDescription(row.record) }}</small>
+            }
+            @if (row.record.note) {
+              <small>{{ row.record.note }}</small>
+            }
+          </span>
+          <fa-icon [icon]="icons.right"></fa-icon>
+        </button>
+      }
+    </div>
+  }
+  <button type="button" class="secondary-button profile-cta" (click)="chooseClass.emit()">
+    <fa-icon [icon]="icons.present"></fa-icon> Pasar lista de esta clase
+  </button>
+</div>

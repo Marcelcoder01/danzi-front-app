@@ -1,0 +1,193 @@
+h2,
+p {
+  margin: 0;
+}
+h2 {
+  font-size: 16px;
+  font-weight: 700;
+}
+button {
+  font: inherit;
+}
+button {
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+button:focus-visible {
+  outline: 3px solid var(--color-accent-light);
+  outline-offset: 3px;
+}
+.roster-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.surface {
+  background: white;
+  border: 1px solid var(--color-border-light);
+  border-radius: 14px;
+  box-shadow:
+    5px 5px 15px #1a1a2e08,
+    -4px -4px 12px #ffffffdc;
+}
+.text-button {
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 700;
+}
+.roster-heading {
+  margin: 18px 0 10px;
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+.roster-list {
+  overflow: hidden;
+}
+.roster-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid #f0f2f7;
+}
+.roster-row:last-child {
+  border-bottom: 0;
+}
+.student-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  text-align: left;
+}
+.avatar {
+  display: grid;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+  background: #eeecf8;
+  color: #6c63a8;
+}
+.avatar.lilac {
+  background: #eae3f6;
+  color: #77629b;
+}
+.avatar.peach {
+  background: #f9e4da;
+  color: #b47655;
+}
+.avatar.mint {
+  background: #dbeee8;
+  color: #39806e;
+}
+.avatar.sky {
+  background: #e0e9f5;
+  color: #557ba5;
+}
+.student-copy {
+  display: grid;
+  min-width: 0;
+}
+.student-copy strong {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.student-copy small {
+  margin-top: 3px;
+  color: var(--color-text-muted);
+  font-size: 9px;
+}
+.status-actions {
+  display: flex;
+  flex: none;
+  gap: 5px;
+}
+.status-button {
+  width: 42px;
+  height: 44px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 15px;
+}
+.present {
+  color: #149961;
+  background: #eaf8f0;
+}
+.recovered {
+  color: #2984f8;
+  background: #eaf2ff;
+}
+.absent {
+  color: #f25768;
+  background: #fff0f2;
+}
+.pending {
+  color: #929caf;
+  background: #f0f2f6;
+}
+.status-button.selected.present {
+  color: white;
+  background: #16ae6a;
+}
+.status-button.selected.recovered {
+  color: white;
+  background: #3487fb;
+}
+.status-button.selected.absent {
+  color: white;
+  background: #fb5d6d;
+}
+.status-button.selected {
+  box-shadow: 0 3px 8px #1a1a2e12;
+}
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+.empty-state h2 {
+  margin: 12px 0;
+  color: var(--color-text);
+}
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+}
+.roster-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+h2 {
+  margin: 12px 0;
+  font-size: 14px;
+}
+:host {
+  display: block;
+}
+@media (max-width: 639px) {
+  .student-copy strong {
+    font-size: 12px;
+  }
+  .student-copy small {
+    font-size: 10px;
+  }
+}

@@ -1,1 +1,302 @@
-<p>Asistencia - Gestión de asistencia</p>
+<div
+  class="attendance-page"
+  [class.forced-session]="viewMode === 'session'"
+  [class.forced-month]="viewMode === 'month'"
+>
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">TU ACADEMIA, AL DÍA</p>
+      <h1>Asistencias</h1>
+      <p class="subtitle">Menos gestión. Más tiempo para bailar.</p>
+    </div>
+    <div class="heading-tools">
+      <span class="demo-label"
+        ><span class="h-1 w-1 rounded-full bg-[var(--color-accent-light)]"></span> Datos de
+        ejemplo</span
+      >
+      <div class="view-toggle" [attr.data-view]="viewMode" aria-label="Vista de asistencias">
+        <button
+          type="button"
+          class="session-tab"
+          [attr.aria-pressed]="effectiveView === 'session'"
+          [class.active]="effectiveView === 'session'"
+          (click)="viewMode = 'session'"
+        >
+          Pasar lista
+        </button>
+        <button
+          type="button"
+          class="month-tab"
+          [attr.aria-pressed]="effectiveView === 'month'"
+          [class.active]="effectiveView === 'month'"
+          (click)="viewMode = 'month'"
+        >
+          <fa-icon [icon]="icons.calendar"></fa-icon> Mes
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="session-mode" aria-label="Registro rápido de asistencias">
+    <div class="surface session-controls">
+      <label class="field"
+        ><span>Clase</span>
+        <select [(ngModel)]="sessionClassId" (ngModelChange)="chooseClass()">
+          @for (activity of attendance.classes; track activity.id) {
+            <option [value]="activity.id">{{ activity.name }} · {{ activity.level }}</option>
+          }
+        </select>
+      </label>
+      <p class="session-meta">
+        <fa-icon [icon]="icons.clock"></fa-icon> {{ sessionClass.time }} <span>·</span>
+        {{ sessionClass.room }}
+      </p>
+      <div class="date-navigation">
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Sesión anterior"
+          [disabled]="!canShiftSession(-1)"
+          (click)="shiftSession(-1)"
+        >
+          <fa-icon [icon]="icons.left"></fa-icon>
+        </button>
+        <label class="date-field"
+          ><fa-icon [icon]="icons.calendar"></fa-icon
+          ><input
+            type="date"
+            aria-label="Fecha de la clase"
+            [(ngModel)]="selectedDate"
+            (ngModelChange)="changeDate()"
+        /></label>
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Sesión siguiente"
+          [disabled]="!canShiftSession(1)"
+          (click)="shiftSession(1)"
+        >
+          <fa-icon [icon]="icons.right"></fa-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="quick-filters" aria-label="Filtrar alumnos por asistencia">
+      @for (filter of quickFilters; track filter.id) {
+        <button
+          type="button"
+          [class.active]="statusFilter === filter.id"
+          [attr.data-filter]="filter.id"
+          [attr.aria-pressed]="statusFilter === filter.id"
+          (click)="statusFilter = filter.id"
+        >
+          <span>{{ filter.label }}</span
+          ><strong>{{ filterCount(filter.id) }}</strong>
+        </button>
+      }
+    </div>
+    <label class="search-field"
+      ><fa-icon [icon]="icons.search"></fa-icon
+      ><input
+        type="search"
+        placeholder="Buscar alumno..."
+        aria-label="Buscar alumno en la clase"
+        [(ngModel)]="searchTerm"
+    /></label>
+
+    @if (selectedSession; as session) {
+      @if (selectedDate > attendance.today) {
+        <p class="notice">
+          <fa-icon [icon]="icons.info"></fa-icon> Esta sesión aún no ha empezado. Podrás marcar la
+          asistencia ese día.
+        </p>
+      }
+      <app-attendance-roster
+        [roster]="roster"
+        [statusByStudent]="rosterStatuses"
+        [pendingVisibleCount]="pendingVisibleCount"
+        [future]="selectedDate > attendance.today"
+        (mark)="quickMark($event.student, $event.status)"
+        (detail)="openStudent($event)"
+        (markPending)="markPending()"
+        (clear)="clearFilters()"
+      ></app-attendance-roster>
+      <p class="helper">Toca el nombre para ver el historial o justificar una falta.</p>
+    } @else {
+      <div class="surface empty-state">
+        <fa-icon [icon]="icons.calendar"></fa-icon>
+        <h2 class="text-base font-bold">No hay clase en esta fecha</h2>
+        <p>Elige otra fecha o utiliza las flechas para ir a una sesión.</p>
+      </div>
+    }
+  </section>
+
+  <section class="month-mode" aria-label="Resumen mensual de asistencias">
+    <div class="month-toolbar">
+      <p class="subtitle">Gestiona la asistencia de tus alumnos y sus recuperaciones.</p>
+      <div class="month-navigation">
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Mes anterior"
+          (click)="shiftMonth(-1)"
+        >
+          <fa-icon [icon]="icons.left"></fa-icon>
+        </button>
+        <label class="date-field"
+          ><fa-icon [icon]="icons.calendar"></fa-icon
+          ><input
+            type="month"
+            aria-label="Mes de asistencia"
+            [ngModel]="month"
+            (ngModelChange)="changeMonth($event)"
+        /></label>
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Mes siguiente"
+          (click)="shiftMonth(1)"
+        >
+          <fa-icon [icon]="icons.right"></fa-icon>
+        </button>
+      </div>
+    </div>
+    <div class="monthly-filters">
+      <label class="field"
+        ><span>Clase</span
+        ><select [(ngModel)]="classFilter">
+          <option value="">Todas las clases</option>
+          @for (activity of attendance.classes; track activity.id) {
+            <option [value]="activity.id">{{ activity.name }}</option>
+          }
+        </select></label
+      >
+      <label class="field"
+        ><span>Nivel</span
+        ><select [(ngModel)]="levelFilter">
+          <option value="">Todos los niveles</option>
+          <option value="A">Principiante</option>
+          <option value="B">Intermedio</option>
+          <option value="C">Avanzado</option>
+        </select></label
+      >
+      <label class="search-field"
+        ><fa-icon [icon]="icons.search"></fa-icon
+        ><input
+          type="search"
+          placeholder="Buscar alumno..."
+          aria-label="Buscar alumno en el mes"
+          [(ngModel)]="searchTerm"
+      /></label>
+      <button
+        type="button"
+        class="secondary-button"
+        [attr.aria-expanded]="filtersOpen"
+        (click)="filtersOpen = !filtersOpen"
+      >
+        <fa-icon [icon]="icons.filter"></fa-icon> Filtros
+      </button>
+    </div>
+    @if (filtersOpen) {
+      <div class="filter-note">
+        <span>{{ monthlyStudents.length }} alumnos · {{ monthLabel }}</span
+        ><button type="button" class="text-button" (click)="clearFilters()">Limpiar filtros</button>
+      </div>
+    }
+
+    <div class="kpi-grid">
+      <article class="kpi present">
+        <span class="kpi-icon"><fa-icon [icon]="icons.users"></fa-icon></span>
+        <div>
+          <p>Asistieron</p>
+          <strong>{{ monthCounts.present }}</strong
+          ><small>asistencias del mes</small>
+        </div>
+      </article>
+      <article class="kpi recovered">
+        <span class="kpi-icon"><fa-icon [icon]="icons.recovered"></fa-icon></span>
+        <div>
+          <p>Recuperadas</p>
+          <strong>{{ monthCounts.recovered }}</strong
+          ><small>en otras clases</small>
+        </div>
+      </article>
+      <article class="kpi absent">
+        <span class="kpi-icon"><fa-icon [icon]="icons.absent"></fa-icon></span>
+        <div>
+          <p>Faltas</p>
+          <strong>{{ monthCounts.absent }}</strong
+          ><small>{{ monthCounts.justified }} justificadas aparte</small>
+        </div>
+      </article>
+      <article class="kpi rate">
+        <span class="kpi-icon"><fa-icon [icon]="icons.chart"></fa-icon></span>
+        <div>
+          <strong>{{ attendanceRate }}%</strong>
+          <p>de asistencia</p>
+          <small>sobre sesiones marcadas</small>
+        </div>
+      </article>
+    </div>
+
+    <div class="monthly-content">
+      <app-attendance-matrix
+        [monthlyStudents]="monthlyStudents"
+        [month]="month"
+        [selectedStudentId]="selectedStudent.id"
+        (selectStudent)="openStudent($event)"
+        (edit)="openEditor($event.student, $event.session)"
+      ></app-attendance-matrix>
+      <aside class="surface student-inspector" aria-label="Detalle del alumno">
+        <app-attendance-student
+          [selectedStudent]="selectedStudent"
+          [month]="month"
+          [dialog]="false"
+          (close)="studentDialog.close()"
+          (chooseClass)="goToStudentClass()"
+          (edit)="openEditor($event.student, $event.session)"
+        ></app-attendance-student>
+      </aside>
+    </div>
+  </section>
+
+  <div class="legend" aria-label="Leyenda de asistencia">
+    @for (status of statuses; track status) {
+      <span
+        ><span class="status-dot" [class]="status"><fa-icon [icon]="icons[status]"></fa-icon></span
+        >{{ statusLabels[status] }}</span
+      >
+    }
+  </div>
+  <div class="save-bar">
+    <div>
+      <strong>{{ draftCount ? draftCount + ' cambios sin guardar' : 'Todo al día' }}</strong
+      ><small>Guardado local en este dispositivo</small>
+    </div>
+    <button
+      type="button"
+      class="primary-button"
+      [disabled]="!draftCount"
+      (click)="attendance.save()"
+    >
+      <fa-icon [icon]="icons.save"></fa-icon> Guardar asistencia
+    </button>
+  </div>
+  @if (attendance.feedback()) {
+    <p class="save-feedback" [class.error]="attendance.saveError()" role="status">
+      {{ attendance.feedback() }}
+    </p>
+  }
+
+  <dialog #studentDialog class="student-dialog" aria-labelledby="student-dialog-title">
+    <app-attendance-student
+      [selectedStudent]="selectedStudent"
+      [month]="month"
+      [dialog]="true"
+      (close)="studentDialog.close()"
+      (chooseClass)="goToStudentClass()"
+      (edit)="openEditor($event.student, $event.session)"
+    ></app-attendance-student>
+  </dialog>
+  <app-attendance-editor #editor></app-attendance-editor>
+</div>

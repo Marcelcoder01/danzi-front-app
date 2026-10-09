@@ -2,7 +2,7 @@
 
 ## Attendance preview
 
-The `Daniel` branch includes `/admin/attendance`, with a mobile roll call, a monthly desktop grid,
+The application includes `/admin/attendance`, with a mobile roll call, a monthly desktop grid,
 and each student's attendance calendar and history. It uses the existing Angular standalone components,
 Tailwind/daisyUI theme and Font Awesome icons.
 

@@ -1,30 +1,44 @@
-.auth-card {
-  background: var(--color-surface);
-  padding: var(--spacing-xl);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-lg);
-  max-width: 400px;
-  width: 100%;
+.login-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 20%,
+    rgba(0, 0, 0, .3)
+  );
 }
 
-.auth-card__badge {
-  background: var(--color-accent);
-  color: var(--color-text-on-accent);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 600;
-  display: inline-block;
-  margin-bottom: var(--spacing-md);
+.login-card {
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-h1 {
-  margin: 0 0 var(--spacing-sm) 0;
-  color: var(--color-text);
-  font-weight: 700;
+.login-input-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
 }
 
-p {
-  color: var(--color-text-muted);
-  margin: 0;
+.login-input-wrapper:focus-within {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+
+/* Responsive padding for mobile */
+@media (max-width: 480px) {
+  .login-wrapper > main {
+    padding: 1rem;
+  }
+
+  .login-wrapper > main > section {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-wrapper > main {
+    animation: none;
+  }
 }

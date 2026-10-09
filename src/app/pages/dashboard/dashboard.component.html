@@ -1,452 +1,352 @@
-<div class="min-h-full p-4 sm:p-6 lg:p-8">
-
+<div class="min-h-full bg-[#f4f5f9] p-4 sm:p-6 lg:p-8">
   <!-- Header -->
-  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <div
+    class="dashboard-enter dashboard-enter-1 mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+  >
     <div>
-      <h1 class="mt-1 text-2xl font-bold tracking-tight sm:text-3xl text-primary">
-        Panel principal
-      </h1>
+      <h1 class="text-2xl font-bold tracking-tight text-[#1a1a2e] sm:text-3xl">Panel principal</h1>
 
-      <p class="mt-1 text-sm text-light">
-        Aquí tienes un resumen de lo que está pasando hoy.
-      </p>
+      <p class="mt-1 text-sm text-[#718096]">Aquí tienes un resumen de lo que está pasando hoy.</p>
     </div>
 
-    <button class="btn-primary-custom px-4 py-2 rounded-xl font-medium flex items-center gap-2">
+    <button
+      type="button"
+      class="flex items-center gap-2 rounded-xl bg-[#1a1a2e] px-4 py-2.5 font-medium text-white shadow-[0_5px_12px_rgba(26,26,46,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2a2a4e] hover:shadow-[0_7px_16px_rgba(26,26,46,0.22)]"
+    >
       <fa-icon [icon]="faPlus"></fa-icon>
       Nueva clase
     </button>
   </div>
 
-
   <!-- KPIs -->
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-
+  <div
+    class="dashboard-enter dashboard-enter-2 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+  >
     <!-- Alumnos -->
-    <div class="card-neo p-5">
+    <div class="dashboard-card group p-5">
       <div class="flex items-start justify-between">
         <div>
-          <p class="text-sm font-medium text-muted">
-            Total alumnos
+          <p class="text-sm font-medium text-[#718096]">Total alumnos</p>
+
+          <p class="mt-2 text-3xl font-bold tracking-tight text-[#1a1a2e] tabular-nums">
+            {{ totalStudents }}
           </p>
 
-          <p class="mt-2 text-3xl font-bold tracking-tight text-primary">
-            42
-          </p>
+          <div class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1">
+            <span class="size-1.5 rounded-full bg-emerald-500"></span>
+            <span class="text-xs font-semibold text-emerald-700">+12%</span>
+          </div>
         </div>
 
-        <div class="flex size-11 items-center justify-center rounded-xl icon-bg-primary">
+        <div
+          class="flex size-11 items-center justify-center rounded-xl bg-[#6c63a8]/10 text-[#514989] transition-transform duration-300 group-hover:scale-105"
+        >
           <fa-icon [icon]="faUsers" class="text-lg"></fa-icon>
         </div>
       </div>
-
-      <div class="mt-4 flex items-center gap-2">
-        <span class="badge-success px-2 py-0.5 rounded-lg text-xs font-medium">
-          +12%
-        </span>
-
-        <span class="text-xs text-light">
-          vs. mes anterior
-        </span>
-      </div>
-
     </div>
 
-
     <!-- Clases -->
-    <div class="card-neo p-5">
+    <div class="dashboard-card group p-5">
       <div class="flex items-start justify-between">
         <div>
-          <p class="text-sm font-medium text-muted">
-            Clases activas
+          <p class="text-sm font-medium text-[#718096]">Clases activas</p>
+
+          <p class="mt-2 text-3xl font-bold tracking-tight text-[#1a1a2e] tabular-nums">
+            {{ activeClasses }}
           </p>
 
-          <p class="mt-2 text-3xl font-bold tracking-tight text-primary">
-            8
-          </p>
+          <div class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1">
+            <span class="size-1.5 rounded-full bg-blue-500"></span>
+            <span class="text-xs font-semibold text-blue-700">Esta semana</span>
+          </div>
         </div>
 
-        <div class="flex size-11 items-center justify-center rounded-xl icon-bg-secondary">
+        <div
+          class="flex size-11 items-center justify-center rounded-xl bg-[#16213e]/10 text-[#16213e] transition-transform duration-300 group-hover:scale-105"
+        >
           <fa-icon [icon]="faMusic" class="text-lg"></fa-icon>
         </div>
       </div>
-
-      <div class="mt-4 flex items-center gap-2">
-        <span class="badge-info px-2 py-0.5 rounded-lg text-xs font-medium">
-          3 hoy
-        </span>
-
-        <span class="text-xs text-light">
-          próximas clases
-        </span>
-      </div>
-
     </div>
-
 
     <!-- Asistencia -->
-    <div class="card-neo p-5">
-      <div class="flex items-start justify-between">
-        <div>
-          <p class="text-sm font-medium text-muted">
-            Asistencia
+    <div class="dashboard-card group p-5">
+      <div class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-sm font-medium text-[#718096]">Asistencia</p>
+
+          <p class="mt-2 text-3xl font-bold tracking-tight text-[#1a1a2e] tabular-nums">
+            {{ attendance }}%
           </p>
 
-          <p class="mt-2 text-3xl font-bold tracking-tight text-primary">
-            94%
-          </p>
+          <div class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1">
+            <span class="size-1.5 rounded-full bg-emerald-500"></span>
+            <span class="text-xs font-semibold text-emerald-700">Excelente</span>
+          </div>
         </div>
 
-        <div class="flex size-11 items-center justify-center rounded-xl icon-bg-success">
-          <fa-icon [icon]="faUserCheck" class="text-lg"></fa-icon>
+        <!-- Donut -->
+        <div
+          class="relative flex size-20 shrink-0 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-105"
+          [style.background]="
+            'conic-gradient(#6c63a8 ' + attendance + '%, #edf0f5 ' + attendance + '%)'
+          "
+        >
+          <div
+            class="flex size-[60px] items-center justify-center rounded-full bg-white shadow-[inset_1px_1px_3px_rgba(26,26,46,0.04)]"
+          >
+            <fa-icon [icon]="faUserCheck" class="text-sm text-[#6c63a8]"></fa-icon>
+          </div>
         </div>
       </div>
-
-      <div class="mt-4 flex items-center gap-2">
-        <span class="badge-success px-2 py-0.5 rounded-lg text-xs font-medium">
-          +4.2%
-        </span>
-
-        <span class="text-xs text-light">
-          este mes
-        </span>
-      </div>
-
     </div>
 
-
     <!-- Ingresos -->
-    <div class="card-neo p-5">
+    <div class="dashboard-card group p-5">
       <div class="flex items-start justify-between">
         <div>
-          <p class="text-sm font-medium text-muted">
-            Ingresos del mes
+          <p class="text-sm font-medium text-[#718096]">Ingresos del mes</p>
+
+          <p class="mt-2 text-3xl font-bold tracking-tight text-[#1a1a2e] tabular-nums">
+            {{ monthlyIncome | number: '1.0-0' }} €
           </p>
 
-          <p class="mt-2 text-3xl font-bold tracking-tight text-primary">
-            3.240 €
-          </p>
+          <div class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1">
+            <span class="size-1.5 rounded-full bg-emerald-500"></span>
+            <span class="text-xs font-semibold text-emerald-700">+8.4%</span>
+          </div>
         </div>
 
-        <div class="flex size-11 items-center justify-center rounded-xl icon-bg-accent">
+        <div
+          class="flex size-11 items-center justify-center rounded-xl bg-[#6c63a8]/10 text-[#6c63a8] transition-transform duration-300 group-hover:scale-105"
+        >
           <fa-icon [icon]="faEuroSign" class="text-lg"></fa-icon>
         </div>
       </div>
-
-      <div class="mt-4 flex items-center gap-2">
-        <span class="badge-success px-2 py-0.5 rounded-lg text-xs font-medium">
-          +8.5%
-        </span>
-
-        <span class="text-xs text-light">
-          vs. mes anterior
-        </span>
-      </div>
-
     </div>
-
   </div>
-
 
   <!-- Main content -->
-  <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-
+  <div class="dashboard-enter dashboard-enter-3 mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
     <!-- Próximas clases -->
-    <div class="card-neo xl:col-span-2">
+    <div class="dashboard-card p-6 xl:col-span-2">
+      <div class="mb-5 flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-bold text-[#1a1a2e]">Próximas clases</h2>
 
-      <div class="p-5 sm:p-6">
-
-        <!-- Section header -->
-        <div class="flex items-center justify-between">
-
-          <div>
-            <h2 class="text-lg font-semibold text-primary">
-              Próximas clases
-            </h2>
-
-            <p class="mt-1 text-sm text-muted">
-              Tu agenda para hoy
-            </p>
-          </div>
-
-          <button class="btn-ghost-custom px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
-            Ver calendario
-            <fa-icon [icon]="faArrowRight"></fa-icon>
-          </button>
-
+          <p class="mt-0.5 text-sm text-[#718096]">Tu agenda para hoy</p>
         </div>
 
+        <button
+          type="button"
+          class="text-sm font-semibold text-[#6c63a8] transition-colors hover:text-[#514989]"
+        >
+          Ver todas
+        </button>
+      </div>
 
-        <!-- Classes -->
-        <div class="mt-5 divide-y divider-custom">
-
-          <!-- Class 1 -->
-          <div class="flex items-center gap-4 py-4 first:pt-0">
-
-            <div class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl icon-bg-primary">
-              <span class="text-xs font-medium">
-                18:00
-              </span>
-            </div>
-
-            <div class="min-w-0 flex-1">
-              <p class="truncate font-semibold text-primary">
-                Salsa Inicial
-              </p>
-
-              <div class="mt-1 flex items-center gap-2 text-sm text-muted">
-                <span>12 alumnos</span>
-                <span>•</span>
-                <span>Sala 1</span>
-              </div>
-            </div>
-
-            <span class="badge-success px-2 py-0.5 rounded-lg text-xs font-medium">
-              Completa
-            </span>
-
-          </div>
-
-
-          <!-- Class 2 -->
-          <div class="flex items-center gap-4 py-4">
-
-            <div class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl icon-bg-secondary">
-              <span class="text-xs font-medium">
-                19:30
-              </span>
-            </div>
-
-            <div class="min-w-0 flex-1">
-              <p class="truncate font-semibold text-primary">
-                Bachata Intermedio
-              </p>
-
-              <div class="mt-1 flex items-center gap-2 text-sm text-muted">
-                <span>9 alumnos</span>
-                <span>•</span>
-                <span>Sala 2</span>
-              </div>
-            </div>
-
-            <span class="badge-warning px-2 py-0.5 rounded-lg text-xs font-medium">
-              2 plazas
-            </span>
-
-          </div>
-
-
-          <!-- Class 3 -->
-          <div class="flex items-center gap-4 py-4 last:pb-0">
-
-            <div class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl icon-bg-accent">
-              <span class="text-xs font-medium">
-                21:00
-              </span>
-            </div>
-
-            <div class="min-w-0 flex-1">
-              <p class="truncate font-semibold text-primary">
-                Salsa Avanzado
-              </p>
-
-              <div class="mt-1 flex items-center gap-2 text-sm text-muted">
-                <span>15 alumnos</span>
-                <span>•</span>
-                <span>Sala 1</span>
-              </div>
-            </div>
-
-            <span class="badge-error px-2 py-0.5 rounded-lg text-xs font-medium">
-              Lista de espera
-            </span>
-
-          </div>
-
+      <!-- Clase -->
+      <div
+        class="flex items-center gap-4 rounded-xl p-3 transition-colors duration-200 hover:bg-[#f8f9fa]"
+      >
+        <div
+          class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-[#f4f5f9] text-[#514989] shadow-[inset_2px_2px_5px_rgba(26,26,46,0.08),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]"
+        >
+          <span class="text-xs font-bold">18:00</span>
         </div>
 
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold text-[#1a1a2e]">Salsa Intermedio</p>
+
+          <p class="mt-0.5 text-xs text-[#718096]">12 alumnos · Sala 1</p>
+        </div>
+
+        <span
+          class="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+        >
+          Completa
+        </span>
+      </div>
+
+      <!-- Clase -->
+      <div
+        class="flex items-center gap-4 rounded-xl p-3 transition-colors duration-200 hover:bg-[#f8f9fa]"
+      >
+        <div
+          class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-[#f4f5f9] text-[#514989] shadow-[inset_2px_2px_5px_rgba(26,26,46,0.08),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]"
+        >
+          <span class="text-xs font-bold">19:30</span>
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold text-[#1a1a2e]">Bachata Principiante</p>
+
+          <p class="mt-0.5 text-xs text-[#718096]">8 alumnos · Sala 2</p>
+        </div>
+
+        <span
+          class="shrink-0 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700"
+        >
+          2 plazas
+        </span>
+      </div>
+
+      <!-- Clase -->
+      <div
+        class="flex items-center gap-4 rounded-xl p-3 transition-colors duration-200 hover:bg-[#f8f9fa]"
+      >
+        <div
+          class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-[#f4f5f9] text-[#514989] shadow-[inset_2px_2px_5px_rgba(26,26,46,0.08),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]"
+        >
+          <span class="text-xs font-bold">21:00</span>
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold text-[#1a1a2e]">Salsa Avanzado</p>
+
+          <p class="mt-0.5 text-xs text-[#718096]">14 alumnos · Sala 1</p>
+        </div>
+
+        <span
+          class="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700"
+        >
+          Lista de espera
+        </span>
       </div>
     </div>
 
+    <!-- Ocupación -->
+    <div class="dashboard-card p-6">
+      <div class="flex items-start justify-between">
+        <div>
+          <h2 class="text-base font-bold text-[#1a1a2e]">Ocupación</h2>
 
-    <!-- Actividad reciente -->
-    <div class="card-neo">
+          <p class="mt-0.5 text-sm text-[#718096]">Capacidad de tus clases</p>
+        </div>
 
-      <div class="p-5 sm:p-6">
+        <div
+          class="flex size-10 items-center justify-center rounded-xl bg-[#6c63a8]/10 text-[#6c63a8]"
+        >
+          <fa-icon [icon]="faUsers"></fa-icon>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-end justify-between">
+        <span class="text-2xl font-bold text-[#1a1a2e] tabular-nums"> {{ occupancy }}% </span>
+
+        <span class="text-xs font-medium text-[#718096]"> Media mensual </span>
+      </div>
+
+      <div
+        class="mt-5 h-3 w-full overflow-hidden rounded-full bg-[#f4f5f9] shadow-[inset_2px_2px_5px_rgba(26,26,46,0.08),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]"
+      >
+        <div
+          class="h-full rounded-full bg-gradient-to-r from-[#514989] to-[#8279bd] shadow-[0_2px_6px_rgba(108,99,168,0.25)] transition-all duration-500"
+          [style.width.%]="occupancy"
+        ></div>
+      </div>
+
+      <div class="mt-4 flex items-center justify-between text-xs">
+        <span class="text-[#718096]">0%</span>
+
+        <span class="font-medium text-[#514989]">Buena ocupación</span>
+
+        <span class="text-[#718096]">100%</span>
+      </div>
+
+      <div class="mt-6 flex items-start gap-3 rounded-xl bg-[#f8f7fc] p-4">
+        <div
+          class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#6c63a8]/10 text-[#6c63a8]"
+        >
+          <fa-icon [icon]="faCircleInfo"></fa-icon>
+        </div>
 
         <div>
-          <h2 class="text-lg font-semibold text-primary">
-            Actividad reciente
-          </h2>
+          <p class="text-sm font-semibold text-[#1a1a2e]">Todo bajo control</p>
 
-          <p class="mt-1 text-sm text-muted">
-            Últimos movimientos
+          <p class="mt-0.5 text-xs leading-relaxed text-[#718096]">
+            La ocupación media ha mejorado respecto al mes anterior.
           </p>
         </div>
-
-
-        <div class="mt-5 space-y-5">
-
-          <!-- Activity -->
-          <div class="flex gap-3">
-
-            <div class="flex size-9 shrink-0 items-center justify-center rounded-full icon-bg-success">
-              <fa-icon [icon]="faUserPlus" class="text-sm"></fa-icon>
-            </div>
-
-            <div class="min-w-0">
-              <p class="text-sm text-primary">
-                <span class="font-semibold">Laura Gómez</span>
-                se ha inscrito.
-              </p>
-
-              <p class="mt-0.5 text-xs text-light">
-                Hace 15 minutos
-              </p>
-            </div>
-
-          </div>
-
-
-          <div class="flex gap-3">
-
-            <div class="flex size-9 shrink-0 items-center justify-center rounded-full icon-bg-primary">
-              <fa-icon [icon]="faCreditCard" class="text-sm"></fa-icon>
-            </div>
-
-            <div class="min-w-0">
-              <p class="text-sm text-primary">
-                Pago recibido de
-                <span class="font-semibold">Carlos Ruiz</span>.
-              </p>
-
-              <p class="mt-0.5 text-xs text-light">
-                Hace 1 hora
-              </p>
-            </div>
-
-          </div>
-
-
-          <div class="flex gap-3">
-
-            <div class="flex size-9 shrink-0 items-center justify-center rounded-full icon-bg-warning">
-              <fa-icon [icon]="faCalendarPlus" class="text-sm"></fa-icon>
-            </div>
-
-            <div class="min-w-0">
-              <p class="text-sm text-primary">
-                Nueva clase creada:
-                <span class="font-semibold">Bachata</span>.
-              </p>
-
-              <p class="mt-0.5 text-xs text-light">
-                Hace 2 horas
-              </p>
-            </div>
-
-          </div>
-
-
-          <div class="flex gap-3">
-
-            <div class="flex size-9 shrink-0 items-center justify-center rounded-full icon-bg-info">
-              <fa-icon [icon]="faUserCheck" class="text-sm"></fa-icon>
-            </div>
-
-            <div class="min-w-0">
-              <p class="text-sm text-primary">
-                Asistencia actualizada.
-              </p>
-
-              <p class="mt-0.5 text-xs text-light">
-                Hace 3 horas
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <button class="btn-ghost-custom px-4 py-2 rounded-lg text-sm font-medium w-full mt-5">
-          Ver toda la actividad
-        </button>
-
       </div>
     </div>
-
   </div>
 
+  <!-- Actividad reciente -->
+  <div class="dashboard-enter dashboard-enter-4 dashboard-card mt-6 p-6">
+    <div class="mb-5">
+      <h2 class="text-base font-bold text-[#1a1a2e]">Actividad reciente</h2>
 
-  <!-- Bottom section -->
-  <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-
-    <!-- Occupancy -->
-    <div class="card-neo">
-
-      <div class="p-5 sm:p-6">
-
-        <div class="flex items-start justify-between">
-
-          <div>
-            <h2 class="text-lg font-semibold text-primary">
-              Ocupación de clases
-            </h2>
-
-            <p class="mt-1 text-sm text-muted">
-              Capacidad utilizada esta semana
-            </p>
-          </div>
-
-          <span class="text-2xl font-bold text-primary">
-            78%
-          </span>
-
-        </div>
-
-        <div class="mt-5 h-3 w-full rounded-full overflow-hidden progress-bg">
-          <div class="h-full rounded-full transition-all duration-500 progress-gradient" style="width: 78%;"></div>
-        </div>
-
-        <div class="mt-2 flex justify-between text-xs text-muted">
-          <span>156 plazas ocupadas</span>
-          <span>200 plazas</span>
-        </div>
-
-      </div>
-
+      <p class="mt-0.5 text-sm text-[#718096]">Últimos movimientos de la academia</p>
     </div>
 
-
-    <!-- Notice -->
-    <div class="card-neo">
-
-      <div class="p-5 sm:p-6">
-
-        <div class="flex gap-4">
-
-          <div class="flex size-11 shrink-0 items-center justify-center rounded-xl icon-bg-info">
-            <fa-icon [icon]="faCircleInfo"></fa-icon>
-          </div>
-
-          <div> 
-            <h2 class="font-semibold text-primary">
-              Todo bajo control
-            </h2>
-
-            <p class="mt-1 text-sm leading-relaxed text-muted">
-              No tienes incidencias pendientes. Tus pagos,
-              clases y asistencia están al día.
-            </p>
-          </div>
-
+    <div class="space-y-5">
+      <!-- Alumno nuevo -->
+      <div class="flex gap-3">
+        <div
+          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#6c63a8]/10 text-[#6c63a8]"
+        >
+          <fa-icon [icon]="faUserPlus"></fa-icon>
         </div>
 
+        <div class="flex-1">
+          <p class="text-sm text-[#2d3748]">
+            <span class="font-semibold">Laura Martínez</span>
+            se ha unido a Salsa Principiante.
+          </p>
+
+          <p class="mt-1 text-xs text-[#a0aec0]">Hace 15 minutos</p>
+        </div>
       </div>
 
-    </div>
+      <!-- Pago -->
+      <div class="flex gap-3">
+        <div
+          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600"
+        >
+          <fa-icon [icon]="faCreditCard"></fa-icon>
+        </div>
 
+        <div class="flex-1">
+          <p class="text-sm text-[#2d3748]">
+            <span class="font-semibold">Carlos Pérez</span>
+            ha realizado un pago de 45 €.
+          </p>
+
+          <p class="mt-1 text-xs text-[#a0aec0]">Hace 1 hora</p>
+        </div>
+      </div>
+
+      <!-- Nueva clase -->
+      <div class="flex gap-3">
+        <div
+          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#16213e]/10 text-[#16213e]"
+        >
+          <fa-icon [icon]="faCalendarPlus"></fa-icon>
+        </div>
+
+        <div class="flex-1">
+          <p class="text-sm text-[#2d3748]">Se ha creado una nueva clase de Bachata.</p>
+
+          <p class="mt-1 text-xs text-[#a0aec0]">Hace 3 horas</p>
+        </div>
+      </div>
+
+      <!-- Asistencia -->
+      <div class="flex gap-3">
+        <div
+          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-600"
+        >
+          <fa-icon [icon]="faUserCheck"></fa-icon>
+        </div>
+
+        <div class="flex-1">
+          <p class="text-sm text-[#2d3748]">11 alumnos registrados en la clase de las 18:00.</p>
+
+          <p class="mt-1 text-xs text-[#a0aec0]">Hace 4 horas</p>
+        </div>
+      </div>
+    </div>
   </div>
-
 </div>

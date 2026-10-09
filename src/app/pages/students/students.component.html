@@ -1,15 +1,10 @@
 <div class="min-h-full p-4 sm:p-6 lg:p-8">
-
   <!-- Header -->
   <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight sm:text-3xl text-primary">
-        Alumnos
-      </h1>
+      <h1 class="text-2xl font-bold tracking-tight sm:text-3xl text-primary">Alumnos</h1>
 
-      <p class="mt-1 text-sm text-light">
-        Gestiona todos los estudiantes de la academia.
-      </p>
+      <p class="mt-1 text-sm text-light">Gestiona todos los estudiantes de la academia.</p>
     </div>
 
     <button class="btn-primary-custom px-4 py-2 rounded-xl font-medium flex items-center gap-2">
@@ -18,7 +13,6 @@
     </button>
   </div>
 
-
   <!-- Filters -->
   <div class="card-neo p-4 mb-6">
     <div class="flex flex-col gap-4">
@@ -26,20 +20,17 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-3 flex-1">
           <!-- Search -->
           <div class="relative flex-1 max-w-md">
-            <fa-icon 
-              [icon]="faSearch" 
-              class="search-icon"
-            ></fa-icon>
+            <fa-icon [icon]="faSearch" class="search-icon"></fa-icon>
             <input
               type="text"
               placeholder="Buscar alumno..."
               class="search-input"
               [(ngModel)]="searchTerm"
-            >
+            />
           </div>
 
           <!-- Filter Toggle -->
-          <button 
+          <button
             class="btn-ghost-custom px-4 py-2 rounded-lg flex items-center gap-2"
             (click)="toggleFilters()"
           >
@@ -61,10 +52,7 @@
             <!-- Status Filter -->
             <div class="flex-1">
               <label class="block text-sm font-medium text-muted mb-2">Estado</label>
-              <select 
-                class="filter-select"
-                [(ngModel)]="filterStatus"
-              >
+              <select class="filter-select" [(ngModel)]="filterStatus">
                 <option value="">Todos</option>
                 <option value="active">Activo</option>
                 <option value="inactive">Inactivo</option>
@@ -75,10 +63,7 @@
             <!-- Level Filter -->
             <div class="flex-1">
               <label class="block text-sm font-medium text-muted mb-2">Nivel</label>
-              <select 
-                class="filter-select"
-                [(ngModel)]="filterLevel"
-              >
+              <select class="filter-select" [(ngModel)]="filterLevel">
                 <option value="">Todos</option>
                 <option value="Principiante">Principiante</option>
                 <option value="Intermedio">Intermedio</option>
@@ -89,18 +74,26 @@
             <!-- Payment Filter -->
             <div class="flex-1">
               <label class="block text-sm font-medium text-muted mb-2">Pago</label>
-              <select 
-                class="filter-select"
-                [(ngModel)]="filterPayment"
-              >
+              <select class="filter-select" [(ngModel)]="filterPayment">
                 <option value="">Todos</option>
                 <option value="paid">Pagado</option>
                 <option value="pending">Pendiente</option>
               </select>
             </div>
 
+            <!-- Role Filter -->
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-muted mb-2">Rol</label>
+              <select class="filter-select" [(ngModel)]="filterRole">
+                <option value="">Todos</option>
+                <option value="leader">Líder</option>
+                <option value="follower">Seguidor</option>
+                <option value="mixed">Ambos</option>
+              </select>
+            </div>
+
             <!-- Clear Filters -->
-            <button 
+            <button
               class="clear-filters-btn flex items-center gap-2 text-sm"
               (click)="clearFilters()"
             >
@@ -113,9 +106,8 @@
     </div>
   </div>
 
-
-  <!-- Table -->
-  <div class="card-neo overflow-hidden">
+  <!-- Table for desktop -->
+  <div class="card-neo overflow-hidden hidden md:block">
     <div class="table-container">
       <table class="table">
         <thead>
@@ -123,6 +115,7 @@
             <th>Alumno</th>
             <th>Contacto</th>
             <th>Nivel</th>
+            <th>Rol</th>
             <th>Estado</th>
             <th>Pago</th>
             <th>Fecha alta</th>
@@ -136,10 +129,12 @@
               <td>
                 <div class="flex items-center gap-3">
                   <div class="avatar-circle">
-                    {{ getInitials(student) }}
+                    {{ studentsService.getInitials(student) }}
                   </div>
                   <div>
-                    <p class="font-semibold text-primary">{{ getDisplayName(student) }}</p>
+                    <p class="font-semibold text-primary">
+                      {{ studentsService.getDisplayName(student) }}
+                    </p>
                     <p class="text-sm text-muted">{{ student.email }}</p>
                   </div>
                 </div>
@@ -152,30 +147,47 @@
 
               <!-- Level -->
               <td>
-                <span class="level-badge">
-                  {{ getLevelLabel(student.level) }}
+                <span class="level-badge whitespace-nowrap">
+                  {{ studentsService.getLevelLabel(student.level) }}
+                </span>
+              </td>
+
+              <!-- Role -->
+              <td>
+                <span
+                  class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+                  [class.bg-[#6c63a8]/15]="student.role === 'leader'"
+                  [class.text-[#514989]]="student.role === 'leader'"
+                  [class.bg-[#26315e]/15]="student.role === 'follower'"
+                  [class.text-[#16213e]]="student.role === 'follower'"
+                  [class.bg-[#8279bd]/20]="student.role === 'mixed'"
+                  [class.text-[#514989]]="student.role === 'mixed'"
+                >
+                  {{ studentsService.getRoleLabel(student.role) }}
                 </span>
               </td>
 
               <!-- Status -->
               <td>
-                <span 
+                <span
                   class="px-2 py-0.5 rounded-lg text-xs font-medium"
-                  [class]="getStatusClass(student.status)"
+                  [class]="studentsService.getStatusClass(student.status)"
                 >
-                  {{ getStatusText(student.status) }}
+                  {{ studentsService.getStatusText(student.status) }}
                 </span>
               </td>
 
               <!-- Payment -->
               <td>
                 <div class="flex items-center gap-2">
-                  <span 
+                  <span
                     class="w-2 h-2 rounded-full"
                     [class.bg-green-500]="student.hasPaid"
                     [class.bg-red-500]="!student.hasPaid"
                   ></span>
-                  <span class="text-sm text-primary">{{ student.hasPaid ? 'Pagado' : 'Pendiente' }}</span>
+                  <span class="text-sm text-primary">{{
+                    student.hasPaid ? 'Pagado' : 'Pendiente'
+                  }}</span>
                 </div>
               </td>
 
@@ -187,22 +199,13 @@
               <!-- Actions -->
               <td class="text-right">
                 <div class="flex items-center justify-end gap-2">
-                  <button 
-                    class="action-btn action-btn-view"
-                    title="Ver"
-                  >
+                  <button class="action-btn action-btn-view" title="Ver">
                     <fa-icon [icon]="faEye" class="text-sm"></fa-icon>
                   </button>
-                  <button 
-                    class="action-btn action-btn-edit"
-                    title="Editar"
-                  >
+                  <button class="action-btn action-btn-edit" title="Editar">
                     <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
                   </button>
-                  <button 
-                    class="action-btn action-btn-delete"
-                    title="Eliminar"
-                  >
+                  <button class="action-btn action-btn-delete" title="Eliminar">
                     <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
                   </button>
                 </div>
@@ -219,20 +222,107 @@
         Mostrando 1-{{ students.length }} de {{ students.length }} alumnos
       </p>
       <div class="flex items-center gap-2">
-        <button 
-          class="px-3 py-1.5 rounded-lg text-sm btn-ghost-custom"
-          disabled
-        >
-          Anterior
-        </button>
-        <button 
-          class="px-3 py-1.5 rounded-lg text-sm btn-ghost-custom"
-          disabled
-        >
-          Siguiente
-        </button>
+        <button class="px-3 py-1.5 rounded-lg text-sm btn-ghost-custom" disabled>Anterior</button>
+        <button class="px-3 py-1.5 rounded-lg text-sm btn-ghost-custom" disabled>Siguiente</button>
       </div>
     </div>
   </div>
 
+  <!-- Cards for mobile -->
+  <div class="md:hidden space-y-4">
+    @for (student of students; track student.id) {
+      <div class="card-neo p-4">
+        <!-- Header -->
+        <div class="flex items-start gap-3 mb-4">
+          <div class="avatar-circle shrink-0">
+            {{ studentsService.getInitials(student) }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-primary truncate">
+              {{ studentsService.getDisplayName(student) }}
+            </p>
+            <p class="text-sm text-muted truncate">{{ student.email }}</p>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <p class="text-xs text-muted mb-1">Contacto</p>
+            <p class="text-sm text-primary">{{ student.phone }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted mb-1">Fecha alta</p>
+            <p class="text-sm text-muted">{{ student.startDate }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted mb-1">Nivel</p>
+            <span class="level-badge whitespace-nowrap">
+              {{ studentsService.getLevelLabel(student.level) }}
+            </span>
+          </div>
+          <div>
+            <p class="text-xs text-muted mb-1">Rol</p>
+            <span
+              class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+              [class.bg-[#6c63a8]/15]="student.role === 'leader'"
+              [class.text-[#514989]]="student.role === 'leader'"
+              [class.bg-[#26315e]/15]="student.role === 'follower'"
+              [class.text-[#16213e]]="student.role === 'follower'"
+              [class.bg-[#8279bd]/20]="student.role === 'mixed'"
+              [class.text-[#514989]]="student.role === 'mixed'"
+            >
+              {{ studentsService.getRoleLabel(student.role) }}
+            </span>
+          </div>
+          <div>
+            <p class="text-xs text-muted mb-1">Estado</p>
+            <span
+              class="px-2 py-0.5 rounded-lg text-xs font-medium"
+              [class]="studentsService.getStatusClass(student.status)"
+            >
+              {{ studentsService.getStatusText(student.status) }}
+            </span>
+          </div>
+          <div>
+            <p class="text-xs text-muted mb-1">Pago</p>
+            <div class="flex items-center gap-2">
+              <span
+                class="w-2 h-2 rounded-full"
+                [class.bg-green-500]="student.hasPaid"
+                [class.bg-red-500]="!student.hasPaid"
+              ></span>
+              <span class="text-sm text-primary">{{
+                student.hasPaid ? 'Pagado' : 'Pendiente'
+              }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t divider-custom">
+          <button class="action-btn action-btn-view" title="Ver">
+            <fa-icon [icon]="faEye" class="text-sm"></fa-icon>
+          </button>
+          <button class="action-btn action-btn-edit" title="Editar">
+            <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
+          </button>
+          <button class="action-btn action-btn-delete" title="Eliminar">
+            <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Mobile Pagination -->
+    <div class="px-4 py-3 flex items-center justify-between">
+      <p class="text-sm text-muted">
+        Mostrando 1-{{ students.length }} de {{ students.length }} alumnos
+      </p>
+      <div class="flex items-center gap-2">
+        <button class="px-3 py-1.5 rounded-lg text-sm btn-ghost-custom" disabled>Anterior</button>
+        <button class="px-3 py-1.5 rounded-lg text-sm btn-ghost-custom" disabled>Siguiente</button>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,7 +1,7 @@
 import type { Level } from '../../../shared/interfaces/level.interface';
 import type { PaymentMethod } from '../../payments/interfaces/payment-method.interface';
 import { StudentLevel } from './student-level.enum';
-import type { StudentStatus } from './student-status.type';
+import type { StudentRole, StudentStatus } from './student-status.type';
 
 export interface Student {
   id?: string;
@@ -16,14 +16,7 @@ export interface Student {
   startDate: string;
   level: StudentLevel;
   status: StudentStatus;
+  role: StudentRole;
   hasPaid: boolean;
 }
 
-export interface StudentWithRelations extends Student {
-  currentLevel: Level | null;
-  preferredPaymentMethod: PaymentMethod | null;
-}
-
-
-export type StudentInput = Omit<Student, 'id' | 'createdAt' | 'updatedAt'>;
-export type StudentUpdateInput = Partial<StudentInput>;

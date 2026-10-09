@@ -1,1 +1,166 @@
-<p>Clases - Gestión de clases</p>
+<div class="min-h-full p-4 sm:p-6 lg:p-8">
+  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <div class="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+        Programación
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight sm:text-3xl text-primary">Clases y eventos</h1>
+      <p class="mt-1 text-sm text-light">Organiza la oferta, los niveles y la disponibilidad de tu escuela.</p>
+    </div>
+
+    <button class="btn-primary-custom flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium">
+      <fa-icon [icon]="faPlus"></fa-icon>
+      Crear actividad
+    </button>
+  </div>
+
+  <section class="card-neo mb-6 p-4" aria-label="Filtros de clases y eventos">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+          <div class="relative max-w-xl flex-1">
+            <fa-icon [icon]="faSearch" class="search-icon"></fa-icon>
+            <input [(ngModel)]="searchTerm" type="search" class="search-input" placeholder="Buscar por clase, profesor o sala...">
+          </div>
+
+          <button class="btn-ghost-custom flex items-center justify-center gap-2 rounded-lg px-4 py-2" (click)="toggleFilters()">
+            <fa-icon [icon]="faFilter"></fa-icon>
+            Filtros
+            @if (filterType || filterLevel || !filterStatus) {
+              <span class="filter-dot"></span>
+            }
+          </button>
+        </div>
+
+        <p class="text-sm text-muted">
+          <span class="font-semibold text-primary">{{ activities.length }}</span>
+          {{ activities.length === 1 ? 'actividad' : 'actividades' }}
+        </p>
+      </div>
+
+      @if (isFiltersVisible) {
+        <div class="grid gap-4 border-t pt-4 divider-custom sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_auto] xl:items-end">
+          <label class="filter-field">
+            <span>Tipo</span>
+            <select [(ngModel)]="filterType" class="filter-select">
+              <option value="">Todos</option>
+              <option value="class">Clases regulares</option>
+              <option value="event">Eventos</option>
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span>Nivel</span>
+            <select [(ngModel)]="filterLevel" class="filter-select">
+              <option value="">Todos los niveles</option>
+              <option value="A">Inicial · A</option>
+              <option value="B">Intermedio · B</option>
+              <option value="C">Avanzado · C</option>
+              <option value="Todos">Multinivel</option>
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span>Estado</span>
+            <select [(ngModel)]="filterStatus" class="filter-select">
+              <option value="">Todos</option>
+              <option value="active">Activas y publicadas</option>
+              <option value="draft">Borradores</option>
+            </select>
+          </label>
+
+          <button class="clear-filters-btn flex items-center justify-center gap-2 text-sm" (click)="clearFilters()">
+            <fa-icon [icon]="faXmark"></fa-icon>
+            Limpiar
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="mb-4 flex items-center gap-2 overflow-x-auto pb-1">
+    <span class="section-label">Vista actual</span>
+    <span class="summary-chip summary-chip-class">{{ allActivities.filter(a => a.type === 'class').length }} clases</span>
+    <span class="summary-chip summary-chip-event">{{ allActivities.filter(a => a.type === 'event').length }} eventos</span>
+  </div>
+
+  @if (activities.length) {
+    <section class="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3" aria-label="Listado de clases y eventos">
+      @for (activity of activities; track activity.id) {
+        <article class="activity-card" [class.is-draft]="activity.status === 'draft'">
+          <div class="activity-accent" [class]="'accent-' + activity.color"></div>
+
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex min-w-0 items-start gap-3">
+              <div class="activity-icon" [class]="'icon-' + activity.color">
+                <fa-icon [icon]="activity.type === 'class' ? faMusic : faCalendarDays"></fa-icon>
+              </div>
+              <div class="min-w-0">
+                <div class="mb-1 flex items-center gap-2">
+                  <span class="type-label" [class.event-label]="activity.type === 'event'">
+                    {{ activity.type === 'class' ? 'Clase regular' : 'Evento' }}
+                  </span>
+                  @if (activity.status === 'draft') {
+                    <span class="draft-label">Borrador</span>
+                  }
+                </div>
+                <h2 class="truncate text-base font-bold text-primary">{{ activity.name }}</h2>
+                <p class="mt-0.5 truncate text-sm text-muted">{{ activity.teacher }}</p>
+              </div>
+            </div>
+
+            <button class="menu-btn" [attr.aria-label]="'Opciones de ' + activity.name">
+              <fa-icon [icon]="faEllipsis"></fa-icon>
+            </button>
+          </div>
+
+          <div class="mt-5 grid grid-cols-2 gap-3 text-sm">
+            <div class="detail-block">
+              <span class="detail-icon"><fa-icon [icon]="faCalendarDays"></fa-icon></span>
+              <div>
+                <p class="detail-label">Próxima sesión</p>
+                <p class="detail-value">{{ activity.nextDate }}</p>
+              </div>
+            </div>
+            <div class="detail-block">
+              <span class="detail-icon"><fa-icon [icon]="faClock"></fa-icon></span>
+              <div>
+                <p class="detail-label">Horario</p>
+                <p class="detail-value">{{ activity.schedule }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 rounded-xl schedule-panel">
+            <div class="flex items-center justify-between gap-3">
+              <span class="level-tag">{{ activity.level }}</span>
+              <span class="text-xs font-medium text-muted">{{ activity.room }}</span>
+            </div>
+            <div class="mt-3 flex items-center justify-between text-xs">
+              <span class="flex items-center gap-1.5 text-muted"><fa-icon [icon]="faUsers"></fa-icon> {{ activity.attendees }} de {{ activity.capacity }} inscritos</span>
+              <span class="font-semibold text-primary">{{ getOccupancy(activity) }}%</span>
+            </div>
+            <div class="mt-2 h-1.5 overflow-hidden rounded-full progress-track">
+              <div class="h-full rounded-full occupancy-bar" [class]="'bar-' + activity.color" [style.width.%]="getOccupancy(activity)"></div>
+            </div>
+          </div>
+
+          <div class="mt-5 flex items-center justify-between gap-3 border-t pt-4 divider-custom">
+            <span class="availability-badge" [class]="getAvailabilityClass(activity)">{{ getAvailabilityLabel(activity) }}</span>
+            <button class="view-link">Ver detalle <span aria-hidden="true">→</span></button>
+          </div>
+        </article>
+      }
+    </section>
+  } @else {
+    <section class="card-neo empty-state">
+      <div class="empty-icon"><fa-icon [icon]="faSearch"></fa-icon></div>
+      <h2 class="mt-4 text-lg font-bold text-primary">No encontramos actividades</h2>
+      <p class="mt-1 text-sm text-muted">Prueba a ajustar los filtros o limpia la búsqueda.</p>
+      <button class="clear-filters-btn mt-5 inline-flex items-center gap-2 text-sm" (click)="clearFilters()">
+        <fa-icon [icon]="faXmark"></fa-icon> Limpiar filtros
+      </button>
+    </section>
+  }
+</div>

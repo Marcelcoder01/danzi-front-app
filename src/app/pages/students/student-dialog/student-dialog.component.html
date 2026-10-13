@@ -1,0 +1,336 @@
+<dialog id="student_dialog" class="modal w-full max-w-3xl">
+  <div
+    class="modal-box rounded-[28px] border border-white/10 bg-[var(--color-surface)]/95 p-0 shadow-[0_25px_80px_rgba(0,0,0,0.18),inset_1px_1px_0_rgba(255,255,255,0.45)]"
+  >
+    <div
+      class="flex items-start justify-between border-b border-[var(--color-border)]/60 px-7 pt-7 pb-6"
+    >
+      <div class="flex items-center gap-4">
+        <!-- Icon -->
+        <div
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.04),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]"
+        >
+          <fa-icon [icon]="faUserPlus" class="text-lg"></fa-icon>
+        </div>
+
+        <div>
+          <h3 class="text-xl font-semibold tracking-tight text-[var(--color-text)]">
+            Nuevo alumno
+          </h3>
+
+          <p class="mt-1 text-sm text-[var(--color-text-muted)]">
+            Añade un nuevo estudiante a tu academia.
+          </p>
+        </div>
+      </div>
+
+      <!-- Close -->
+      <button
+        type="button"
+        class="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface-alt)]/70 text-[var(--color-text-muted)] shadow-[2px_2px_6px_rgba(0,0,0,0.05),-2px_-2px_6px_rgba(255,255,255,0.5)] transition-all duration-200 hover:-translate-y-0.5 hover:text-[var(--color-text)] hover:shadow-md"
+        (click)="closeDialog()"
+      >
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="px-7 py-6">
+      <section class="mb-7">
+        <div class="mb-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-accent)]">
+            Información personal
+          </p>
+
+          <p class="mt-1 text-xs text-[var(--color-text-muted)]">Datos básicos del estudiante</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <!-- Nombre -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Nombre
+              <span class="text-[var(--color-accent)]">*</span>
+            </label>
+
+            <div class="danzi-field">
+              <fa-icon [icon]="faUser"></fa-icon>
+
+              <input
+                type="text"
+                placeholder="Nombre del alumno"
+                class="danzi-input"
+                [(ngModel)]="newStudent.firstName"
+                name="firstName"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Apellido -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Apellido
+            </label>
+
+            <div class="danzi-field">
+              <fa-icon [icon]="faUser"></fa-icon>
+
+              <input
+                type="text"
+                placeholder="Apellido del alumno"
+                class="danzi-input"
+                [(ngModel)]="newStudent.lastName"
+                name="lastName"
+              />
+            </div>
+          </div>
+
+          <!-- Alias -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]"> Alias </label>
+
+            <input
+              type="text"
+              placeholder="Nombre artístico"
+              class="danzi-input"
+              [(ngModel)]="newStudent.alias"
+              name="alias"
+            />
+          </div>
+
+          <!-- Instagram -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Instagram
+            </label>
+
+            <input
+              type="text"
+              placeholder="@usuario"
+              class="danzi-input"
+              [(ngModel)]="newStudent.instagram"
+              name="instagram"
+            />
+          </div>
+
+          <!-- Email -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]"> Email </label>
+
+            <div class="danzi-field">
+              <fa-icon [icon]="faEnvelope"></fa-icon>
+
+              <input
+                type="email"
+                placeholder="correo@ejemplo.com"
+                class="danzi-input"
+                [(ngModel)]="newStudent.email"
+                name="email"
+              />
+            </div>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Teléfono
+            </label>
+
+            <div class="danzi-field">
+              <fa-icon [icon]="faPhone"></fa-icon>
+
+              <input
+                type="tel"
+                placeholder="+34 600 000 000"
+                class="danzi-input"
+                [(ngModel)]="newStudent.phone"
+                name="phone"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           ACADEMY INFORMATION
+           =================================================== -->
+      <section>
+        <div class="mb-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-accent)]">
+            Información de academia
+          </p>
+
+          <p class="mt-1 text-xs text-[var(--color-text-muted)]">
+            Configura el perfil del alumno dentro de Danzi
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <!-- Fecha nacimiento -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Fecha de nacimiento
+            </label>
+
+            <input
+              type="date"
+              class="danzi-input"
+              [(ngModel)]="newStudent.birthDate"
+              name="birthDate"
+            />
+          </div>
+
+          <!-- Fecha alta -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Fecha de alta
+              <span class="text-[var(--color-accent)]">*</span>
+            </label>
+
+            <input
+              type="date"
+              class="danzi-input"
+              [(ngModel)]="newStudent.startDate"
+              name="startDate"
+              required
+            />
+          </div>
+
+          <!-- Nivel -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]"> Nivel </label>
+
+            <select class="danzi-select" [(ngModel)]="newStudent.level" name="level">
+              @for (level of studentLevels; track level) {
+                <option [value]="level">
+                  {{ studentLevelsLabels[level] }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Estado -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]"> Estado </label>
+
+            <select class="danzi-select" [(ngModel)]="newStudent.status" name="status">
+              @for (status of studentStatuses; track status) {
+                <option [value]="status">
+                  {{ studentStatusesLabels[status] }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Rol -->
+          <div class="form-control">
+            <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Rol en pareja
+            </label>
+
+            <select class="danzi-select" [(ngModel)]="newStudent.role" name="role">
+              @for (role of studentRoles; track role) {
+                <option [value]="role">
+                  {{ studentRolesLabels[role] }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Pago -->
+          <!-- Pago -->
+          <div
+            class="rounded-2xl border border-[var(--color-border)]/60 bg-[var(--color-surface-alt)]/70 px-4 py-3 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.04),inset_-1px_-1px_3px_rgba(255,255,255,0.7)] transition-all duration-200 hover:border-[var(--color-accent)]/30"
+          >
+            <!-- Cabecera: título + toggle -->
+            <label class="flex cursor-pointer items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-medium text-[var(--color-text)]">Pago realizado</p>
+                <p class="mt-0.5 text-xs text-[var(--color-text-muted)]">Marcar como pagado</p>
+              </div>
+
+              <input
+                type="checkbox"
+                class="toggle border-none bg-[var(--color-border)] checked:bg-[var(--color-accent)]"
+                [(ngModel)]="newStudent.hasPaid"
+                name="hasPaid"
+              />
+            </label>
+
+            <!-- Controles de período (solo visibles cuando está pagado) -->
+            @if (newStudent.hasPaid) {
+              <div class="mt-3 border-t border-[var(--color-border)]/40 pt-3">
+                <label class="mb-1.5 block text-xs font-medium text-[var(--color-text-muted)]">
+                  Período de pago
+                </label>
+
+                <select class="danzi-select" [(ngModel)]="paymentPeriod" name="paymentPeriod">
+                  <option value="1">1 mes</option>
+                  <option value="2">2 meses</option>
+                  <option value="custom">Otro período</option>
+                </select>
+
+                <!-- Rango de fechas (solo cuando se elige "Otro período") -->
+                @if (paymentPeriod === 'custom') {
+                  <div class="mt-3 grid grid-cols-2 gap-3">
+                    <div>
+                      <label
+                        class="mb-1 block text-[11px] font-medium text-[var(--color-text-muted)]"
+                      >
+                        Desde
+                      </label>
+                      <input
+                        type="date"
+                        class="danzi-input"
+                        [(ngModel)]="paymentFrom"
+                        name="paymentFrom"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        class="mb-1 block text-[11px] font-medium text-[var(--color-text-muted)]"
+                      >
+                        Hasta
+                      </label>
+                      <input
+                        type="date"
+                        class="danzi-input"
+                        [(ngModel)]="paymentTo"
+                        name="paymentTo"
+                      />
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <div
+        class="mt-7 flex items-center justify-end gap-3 border-t border-[var(--color-border)]/60 pt-5"
+      >
+        <button
+          type="button"
+          class="rounded-xl px-5 py-2.5 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-text)]"
+          (click)="closeDialog()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="group flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(108,99,168,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_12px_25px_rgba(108,99,168,0.32)] active:translate-y-0"
+        >
+          <span>Crear alumno</span>
+
+          <fa-icon
+            [icon]="faArrowRight"
+            class="text-xs transition-transform duration-200 group-hover:translate-x-0.5"
+          ></fa-icon>
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>

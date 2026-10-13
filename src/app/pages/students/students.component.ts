@@ -13,13 +13,14 @@ import {
 import { Student } from './interfaces/student.interface';
 import { StudentLevel } from './interfaces/student-level.enum';
 import { StudentsService } from './services/students.service';
+import { StudentDialogComponent } from './student-dialog/student-dialog.component';
 
 @Component({
   selector: 'app-students',
   standalone: true,
   templateUrl: './students.component.html',
   styleUrl: './students.component.css',
-  imports: [FormsModule, FaIconComponent]
+  imports: [FormsModule, FaIconComponent, StudentDialogComponent]
 })
 export class StudentsComponent {
   faPlus = faPlus;
@@ -200,5 +201,11 @@ export class StudentsComponent {
     this.searchTerm = '';
   }
 
+  openStudentDialog(): void {
+    const dialog = document.getElementById('student_dialog') as HTMLDialogElement;
+    if (dialog) {
+      dialog.showModal();
+    }
+  }
 
 }

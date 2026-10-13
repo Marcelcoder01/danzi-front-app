@@ -7,7 +7,10 @@
       <p class="mt-1 text-sm text-light">Gestiona todos los estudiantes de la academia.</p>
     </div>
 
-    <button class="btn-primary-custom px-4 py-2 rounded-xl font-medium flex items-center gap-2">
+    <button
+      class="btn-primary-custom px-4 py-2 rounded-xl font-medium flex items-center gap-2"
+      (click)="openStudentDialog()"
+    >
       <fa-icon [icon]="faPlus"></fa-icon>
       Nuevo alumno
     </button>
@@ -326,3 +329,6 @@
     </div>
   </div>
 </div>
+
+<!-- Student Dialog -->
+<app-student-dialog></app-student-dialog>

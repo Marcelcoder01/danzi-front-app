@@ -1,0 +1,52 @@
+<div class="roster-heading">
+  <span>{{ roster.length }} alumnos</span>
+  <button
+    type="button"
+    class="text-button"
+    [disabled]="!pendingVisibleCount || future"
+    (click)="markPending.emit()"
+  >
+    Marcar pendientes ({{ pendingVisibleCount }}) <fa-icon [icon]="icons.present"></fa-icon>
+  </button>
+</div>
+<div class="surface roster-list">
+  @for (student of roster; track student.id) {
+    <div class="roster-row">
+      <button
+        type="button"
+        class="student-link"
+        [attr.aria-label]="'Ver ficha de ' + fullName(student)"
+        (click)="openStudent(student)"
+      >
+        <span class="avatar" [class]="student.avatarColor">{{ initials(student) }}</span>
+        <span class="student-copy"
+          ><strong>{{ fullName(student) }}</strong
+          ><small>{{ statusLabels[sessionStatus(student)] }}</small></span
+        >
+      </button>
+      <div class="status-actions" [attr.aria-label]="'Asistencia de ' + fullName(student)">
+        @for (status of quickStatuses; track status) {
+          <button
+            type="button"
+            class="status-button"
+            [class]="status"
+            [class.selected]="sessionStatus(student) === status"
+            [attr.aria-pressed]="sessionStatus(student) === status"
+            [attr.aria-label]="statusLabels[status] + ': ' + fullName(student)"
+            [title]="statusLabels[status]"
+            [disabled]="future"
+            (click)="quickMark(student, status)"
+          >
+            <fa-icon [icon]="icons[status]"></fa-icon>
+          </button>
+        }
+      </div>
+    </div>
+  } @empty {
+    <div class="empty-state">
+      <fa-icon [icon]="icons.search"></fa-icon>
+      <h2>No hay alumnos con estos filtros</h2>
+      <button type="button" class="text-button" (click)="clearFilters()">Limpiar filtros</button>
+    </div>
+  }
+</div>

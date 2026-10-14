@@ -5,7 +5,6 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { StudentsComponent } from './pages/students/students.component';
 import { ClassesComponent } from './pages/classes/classes.component';
 import { CalendarComponent } from './pages/calendar/calendar.component';
-import { AttendanceComponent } from './pages/attendance/attendance.component';
 import { PaymentsComponent } from './pages/payments/payments.component';
 import { ValidationsComponent } from './pages/validations/validations.component';
 import { SettingsComponent } from './pages/settings/settings.component';
@@ -16,9 +15,7 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    children: [
-      { path: '', component: LoginComponent }
-    ]
+    children: [{ path: '', component: LoginComponent }],
   },
   {
     path: 'admin',
@@ -29,12 +26,18 @@ export const routes: Routes = [
       { path: 'students', component: StudentsComponent },
       { path: 'classes', component: ClassesComponent },
       { path: 'calendar', component: CalendarComponent },
-      { path: 'attendance', component: AttendanceComponent },
+      {
+        path: 'attendance',
+        loadComponent: () =>
+          import('./pages/attendance/attendance.component').then(
+            (module) => module.AttendanceComponent,
+          ),
+      },
       { path: 'payments', component: PaymentsComponent },
       { path: 'validations', component: ValidationsComponent },
-      { path: 'settings', component: SettingsComponent }
-    ]
+      { path: 'settings', component: SettingsComponent },
+    ],
   },
   { path: 'unauthorized', component: UnauthorizedComponent },
-  { path: '**', redirectTo: '/admin' }
+  { path: '**', redirectTo: '/admin' },
 ];

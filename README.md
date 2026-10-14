@@ -1,5 +1,15 @@
 # DanziFrontApp
 
+## Attendance preview
+
+The application includes `/admin/attendance`, with a mobile roll call, a monthly desktop grid,
+and each student's attendance calendar and history. It uses the existing Angular standalone components,
+Tailwind/daisyUI theme and Font Awesome icons.
+
+This first version uses clearly labelled demo students and classes. The Save attendance action persists
+records in this browser's local storage; it does not yet synchronize across devices or write to the backend.
+Recoveries link a missed lesson to another completed lesson of the same exact level within the same month.
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.24.
 
 ## Development server

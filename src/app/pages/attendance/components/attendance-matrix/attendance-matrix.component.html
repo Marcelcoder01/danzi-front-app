@@ -1,0 +1,106 @@
+<div class="surface matrix-card">
+  <div class="matrix-heading">
+    <h2>El mes, de un vistazo</h2>
+    <span>{{ monthlyStudents.length }} alumnos</span>
+  </div>
+  <div
+    class="matrix-scroll"
+    tabindex="0"
+    aria-label="Tabla de asistencia mensual; desliza para ver todos los días"
+  >
+    <table class="attendance-table">
+      <caption class="sr-only">
+        Asistencia de
+        {{
+          monthLabel
+        }}. Selecciona una sesión para editarla.
+      </caption>
+      <thead>
+        <tr>
+          <th rowspan="2" class="name-column">Alumno / Nivel</th>
+          <th rowspan="2" class="class-column">Clase inscrita</th>
+          @for (week of weeks; track week.start) {
+            <th [attr.colspan]="week.span" class="week-column">
+              {{ week.label }}<small>{{ week.start }}–{{ week.end }}</small>
+            </th>
+          }
+        </tr>
+        <tr>
+          @for (day of days; track day.date) {
+            <th
+              class="day-column"
+              [class.weekend]="day.weekend"
+              [class.today]="day.date === attendance.today"
+            >
+              <span>{{ weekdayLabels[day.weekday] }}</span
+              ><small>{{ day.day }}</small>
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (student of monthlyStudents; track student.id) {
+          <tr [class.selected-row]="student.id === selectedStudentId">
+            <td class="name-column">
+              <button
+                type="button"
+                class="student-link"
+                (click)="openStudent(student)"
+                [attr.aria-label]="'Ver ficha de ' + fullName(student)"
+              >
+                <span class="avatar" [class]="student.avatarColor">{{ initials(student) }}</span
+                ><span class="student-copy"
+                  ><strong>{{ fullName(student) }}</strong
+                  ><small>{{ levelLabel(student) }}</small></span
+                >
+              </button>
+            </td>
+            <td class="class-column">
+              <strong>{{ enrolledClass(student).name }}</strong
+              ><small>{{ student.level }}</small>
+            </td>
+            @for (day of days; track day.date) {
+              <td
+                class="day-cell"
+                [class.weekend]="day.weekend"
+                [class.today]="day.date === attendance.today"
+              >
+                @if (daySession(student, day.date); as session) {
+                  <button
+                    type="button"
+                    class="status-dot"
+                    [class]="dayStatus(student, day.date)"
+                    [attr.aria-label]="
+                      fullName(student) +
+                      ', ' +
+                      formatDate(day.date) +
+                      ': ' +
+                      statusLabels[dayStatus(student, day.date)]
+                    "
+                    [title]="statusLabels[dayStatus(student, day.date)]"
+                    [disabled]="day.date > attendance.today"
+                    (click)="openEditor(student, session)"
+                  >
+                    <fa-icon [icon]="icons[dayStatus(student, day.date)]"></fa-icon>
+                  </button>
+                } @else {
+                  <span class="no-session" title="Sin clase">·</span>
+                }
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="days.length + 2" class="empty-state">
+              No hay alumnos con estos filtros.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="matrix-hint">
+    <fa-icon [icon]="icons.info"></fa-icon> Toca un estado para editarlo. Los puntos claros indican
+    días sin clase.
+  </p>
+</div>

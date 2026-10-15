@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
@@ -12,31 +13,13 @@ import {
   faUsers,
   faXmark
 } from '@fortawesome/free-solid-svg-icons';
-
-type ActivityType = 'class' | 'event';
-type ActivityStatus = 'active' | 'draft' | 'completed';
-
-interface ClassActivity {
-  id: string;
-  name: string;
-  type: ActivityType;
-  level: string;
-  teacher: string;
-  schedule: string;
-  nextDate: string;
-  room: string;
-  attendees: number;
-  capacity: number;
-  status: ActivityStatus;
-  color: 'violet' | 'blue' | 'amber' | 'rose' | 'emerald';
-}
-
+import { ClassActivity } from './interfaces/classes.interface';
 @Component({
   selector: 'app-classes',
   standalone: true,
   templateUrl: './classes.component.html',
   styleUrl: './classes.component.css',
-  imports: [FormsModule, FaIconComponent]
+  imports: [CommonModule, FormsModule, FaIconComponent]
 })
 export class ClassesComponent {
   faCalendarDays = faCalendarDays;
@@ -140,5 +123,12 @@ export class ClassesComponent {
     if (activity.attendees === activity.capacity) return 'badge-full';
     if (activity.capacity - activity.attendees <= 3) return 'badge-limited';
     return 'badge-open';
+  }
+
+  getAvailabilityColor(activity: ClassActivity): string {
+    if (activity.status === 'draft') return 'var(--color-text-muted)';
+    if (activity.attendees === activity.capacity) return 'var(--color-error-dark)';
+    if (activity.capacity - activity.attendees <= 3) return 'var(--color-warning-dark)';
+    return 'var(--color-success-dark)';
   }
 }

@@ -161,7 +161,6 @@
   background-color: rgba(0, 0, 0, 0.02);
 }
 
-/* Action buttons */
 .action-btn {
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -184,7 +183,6 @@
   color: var(--color-error);
 }
 
-/* Payment indicators */
 .bg-green-500 {
   background-color: var(--color-success);
 }
@@ -193,9 +191,6 @@
   background-color: var(--color-error);
 }
 
-/* Filter select - ahora usa la definición global en styles.css */
-
-/* Clear filters button */
 .clear-filters-btn {
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;

@@ -10,8 +10,8 @@ import {
   faEye,
   faXmark
 } from '@fortawesome/free-solid-svg-icons';
-import { Student } from './interfaces/student.interface';
-import { StudentLevel } from './interfaces/student-level.enum';
+import { Student } from '../../shared/interfaces/student.interface';
+import { StudentLevel } from '../../shared/interfaces/student-level.enum';
 import { StudentsService } from './services/students.service';
 import { StudentDialogComponent } from './student-dialog/student-dialog.component';
 

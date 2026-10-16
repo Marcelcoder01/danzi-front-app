@@ -35,6 +35,15 @@ button:focus-visible {
   justify-content: space-between;
   gap: 16px;
 }
+.page-heading {
+  margin-bottom: 2rem;
+  align-items: flex-end;
+}
+.page-heading h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  letter-spacing: -0.025em;
+}
 .eyebrow {
   margin-bottom: 4px;
   color: var(--color-accent);
@@ -46,6 +55,10 @@ button:focus-visible {
 .helper {
   color: var(--color-text-muted);
   font-size: 12px;
+}
+.page-heading .subtitle {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 .subtitle {
   margin-top: 4px;
@@ -514,12 +527,15 @@ dialog::backdrop {
     font-size: 26px;
   }
   .page-heading {
-    align-items: start;
+    align-items: flex-start;
+    flex-direction: column;
   }
   .heading-tools {
-    flex-direction: column;
-    align-items: end;
-    gap: 10px;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
   }
   .eyebrow {
     font-size: 8px;
@@ -529,8 +545,7 @@ dialog::backdrop {
     font-size: 10px;
   }
   .page-heading .subtitle {
-    max-width: 175px;
-    font-size: 10px;
+    max-width: none;
   }
   .month-toolbar {
     flex-direction: column;

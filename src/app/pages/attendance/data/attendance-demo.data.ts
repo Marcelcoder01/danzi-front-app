@@ -1,4 +1,4 @@
-import { StudentLevel } from '../../students/interfaces/student-level.enum';
+import { StudentLevel } from '../../../shared/interfaces/student-level.enum';
 import { AttendanceClass, AttendanceStudent } from '../interfaces/attendance.interface';
 
 export const ATTENDANCE_CLASSES: AttendanceClass[] = [

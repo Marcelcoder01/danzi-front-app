@@ -1,5 +1,5 @@
-import { Student } from '../../students/interfaces/student.interface';
-import { StudentLevel } from '../../students/interfaces/student-level.enum';
+import { Student } from '../../../shared/interfaces/student.interface';
+import { StudentLevel } from '../../../shared/interfaces/student-level.enum';
 
 export type AttendanceStatus = 'present' | 'recovered' | 'justified' | 'absent' | 'pending';
 

@@ -2,9 +2,9 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faXmark, faUserPlus, faUser, faEnvelope, faPhone, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { Student } from '../interfaces/student.interface';
-import { StudentLevel } from '../interfaces/student-level.enum';
-import type { StudentRole, StudentStatus } from '../interfaces/student-status.type';
+import { Student } from '../../../shared/interfaces/student.interface';
+import { StudentLevel } from '../../../shared/interfaces/student-level.enum';
+import type { StudentRole, StudentStatus } from '../../../shared/interfaces/student-status.type';
 
 @Component({
   selector: 'app-student-dialog',

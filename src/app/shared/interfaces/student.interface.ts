@@ -1,5 +1,3 @@
-import type { Level } from '../../../shared/interfaces/level.interface';
-import type { PaymentMethod } from '../../payments/interfaces/payment-method.interface';
 import { StudentLevel } from './student-level.enum';
 import type { StudentRole, StudentStatus } from './student-status.type';
 
@@ -19,4 +17,3 @@ export interface Student {
   role: StudentRole;
   hasPaid: boolean;
 }
-

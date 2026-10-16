@@ -1,9 +1,7 @@
 <div class="min-h-full p-4 sm:p-6 lg:p-8">
   <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight sm:text-3xl text-[var(--color-text)]">
-        Clases y eventos
-      </h1>
+      <h1 class="text-2xl font-bold tracking-tight sm:text-3xl text-[var(--color-text)]">Clases</h1>
       <p class="mt-1 text-sm text-[var(--color-text-light)]">
         Organiza la oferta, los niveles y la disponibilidad de tu escuela.
       </p>
@@ -223,7 +221,7 @@
             <div class="flex items-center justify-between gap-3">
               <span
                 class="inline-flex items-center rounded-[0.45rem] px-[0.48rem] py-[0.3rem] text-[0.68rem] font-bold leading-none text-[var(--color-text)] bg-white shadow-[1px_2px_4px_rgba(45,55,72,.07)]"
-                >{{ activity.level }}</span
+                >{{ getLevelLabel(activity.level) }}</span
               >
               <span class="text-xs font-medium text-[var(--color-text-muted)]">{{
                 activity.room

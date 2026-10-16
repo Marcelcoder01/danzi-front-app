@@ -299,6 +299,10 @@ body {
   box-shadow: 0 0 0 2px rgba(108, 99, 168, 0.1);
 }
 
+.filter-select option:checked {
+  font-weight: 600 !important;
+}
+
 .danzi-select:focus {
   background-color: #fff;
 }
@@ -306,6 +310,11 @@ body {
 .danzi-select option {
   background: var(--color-surface);
   color: var(--color-text);
+  font-weight: 400;
+}
+
+.danzi-select option:checked {
+  font-weight: 600 !important;
 }
 
 

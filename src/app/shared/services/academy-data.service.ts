@@ -11,6 +11,7 @@ export class AcademyDataService {
   readonly classes: ClassActivity[] = DEMO_CLASSES;
   readonly classesVersion = signal(0);
   readonly enrollments: Enrollment[] = DEMO_ENROLLMENTS;
+  readonly enrollmentsVersion = signal(0);
 
   addStudent(student: Student): void {
     this.students.push(student);
@@ -54,17 +55,19 @@ export class AcademyDataService {
     );
     this.enrollments.splice(0, this.enrollments.length, ...remainingEnrollments);
     this.classesVersion.update((version) => version + 1);
+    this.enrollmentsVersion.update((version) => version + 1);
     return true;
   }
 
   studentsForClass(classId: string, date?: string): Student[] {
+    const asOfDate = date ?? this.today();
     const enrollmentStudentIds = new Set(
       this.enrollments
         .filter(
           (enrollment) =>
             enrollment.classId === classId &&
-            enrollment.enrolledAt <= (date ?? '9999-12-31') &&
-            (!enrollment.withdrawnAt || enrollment.withdrawnAt > (date ?? '9999-12-31')),
+            enrollment.enrolledAt <= asOfDate &&
+            (!enrollment.withdrawnAt || enrollment.withdrawnAt > asOfDate),
         )
         .map((enrollment) => enrollment.studentId),
     );
@@ -81,8 +84,7 @@ export class AcademyDataService {
   }
 
   enrollmentCount(classId: string): number {
-    const now = new Date();
-    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const today = this.today();
     return this.enrollments.filter(
       (enrollment) =>
         enrollment.classId === classId &&
@@ -99,5 +101,44 @@ export class AcademyDataService {
         enrollment.enrolledAt <= date &&
         (!enrollment.withdrawnAt || enrollment.withdrawnAt > date),
     );
+  }
+
+  enrollStudent(studentId: string, classId: string): boolean {
+    const today = this.today();
+    if (!this.students.some((student) => student.id === studentId)) return false;
+    if (!this.classes.some((activity) => activity.id === classId && activity.type === 'class')) {
+      return false;
+    }
+    if (this.isEnrolled(studentId, classId, today)) return false;
+
+    this.enrollments.push({
+      id: `enrollment-${globalThis.crypto.randomUUID()}`,
+      studentId,
+      classId,
+      enrolledAt: today,
+    });
+    this.enrollmentsVersion.update((version) => version + 1);
+    return true;
+  }
+
+  withdrawStudent(studentId: string, classId: string): boolean {
+    const today = this.today();
+    const enrollment = this.enrollments.find(
+      (item) =>
+        item.studentId === studentId &&
+        item.classId === classId &&
+        item.enrolledAt <= today &&
+        (!item.withdrawnAt || item.withdrawnAt > today),
+    );
+    if (!enrollment) return false;
+
+    enrollment.withdrawnAt = today;
+    this.enrollmentsVersion.update((version) => version + 1);
+    return true;
+  }
+
+  private today(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   }
 }

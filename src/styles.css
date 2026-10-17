@@ -113,9 +113,6 @@ body {
    DANZI MODAL
    ========================================================= */
 
-/* =========================================================
-   DANZI MODAL
-   ========================================================= */
 
 #student_dialog {
   background: transparent;
@@ -128,7 +125,8 @@ body {
 }
 
 #student_dialog .modal-box {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   background: var(--color-surface);
 

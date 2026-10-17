@@ -1,0 +1,274 @@
+<dialog id="participants_dialog" class="modal modal-middle">
+  @if (selectedClass(); as activity) {
+    <div
+      class="modal-box w-[calc(100%-2rem)] max-w-5xl max-h-[90vh] p-0 flex flex-col bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-2xl shadow-[0_30px_90px_rgba(23,31,56,0.24),0_3px_12px_rgba(23,31,56,0.08)]"
+    >
+      <header
+        class="flex items-center justify-between gap-4 p-6 pb-4 border-b border-[var(--color-border-light)]"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+          >
+            <fa-icon [icon]="faUsers" class="text-lg"></fa-icon>
+          </div>
+          <div>
+            <p
+              class="text-[0.68rem] font-extrabold uppercase tracking-[0.12em] text-[var(--color-accent)]"
+            >
+              Gestión de clase
+            </p>
+            <h2 id="participants-title" class="text-xl font-bold text-[var(--color-text)]">
+              Participantes
+            </h2>
+            <p class="text-sm text-[var(--color-text-muted)]">
+              {{ activity.name }} · {{ activity.teacher }}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          aria-label="Cerrar diálogo"
+          class="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface-alt)]/70 text-[var(--color-text-muted)] shadow-[2px_2px_6px_rgba(0,0,0,0.05),-2px_-2px_6px_rgba(255,255,255,0.5)] transition-all duration-200 hover:-translate-y-0.5 hover:text-[var(--color-text)] hover:shadow-md"
+          (click)="close()"
+        >
+          <fa-icon [icon]="faXmark"></fa-icon>
+        </button>
+      </header>
+
+      <div
+        class="flex items-center gap-4 p-4 border-b border-[var(--color-border-light)] bg-gradient-to-r from-[var(--color-accent)]/6 to-[var(--color-surface)]"
+      >
+        <div>
+          <span class="text-xl font-extrabold text-[var(--color-accent)]">{{
+            enrolledStudents().length
+          }}</span>
+          <span class="ml-1 text-xs text-[var(--color-text-muted)]"
+            >de {{ activity.capacity }} plazas ocupadas</span
+          >
+        </div>
+        <div
+          class="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--color-surface-alt)]"
+          role="progressbar"
+          [attr.aria-valuenow]="enrolledStudents().length"
+          [attr.aria-valuemax]="activity.capacity"
+        >
+          <span
+            class="block h-full rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-dark)] transition-all duration-200"
+            [style.width.%]="
+              activity.capacity ? (enrolledStudents().length / activity.capacity) * 100 : 0
+            "
+          ></span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 px-6 py-3 border-b border-[var(--color-border-light)]">
+        <span
+          class="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold text-[#955b14] bg-[#fff2d8]"
+        >
+          <fa-icon [icon]="faCrown"></fa-icon>
+          {{ enrolledStudents().filter((s) => s.role === 'leader').length }} Líder
+        </span>
+        <span
+          class="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold text-[#3460a4] bg-[#e9f1ff]"
+        >
+          <fa-icon [icon]="faPersonWalking"></fa-icon>
+          {{ enrolledStudents().filter((s) => s.role === 'follower').length }} Followers
+        </span>
+        <span
+          class="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold text-[#694ca0] bg-[#f0eaff]"
+        >
+          <fa-icon [icon]="faUsers"></fa-icon>
+          {{ enrolledStudents().filter((s) => s.role === 'mixed').length }} Ambos
+        </span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 flex-1 min-h-0 overflow-auto p-6">
+        <section
+          class="flex flex-col min-h-0 overflow-hidden border border-[var(--color-border-light)] rounded-xl bg-white shadow-sm"
+          aria-labelledby="enrolled-title"
+        >
+          <div class="flex items-center justify-between gap-3 p-4 pb-3">
+            <div>
+              <h3 id="enrolled-title" class="text-sm font-bold text-[var(--color-text)]">
+                Matriculados
+              </h3>
+              <p class="text-xs text-[var(--color-text-muted)]">
+                Alumnos que forman parte de esta clase
+              </p>
+            </div>
+            <span class="badge badge-primary">{{ enrolledStudents().length }}</span>
+          </div>
+
+          <div class="flex-1 min-h-0 overflow-auto px-3 pb-3">
+            @for (student of enrolledStudents(); track student.id) {
+              <article
+                class="flex items-center gap-3 py-2 px-3 border-b border-[var(--color-border-light)] last:border-b-0"
+              >
+                <div
+                  class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent-dark)] text-xs font-extrabold"
+                >
+                  @if (student.photoUrl) {
+                    <img
+                      [src]="student.photoUrl"
+                      [alt]="'Foto de ' + fullName(student)"
+                      class="w-full h-full object-cover"
+                    />
+                  } @else {
+                    {{ initials(student) }}
+                  }
+                </div>
+                <div class="flex-1 min-w-0 grid gap-0.5">
+                  <strong class="truncate text-sm font-bold text-[var(--color-text)]">{{
+                    fullName(student)
+                  }}</strong>
+                  <span class="truncate text-xs text-[var(--color-text-muted)]">{{
+                    student.alias || student.level
+                  }}</span>
+                </div>
+                <span
+                  class="role-badge"
+                  [class.role-leader]="student.role === 'leader'"
+                  [class.role-follower]="student.role === 'follower'"
+                  [class.role-mixed]="student.role === 'mixed'"
+                  >{{ roleLabel(student.role) }}</span
+                >
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs text-[var(--color-error-dark)] bg-[#fff0f2] hover:bg-[#ffe0e5]"
+                  [attr.aria-label]="'Retirar a ' + fullName(student)"
+                  (click)="removeStudent(student)"
+                >
+                  <fa-icon [icon]="faUserMinus"></fa-icon>
+                </button>
+              </article>
+            } @empty {
+              <div class="flex flex-col items-center justify-center min-h-56 p-6 text-center">
+                <div
+                  class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] mb-3"
+                >
+                  <fa-icon [icon]="faUsers"></fa-icon>
+                </div>
+                <strong class="text-sm text-[var(--color-text)]">La clase empieza aquí</strong>
+                <p class="text-xs text-[var(--color-text-muted)] mt-1 max-w-72">
+                  Aún no hay alumnos matriculados. Añade participantes desde la lista de
+                  disponibles.
+                </p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section
+          class="flex flex-col min-h-0 overflow-hidden border border-[var(--color-border-light)] rounded-xl bg-white shadow-sm"
+          aria-labelledby="available-title"
+        >
+          <div class="flex items-center justify-between gap-3 p-4 pb-3">
+            <div>
+              <h3 id="available-title" class="text-sm font-bold text-[var(--color-text)]">
+                Disponibles
+              </h3>
+              <p class="text-xs text-[var(--color-text-muted)]">
+                Alumnos que puedes añadir a esta clase
+              </p>
+            </div>
+            <span class="badge badge-ghost">{{ availableStudents().length }}</span>
+          </div>
+
+          <div class="relative m-4 mb-3">
+            <fa-icon [icon]="faMagnifyingGlass" class="search-icon"></fa-icon>
+            <input
+              type="search"
+              class="search-input"
+              placeholder="Buscar alumno..."
+              [value]="searchTerm()"
+              (input)="searchTerm.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="flex-1 min-h-0 overflow-auto px-3 pb-3">
+            @for (student of availableStudents(); track student.id) {
+              <article
+                class="flex items-center gap-3 py-2 px-3 border-b border-[var(--color-border-light)] last:border-b-0"
+              >
+                <div
+                  class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent-dark)] text-xs font-extrabold"
+                >
+                  @if (student.photoUrl) {
+                    <img
+                      [src]="student.photoUrl"
+                      [alt]="'Foto de ' + fullName(student)"
+                      class="w-full h-full object-cover"
+                    />
+                  } @else {
+                    {{ initials(student) }}
+                  }
+                </div>
+                <div class="flex-1 min-w-0 grid gap-0.5">
+                  <strong class="truncate text-sm font-bold text-[var(--color-text)]">{{
+                    fullName(student)
+                  }}</strong>
+                  <span class="truncate text-xs text-[var(--color-text-muted)]">{{
+                    student.alias || student.level
+                  }}</span>
+                </div>
+                <span
+                  class="role-badge"
+                  [class.role-leader]="student.role === 'leader'"
+                  [class.role-follower]="student.role === 'follower'"
+                  [class.role-mixed]="student.role === 'mixed'"
+                  >{{ roleLabel(student.role) }}</span
+                >
+                <button
+                  type="button"
+                  class="btn btn-xs text-white bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-dark)] hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                  [disabled]="enrolledStudents().length >= activity.capacity"
+                  [attr.aria-label]="'Añadir a ' + fullName(student)"
+                  (click)="addStudent(student)"
+                >
+                  <fa-icon [icon]="faPlus"></fa-icon>
+                </button>
+              </article>
+            } @empty {
+              <div class="flex flex-col items-center justify-center min-h-40 p-6 text-center">
+                <strong class="text-sm text-[var(--color-text)]">{{
+                  searchTerm() ? 'No hay coincidencias' : 'Todos están dentro'
+                }}</strong>
+                <p class="text-xs text-[var(--color-text-muted)] mt-1">
+                  {{
+                    searchTerm()
+                      ? 'Prueba con otro nombre.'
+                      : 'No quedan alumnos disponibles para matricular.'
+                  }}
+                </p>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+
+      <footer
+        class="flex items-center justify-end gap-3 p-4 border-t border-[var(--color-border-light)]"
+      >
+        <button
+          type="button"
+          class="rounded-xl px-5 py-2.5 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-text)]"
+          (click)="cancel()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="group flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(108,99,168,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_12px_25px_rgba(108,99,168,0.32)] active:translate-y-0"
+          (click)="close()"
+        >
+          <span>Listo</span>
+          <fa-icon
+            [icon]="faArrowRight"
+            class="text-xs transition-transform duration-200 group-hover:translate-x-0.5"
+          ></fa-icon>
+        </button>
+      </footer>
+    </div>
+  }
+</dialog>

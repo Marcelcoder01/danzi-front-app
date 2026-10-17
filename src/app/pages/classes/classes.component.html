@@ -290,28 +290,60 @@
             </div>
           </div>
 
-          <div
-            class="mt-5 flex items-center justify-between gap-3 border-t border-[var(--color-border-light)] pt-4"
-          >
-            <span
-              class="inline-flex items-center rounded-[0.45rem] px-[0.55rem] py-[0.38rem] text-[0.68rem] font-bold leading-none"
-              [ngClass]="{
-                'text-[var(--color-success-dark)] bg-[rgba(72,187,120,.12)]':
-                  getAvailabilityClass(activity) === 'badge-open',
-                'text-[var(--color-warning-dark)] bg-[rgba(237,137,54,.13)]':
-                  getAvailabilityClass(activity) === 'badge-limited',
-                'text-[var(--color-error-dark)] bg-[rgba(219,79,125,.12)]':
-                  getAvailabilityClass(activity) === 'badge-full',
-                'text-[var(--color-text-muted)] bg-[var(--color-surface-alt)]':
-                  getAvailabilityClass(activity) === 'badge-draft',
-              }"
-              >{{ getAvailabilityLabel(activity) }}</span
-            >
-            <button
-              class="text-[0.78rem] font-bold text-[var(--color-accent)] transition-all duration-200 hover:text-[var(--color-accent-dark)]"
-            >
-              Ver detalle <span aria-hidden="true">→</span>
-            </button>
+          <div class="mt-5 flex flex-col gap-3 border-t border-[var(--color-border-light)] pt-4">
+            <div class="flex items-center justify-between gap-3">
+              <span
+                class="inline-flex items-center rounded-[0.45rem] px-[0.55rem] py-[0.38rem] text-[0.68rem] font-bold leading-none"
+                [ngClass]="{
+                  'text-[var(--color-success-dark)] bg-[rgba(72,187,120,.12)]':
+                    getAvailabilityClass(activity) === 'badge-open',
+                  'text-[var(--color-warning-dark)] bg-[rgba(237,137,54,.13)]':
+                    getAvailabilityClass(activity) === 'badge-limited',
+                  'text-[var(--color-error-dark)] bg-[rgba(219,79,125,.12)]':
+                    getAvailabilityClass(activity) === 'badge-full',
+                  'text-[var(--color-text-muted)] bg-[var(--color-surface-alt)]':
+                    getAvailabilityClass(activity) === 'badge-draft',
+                }"
+                >{{ getAvailabilityLabel(activity) }}</span
+              >
+              @if (activity.type === 'class') {
+                <button
+                  type="button"
+                  class="text-[0.78rem] font-bold text-[var(--color-accent)] transition-all duration-200 hover:text-[var(--color-accent-dark)]"
+                  (click)="openParticipants(activity)"
+                >
+                  Participantes <span aria-hidden="true">→</span>
+                </button>
+              }
+            </div>
+            @if (activity.type === 'class' && getEnrollmentCount(activity) > 0) {
+              <div class="flex items-center gap-2">
+                @if (getLeaderCount(activity) > 0) {
+                  <span
+                    class="flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.62rem] font-bold text-[#955b14] bg-[#fff2d8]"
+                  >
+                    <fa-icon [icon]="faCrown" class="text-[0.5rem]"></fa-icon>
+                    {{ getLeaderCount(activity) }} Líder
+                  </span>
+                }
+                @if (getFollowerCount(activity) > 0) {
+                  <span
+                    class="flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.62rem] font-bold text-[#3460a4] bg-[#e9f1ff]"
+                  >
+                    <fa-icon [icon]="faPersonWalking" class="text-[0.5rem]"></fa-icon>
+                    {{ getFollowerCount(activity) }} Followers
+                  </span>
+                }
+                @if (getMixedCount(activity) > 0) {
+                  <span
+                    class="flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.62rem] font-bold text-[#694ca0] bg-[#f0eaff]"
+                  >
+                    <fa-icon [icon]="faUsers" class="text-[0.5rem]"></fa-icon>
+                    {{ getMixedCount(activity) }} Ambos
+                  </span>
+                }
+              </div>
+            }
           </div>
         </article>
       }
@@ -343,3 +375,4 @@
   (createClass)="createClass($event)"
   (updateClass)="updateClass($event)"
 ></app-class-dialog>
+<app-participants-dialog></app-participants-dialog>

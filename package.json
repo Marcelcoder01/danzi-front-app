@@ -28,7 +28,7 @@
     "@angular/cli": "^21.2.24",
     "@angular/compiler-cli": "^21.2.0",
     "autoprefixer": "^10.6.1",
-    "daisyui": "^5.7.47",
+    "daisyui": "^4.12.24",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.28",
     "prettier": "^3.8.1",

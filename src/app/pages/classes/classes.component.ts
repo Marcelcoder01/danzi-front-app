@@ -5,10 +5,12 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faCalendarDays,
   faClock,
+  faCrown,
   faEdit,
   faEllipsis,
   faFilter,
   faMusic,
+  faPersonWalking,
   faPlus,
   faSearch,
   faUsers,
@@ -23,25 +25,35 @@ import { StudentLevel, getLevelLabel } from '../../shared/interfaces/student-lev
 import { AcademyDataService } from '../../shared/services/academy-data.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ClassDialogComponent } from './class-dialog/class-dialog.component';
+import { ParticipantsDialogComponent } from './participants-dialog/participants-dialog.component';
 
 @Component({
   selector: 'app-classes',
   standalone: true,
   templateUrl: './classes.component.html',
   styleUrl: './classes.component.css',
-  imports: [CommonModule, FormsModule, FaIconComponent, ClassDialogComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FaIconComponent,
+    ClassDialogComponent,
+    ParticipantsDialogComponent,
+  ],
 })
 export class ClassesComponent {
   @ViewChild(ClassDialogComponent) private classDialog?: ClassDialogComponent;
+  @ViewChild(ParticipantsDialogComponent) private participantsDialog?: ParticipantsDialogComponent;
 
   private readonly academyData = inject(AcademyDataService);
   private readonly toastService = inject(ToastService);
   faCalendarDays = faCalendarDays;
   faClock = faClock;
+  faCrown = faCrown;
   faEdit = faEdit;
   faEllipsis = faEllipsis;
   faFilter = faFilter;
   faMusic = faMusic;
+  faPersonWalking = faPersonWalking;
   faPlus = faPlus;
   faSearch = faSearch;
   faUsers = faUsers;
@@ -56,6 +68,7 @@ export class ClassesComponent {
 
   readonly allActivities = computed(() => {
     this.academyData.classesVersion();
+    this.academyData.enrollmentsVersion();
     return this.academyData.classes;
   });
   readonly regularClassCount = computed(
@@ -105,6 +118,10 @@ export class ClassesComponent {
     if (activity.type === 'class') this.classDialog?.openForEdit(activity);
   }
 
+  openParticipants(activity: ClassActivity): void {
+    if (activity.type === 'class') this.participantsDialog?.openFor(activity);
+  }
+
   createClass(activity: Omit<RegularClassActivity, 'id'>): void {
     try {
       this.academyData.addClass({
@@ -150,6 +167,19 @@ export class ClassesComponent {
 
   getEnrollmentCount(activity: ClassActivity): number {
     return this.academyData.enrollmentCount(activity.id);
+  }
+
+  getLeaderCount(activity: ClassActivity): number {
+    return this.academyData.studentsForClass(activity.id).filter((s) => s.role === 'leader').length;
+  }
+
+  getFollowerCount(activity: ClassActivity): number {
+    return this.academyData.studentsForClass(activity.id).filter((s) => s.role === 'follower')
+      .length;
+  }
+
+  getMixedCount(activity: ClassActivity): number {
+    return this.academyData.studentsForClass(activity.id).filter((s) => s.role === 'mixed').length;
   }
 
   getAvailabilityLabel(activity: ClassActivity): string {

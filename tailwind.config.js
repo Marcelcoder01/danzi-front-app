@@ -1,17 +1,14 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{html,ts}",
-  ],
+  content: ['./src/**/*.{html,ts}'],
   theme: {
     extend: {
       keyframes: {
         'login-enter': {
-          'from': {
+          from: {
             opacity: '0',
             transform: 'translateY(12px) scale(.98)',
           },
-          'to': {
+          to: {
             opacity: '1',
             transform: 'none',
           },
@@ -19,11 +16,9 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require("daisyui").default({
-      include: ["alert", "toast", "button", "dropdown", "menu"],
-      themes: ["light"],
-      logs: false,
-    }),
-  ],
-}
+  daisyui: {
+    themes: ['light'],
+    logs: false,
+  },
+  plugins: [require('daisyui')],
+};

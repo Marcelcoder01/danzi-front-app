@@ -12,7 +12,7 @@ import { StudentsService } from '../../../students/services/students.service';
 import {
   AttendanceSession,
   AttendanceStatus,
-  AttendanceStudent,
+  AttendanceEnrollmentRow,
   ATTENDANCE_LABELS,
   localDateKey,
   parseLocalDate,
@@ -27,11 +27,12 @@ import { AttendanceService } from '../../services/attendance.service';
   styleUrl: './attendance-matrix.component.css',
 })
 export class AttendanceMatrixComponent {
-  @Input({ required: true }) monthlyStudents!: AttendanceStudent[];
+  @Input({ required: true }) monthlyStudents!: AttendanceEnrollmentRow[];
   @Input({ required: true }) month!: string;
   @Input() selectedStudentId = '';
-  @Output() selectStudent = new EventEmitter<AttendanceStudent>();
-  @Output() edit = new EventEmitter<{ student: AttendanceStudent; session: AttendanceSession }>();
+  @Input() selectedClassId = '';
+  @Output() selectStudent = new EventEmitter<AttendanceEnrollmentRow>();
+  @Output() edit = new EventEmitter<{ student: AttendanceEnrollmentRow; session: AttendanceSession }>();
   readonly attendance = inject(AttendanceService);
   private readonly studentsService = inject(StudentsService);
   readonly statusLabels = ATTENDANCE_LABELS;
@@ -44,16 +45,16 @@ export class AttendanceMatrixComponent {
     pending: faCircle,
     info: faCircleInfo,
   };
-  fullName(student: AttendanceStudent): string {
+  fullName(student: AttendanceEnrollmentRow): string {
     return `${student.firstName} ${student.lastName}`;
   }
-  initials(student: AttendanceStudent): string {
+  initials(student: AttendanceEnrollmentRow): string {
     return `${student.firstName[0]}${student.lastName?.[0] ?? ''}`;
   }
-  levelLabel(student: AttendanceStudent): string {
+  levelLabel(student: AttendanceEnrollmentRow): string {
     return `${this.studentsService.getLevelGroup(student.level)} · ${student.level}`;
   }
-  enrolledClass(student: AttendanceStudent) {
+  enrolledClass(student: AttendanceEnrollmentRow) {
     return this.attendance.classes.find((activity) => activity.id === student.classId)!;
   }
   get monthLabel(): string {
@@ -96,17 +97,17 @@ export class AttendanceMatrixComponent {
     }
     return weeks;
   }
-  daySession(student: AttendanceStudent, date: string) {
+  daySession(student: AttendanceEnrollmentRow, date: string) {
     return this.attendance.session(student.classId, date);
   }
-  dayStatus(student: AttendanceStudent, date: string): AttendanceStatus {
+  dayStatus(student: AttendanceEnrollmentRow, date: string): AttendanceStatus {
     const session = this.daySession(student, date);
     return session ? this.attendance.record(student.id, session.id).status : 'pending';
   }
-  openStudent(student: AttendanceStudent): void {
+  openStudent(student: AttendanceEnrollmentRow): void {
     this.selectStudent.emit(student);
   }
-  openEditor(student: AttendanceStudent, session: AttendanceSession): void {
+  openEditor(student: AttendanceEnrollmentRow, session: AttendanceSession): void {
     this.edit.emit({ student, session });
   }
 }

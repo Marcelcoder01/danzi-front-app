@@ -2,18 +2,39 @@ import { StudentLevel } from './student-level.enum';
 
 export type ActivityType = 'class' | 'event';
 export type ActivityStatus = 'active' | 'draft' | 'completed';
+export type ActivityColor = 'violet' | 'blue' | 'amber' | 'rose' | 'emerald';
 
-export interface ClassActivity {
+export interface WeeklyClassSchedule {
+  weekdays: number[];
+  startTime: string;
+  endTime: string;
+}
+
+export interface OneOffSchedule {
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
+interface ActivityBase {
   id: string;
   name: string;
-  type: ActivityType;
   level: StudentLevel | string;
   teacher: string;
-  schedule: string;
-  nextDate: string;
   room: string;
-  attendees: number;
   capacity: number;
   status: ActivityStatus;
-  color: 'violet' | 'blue' | 'amber' | 'rose' | 'emerald';
+  color: ActivityColor;
 }
+
+export interface RegularClassActivity extends ActivityBase {
+  type: 'class';
+  schedule: WeeklyClassSchedule;
+}
+
+export interface EventActivity extends ActivityBase {
+  type: 'event';
+  schedule: OneOffSchedule;
+}
+
+export type ClassActivity = RegularClassActivity | EventActivity;

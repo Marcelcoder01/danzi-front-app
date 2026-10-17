@@ -1,7 +1,7 @@
 <div
   class="attendance-page"
-  [class.forced-session]="viewMode === 'session'"
-  [class.forced-month]="viewMode === 'month'"
+  [class.forced-session]="viewMode() === 'session'"
+  [class.forced-month]="viewMode() === 'month'"
 >
   <header class="page-heading">
     <div>
@@ -9,26 +9,22 @@
       <p class="subtitle">Menos gestión. Más tiempo para bailar.</p>
     </div>
     <div class="heading-tools">
-      <span class="demo-label"
-        ><span class="h-1 w-1 rounded-full bg-[var(--color-accent-light)]"></span> Datos de
-        ejemplo</span
-      >
-      <div class="view-toggle" [attr.data-view]="viewMode" aria-label="Vista de asistencias">
+      <div class="view-toggle" [attr.data-view]="viewMode()" aria-label="Vista de asistencias">
         <button
           type="button"
           class="session-tab"
-          [attr.aria-pressed]="effectiveView === 'session'"
-          [class.active]="effectiveView === 'session'"
-          (click)="viewMode = 'session'"
+          [attr.aria-pressed]="effectiveView() === 'session'"
+          [class.active]="effectiveView() === 'session'"
+          (click)="viewMode.set('session')"
         >
           Pasar lista
         </button>
         <button
           type="button"
           class="month-tab"
-          [attr.aria-pressed]="effectiveView === 'month'"
-          [class.active]="effectiveView === 'month'"
-          (click)="viewMode = 'month'"
+          [attr.aria-pressed]="effectiveView() === 'month'"
+          [class.active]="effectiveView() === 'month'"
+          (click)="viewMode.set('month')"
         >
           <fa-icon [icon]="icons.calendar"></fa-icon> Mes
         </button>
@@ -40,15 +36,16 @@
     <div class="surface session-controls">
       <label class="field"
         ><span>Clase</span>
-        <select [(ngModel)]="sessionClassId" (ngModelChange)="chooseClass()">
+        <select [ngModel]="sessionClassId()" (ngModelChange)="chooseClass($event)">
           @for (activity of attendance.classes; track activity.id) {
             <option [value]="activity.id">{{ activity.name }} · {{ activity.level }}</option>
           }
         </select>
       </label>
       <p class="session-meta">
-        <fa-icon [icon]="icons.clock"></fa-icon> {{ sessionClass.time }} <span>·</span>
-        {{ sessionClass.room }}
+        <fa-icon [icon]="icons.clock"></fa-icon> {{ sessionClass().schedule.startTime }} –
+        {{ sessionClass().schedule.endTime }} <span>·</span>
+        {{ sessionClass().room }}
       </p>
       <div class="date-navigation">
         <button
@@ -65,8 +62,8 @@
           ><input
             type="date"
             aria-label="Fecha de la clase"
-            [(ngModel)]="selectedDate"
-            (ngModelChange)="changeDate()"
+            [ngModel]="selectedDate()"
+            (ngModelChange)="changeDate($event)"
         /></label>
         <button
           type="button"
@@ -84,10 +81,10 @@
       @for (filter of quickFilters; track filter.id) {
         <button
           type="button"
-          [class.active]="statusFilter === filter.id"
+          [class.active]="statusFilter() === filter.id"
           [attr.data-filter]="filter.id"
-          [attr.aria-pressed]="statusFilter === filter.id"
-          (click)="statusFilter = filter.id"
+          [attr.aria-pressed]="statusFilter() === filter.id"
+          (click)="statusFilter.set(filter.id)"
         >
           <span>{{ filter.label }}</span
           ><strong>{{ filterCount(filter.id) }}</strong>
@@ -100,21 +97,22 @@
         type="search"
         placeholder="Buscar alumno..."
         aria-label="Buscar alumno en la clase"
-        [(ngModel)]="searchTerm"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
     /></label>
 
-    @if (selectedSession; as session) {
-      @if (selectedDate > attendance.today) {
+    @if (selectedSession(); as session) {
+      @if (selectedDate() > attendance.today) {
         <p class="notice">
           <fa-icon [icon]="icons.info"></fa-icon> Esta sesión aún no ha empezado. Podrás marcar la
           asistencia ese día.
         </p>
       }
       <app-attendance-roster
-        [roster]="roster"
-        [statusByStudent]="rosterStatuses"
-        [pendingVisibleCount]="pendingVisibleCount"
-        [future]="selectedDate > attendance.today"
+        [roster]="roster()"
+        [statusByStudent]="rosterStatuses()"
+        [pendingVisibleCount]="pendingVisibleCount()"
+        [future]="selectedDate() > attendance.today"
         (mark)="quickMark($event.student, $event.status)"
         (detail)="openStudent($event)"
         (markPending)="markPending()"
@@ -147,7 +145,7 @@
           ><input
             type="month"
             aria-label="Mes de asistencia"
-            [ngModel]="month"
+            [ngModel]="month()"
             (ngModelChange)="changeMonth($event)"
         /></label>
         <button
@@ -163,7 +161,7 @@
     <div class="monthly-filters">
       <label class="field"
         ><span>Clase</span
-        ><select [(ngModel)]="classFilter">
+        ><select [ngModel]="classFilter()" (ngModelChange)="classFilter.set($event)">
           <option value="">Todas las clases</option>
           @for (activity of attendance.classes; track activity.id) {
             <option [value]="activity.id">{{ activity.name }}</option>
@@ -172,7 +170,7 @@
       >
       <label class="field"
         ><span>Nivel</span
-        ><select [(ngModel)]="levelFilter">
+        ><select [ngModel]="levelFilter()" (ngModelChange)="levelFilter.set($event)">
           <option value="">Todos los niveles</option>
           <option value="A">Principiante</option>
           <option value="B">Intermedio</option>
@@ -185,20 +183,21 @@
           type="search"
           placeholder="Buscar alumno..."
           aria-label="Buscar alumno en el mes"
-          [(ngModel)]="searchTerm"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
       /></label>
       <button
         type="button"
         class="secondary-button"
-        [attr.aria-expanded]="filtersOpen"
-        (click)="filtersOpen = !filtersOpen"
+        [attr.aria-expanded]="filtersOpen()"
+        (click)="filtersOpen.update((open) => !open)"
       >
         <fa-icon [icon]="icons.filter"></fa-icon> Filtros
       </button>
     </div>
-    @if (filtersOpen) {
+    @if (filtersOpen()) {
       <div class="filter-note">
-        <span>{{ monthlyStudents.length }} alumnos · {{ monthLabel }}</span
+        <span>{{ monthlyStudents().length }} alumnos · {{ monthLabel() }}</span
         ><button type="button" class="text-button" (click)="clearFilters()">Limpiar filtros</button>
       </div>
     }
@@ -208,7 +207,7 @@
         <span class="kpi-icon"><fa-icon [icon]="icons.users"></fa-icon></span>
         <div>
           <p>Asistieron</p>
-          <strong>{{ monthCounts.present }}</strong
+          <strong>{{ monthCounts().present }}</strong
           ><small>asistencias del mes</small>
         </div>
       </article>
@@ -216,7 +215,7 @@
         <span class="kpi-icon"><fa-icon [icon]="icons.recovered"></fa-icon></span>
         <div>
           <p>Recuperadas</p>
-          <strong>{{ monthCounts.recovered }}</strong
+          <strong>{{ monthCounts().recovered }}</strong
           ><small>en otras clases</small>
         </div>
       </article>
@@ -224,14 +223,14 @@
         <span class="kpi-icon"><fa-icon [icon]="icons.absent"></fa-icon></span>
         <div>
           <p>Faltas</p>
-          <strong>{{ monthCounts.absent }}</strong
-          ><small>{{ monthCounts.justified }} justificadas aparte</small>
+          <strong>{{ monthCounts().absent }}</strong
+          ><small>{{ monthCounts().justified }} justificadas aparte</small>
         </div>
       </article>
       <article class="kpi rate">
         <span class="kpi-icon"><fa-icon [icon]="icons.chart"></fa-icon></span>
         <div>
-          <strong>{{ attendanceRate }}%</strong>
+          <strong>{{ attendanceRate() }}%</strong>
           <p>de asistencia</p>
           <small>sobre sesiones marcadas</small>
         </div>
@@ -240,16 +239,17 @@
 
     <div class="monthly-content">
       <app-attendance-matrix
-        [monthlyStudents]="monthlyStudents"
-        [month]="month"
-        [selectedStudentId]="selectedStudent.id"
+        [monthlyStudents]="monthlyStudents()"
+        [month]="month()"
+        [selectedStudentId]="selectedStudent().id"
+        [selectedClassId]="selectedStudent().classId"
         (selectStudent)="openStudent($event)"
         (edit)="openEditor($event.student, $event.session)"
       ></app-attendance-matrix>
       <aside class="surface student-inspector" aria-label="Detalle del alumno">
         <app-attendance-student
-          [selectedStudent]="selectedStudent"
-          [month]="month"
+          [selectedStudent]="selectedStudent()"
+          [month]="month()"
           [dialog]="false"
           (close)="studentDialog.close()"
           (chooseClass)="goToStudentClass()"
@@ -269,13 +269,13 @@
   </div>
   <div class="save-bar">
     <div>
-      <strong>{{ draftCount ? draftCount + ' cambios sin guardar' : 'Todo al día' }}</strong
+      <strong>{{ draftCount() ? draftCount() + ' cambios sin guardar' : 'Todo al día' }}</strong
       ><small>Guardado local en este dispositivo</small>
     </div>
     <button
       type="button"
       class="primary-button"
-      [disabled]="!draftCount"
+      [disabled]="!draftCount()"
       (click)="attendance.save()"
     >
       <fa-icon [icon]="icons.save"></fa-icon> Guardar asistencia
@@ -289,8 +289,8 @@
 
   <dialog #studentDialog class="student-dialog" aria-labelledby="student-dialog-title">
     <app-attendance-student
-      [selectedStudent]="selectedStudent"
-      [month]="month"
+      [selectedStudent]="selectedStudent()"
+      [month]="month()"
       [dialog]="true"
       (close)="studentDialog.close()"
       (chooseClass)="goToStudentClass()"

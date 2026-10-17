@@ -1,21 +1,11 @@
 import { Student } from '../../../shared/interfaces/student.interface';
-import { StudentLevel } from '../../../shared/interfaces/student-level.enum';
 
 export type AttendanceStatus = 'present' | 'recovered' | 'justified' | 'absent' | 'pending';
 
-export interface AttendanceStudent extends Student {
-  id: string;
+/** A student projected through one enrollment for attendance UI rows. */
+export interface AttendanceEnrollmentRow extends Student {
   classId: string;
   avatarColor: string;
-}
-
-export interface AttendanceClass {
-  id: string;
-  name: string;
-  level: StudentLevel;
-  weekdays: number[];
-  time: string;
-  room: string;
 }
 
 export interface AttendanceSession {
@@ -25,6 +15,7 @@ export interface AttendanceSession {
 }
 
 export interface AttendanceRecord {
+  // In the database, (studentId, sessionId) is the composite primary key.
   studentId: string;
   sessionId: string;
   status: AttendanceStatus;

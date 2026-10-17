@@ -25,7 +25,8 @@
           <div class="relative max-w-xl flex-1">
             <fa-icon [icon]="faSearch" class="search-icon"></fa-icon>
             <input
-              [(ngModel)]="searchTerm"
+              [ngModel]="searchTerm()"
+              (ngModelChange)="searchTerm.set($event)"
               type="search"
               class="search-input"
               placeholder="Buscar por clase, profesor o sala..."
@@ -38,19 +39,19 @@
           >
             <fa-icon [icon]="faFilter"></fa-icon>
             Filtros
-            @if (filterType || filterLevel || !filterStatus) {
+            @if (filterType() || filterLevel() || !filterStatus()) {
               <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]"></span>
             }
           </button>
         </div>
 
         <p class="text-sm text-[var(--color-text-muted)]">
-          <span class="font-semibold text-[var(--color-text)]">{{ activities.length }}</span>
-          {{ activities.length === 1 ? 'actividad' : 'actividades' }}
+          <span class="font-semibold text-[var(--color-text)]">{{ activities().length }}</span>
+          {{ activities().length === 1 ? 'actividad' : 'actividades' }}
         </p>
       </div>
 
-      @if (isFiltersVisible) {
+      @if (isFiltersVisible()) {
         <div
           class="grid gap-4 border-t border-[var(--color-border-light)] pt-4 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_auto] xl:items-end"
         >
@@ -58,7 +59,11 @@
             class="grid gap-[0.45rem] text-[0.78rem] font-semibold text-[var(--color-text-muted)]"
           >
             <span>Tipo</span>
-            <select [(ngModel)]="filterType" class="filter-select">
+            <select
+              [ngModel]="filterType()"
+              (ngModelChange)="filterType.set($event)"
+              class="filter-select"
+            >
               <option value="">Todos</option>
               <option value="class">Clases regulares</option>
               <option value="event">Eventos</option>
@@ -69,7 +74,11 @@
             class="grid gap-[0.45rem] text-[0.78rem] font-semibold text-[var(--color-text-muted)]"
           >
             <span>Nivel</span>
-            <select [(ngModel)]="filterLevel" class="filter-select">
+            <select
+              [ngModel]="filterLevel()"
+              (ngModelChange)="filterLevel.set($event)"
+              class="filter-select"
+            >
               <option value="">Todos los niveles</option>
               <option value="A">Inicial · A</option>
               <option value="B">Intermedio · B</option>
@@ -82,7 +91,11 @@
             class="grid gap-[0.45rem] text-[0.78rem] font-semibold text-[var(--color-text-muted)]"
           >
             <span>Estado</span>
-            <select [(ngModel)]="filterStatus" class="filter-select">
+            <select
+              [ngModel]="filterStatus()"
+              (ngModelChange)="filterStatus.set($event)"
+              class="filter-select"
+            >
               <option value="">Todos</option>
               <option value="active">Activas y publicadas</option>
               <option value="draft">Borradores</option>
@@ -108,20 +121,20 @@
     >
     <span
       class="flex-none rounded-full px-[0.62rem] py-[0.26rem] text-[0.75rem] font-semibold text-[var(--color-accent-dark)] bg-[rgba(108,99,168,.1)]"
-      >{{ allActivities.filter((a) => a.type === 'class').length }} clases</span
+      >{{ regularClassCount() }} clases</span
     >
     <span
       class="flex-none rounded-full px-[0.62rem] py-[0.26rem] text-[0.75rem] font-semibold text-[var(--color-info-dark)] bg-[rgba(66,153,225,.1)]"
-      >{{ allActivities.filter((a) => a.type === 'event').length }} eventos</span
+      >{{ eventCount() }} eventos</span
     >
   </div>
 
-  @if (activities.length) {
+  @if (activities().length) {
     <section
       class="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3"
       aria-label="Listado de clases y eventos"
     >
-      @for (activity of activities; track activity.id) {
+      @for (activity of activities(); track activity.id) {
         <article
           class="relative overflow-hidden rounded-[1.1rem] p-5 bg-[var(--color-surface)] border border-[var(--color-border-light)] shadow-[6px_6px_12px_var(--color-border),-6px_-6px_12px_#fff] transition-all duration-250 hover:shadow-[10px_12px_22px_var(--color-border),-7px_-7px_15px_#fff] sm:p-[1.4rem]"
           [class.opacity-88]="activity.status === 'draft'"
@@ -195,7 +208,7 @@
                 <p
                   class="overflow-hidden truncate text-[0.74rem] font-semibold text-[var(--color-text)] leading-5 whitespace-nowrap"
                 >
-                  {{ activity.nextDate }}
+                  {{ nextDateLabel(activity) }}
                 </p>
               </div>
             </div>
@@ -209,7 +222,7 @@
                 <p
                   class="overflow-hidden truncate text-[0.74rem] font-semibold text-[var(--color-text)] leading-5 whitespace-nowrap"
                 >
-                  {{ activity.schedule }}
+                  {{ scheduleLabel(activity) }}
                 </p>
               </div>
             </div>
@@ -229,7 +242,7 @@
             </div>
             <div class="mt-3 flex items-center justify-between text-xs">
               <span class="flex items-center gap-1.5 text-[var(--color-text-muted)]"
-                ><fa-icon [icon]="faUsers"></fa-icon> {{ activity.attendees }} de
+                ><fa-icon [icon]="faUsers"></fa-icon> {{ getEnrollmentCount(activity) }} de
                 {{ activity.capacity }} inscritos</span
               >
               <span class="font-semibold text-[var(--color-text)]"

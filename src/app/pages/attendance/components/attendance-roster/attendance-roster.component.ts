@@ -3,7 +3,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faCheck, faRotate, faSearch, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
   AttendanceStatus,
-  AttendanceStudent,
+  AttendanceEnrollmentRow,
   ATTENDANCE_LABELS,
 } from '../../interfaces/attendance.interface';
 
@@ -15,12 +15,12 @@ import {
   styleUrl: './attendance-roster.component.css',
 })
 export class AttendanceRosterComponent {
-  @Input({ required: true }) roster!: AttendanceStudent[];
+  @Input({ required: true }) roster!: AttendanceEnrollmentRow[];
   @Input({ required: true }) statusByStudent!: Record<string, AttendanceStatus>;
   @Input() pendingVisibleCount = 0;
   @Input() future = false;
-  @Output() mark = new EventEmitter<{ student: AttendanceStudent; status: AttendanceStatus }>();
-  @Output() detail = new EventEmitter<AttendanceStudent>();
+  @Output() mark = new EventEmitter<{ student: AttendanceEnrollmentRow; status: AttendanceStatus }>();
+  @Output() detail = new EventEmitter<AttendanceEnrollmentRow>();
   @Output() markPending = new EventEmitter<void>();
   @Output() clear = new EventEmitter<void>();
   readonly statusLabels = ATTENDANCE_LABELS;
@@ -30,19 +30,19 @@ export class AttendanceRosterComponent {
     'absent',
   ];
   readonly icons = { present: faCheck, recovered: faRotate, absent: faXmark, search: faSearch };
-  fullName(student: AttendanceStudent): string {
+  fullName(student: AttendanceEnrollmentRow): string {
     return `${student.firstName} ${student.lastName}`;
   }
-  initials(student: AttendanceStudent): string {
+  initials(student: AttendanceEnrollmentRow): string {
     return `${student.firstName[0]}${student.lastName?.[0] ?? ''}`;
   }
-  sessionStatus(student: AttendanceStudent): AttendanceStatus {
+  sessionStatus(student: AttendanceEnrollmentRow): AttendanceStatus {
     return this.statusByStudent[student.id] ?? 'pending';
   }
-  quickMark(student: AttendanceStudent, status: AttendanceStatus): void {
+  quickMark(student: AttendanceEnrollmentRow, status: AttendanceStatus): void {
     this.mark.emit({ student, status });
   }
-  openStudent(student: AttendanceStudent): void {
+  openStudent(student: AttendanceEnrollmentRow): void {
     this.detail.emit(student);
   }
   clearFilters(): void {

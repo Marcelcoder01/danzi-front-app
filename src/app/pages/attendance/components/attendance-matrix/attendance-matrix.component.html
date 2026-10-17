@@ -1,7 +1,7 @@
 <div class="surface matrix-card">
   <div class="matrix-heading">
     <h2>El mes, de un vistazo</h2>
-    <span>{{ monthlyStudents.length }} alumnos</span>
+    <span>{{ monthlyStudents.length }} inscripciones</span>
   </div>
   <div
     class="matrix-scroll"
@@ -39,8 +39,10 @@
         </tr>
       </thead>
       <tbody>
-        @for (student of monthlyStudents; track student.id) {
-          <tr [class.selected-row]="student.id === selectedStudentId">
+        @for (student of monthlyStudents; track student.id + ':' + student.classId) {
+          <tr
+            [class.selected-row]="student.id === selectedStudentId && student.classId === selectedClassId"
+          >
             <td class="name-column">
               <button
                 type="button"

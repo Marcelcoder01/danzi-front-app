@@ -2,7 +2,7 @@ import { StudentLevel } from './student-level.enum';
 import type { StudentRole, StudentStatus } from './student-status.type';
 
 export interface Student {
-  id?: string;
+  id: string;
   firstName: string;
   lastName?: string;
   alias?: string;

@@ -15,7 +15,7 @@ import {
   AttendanceRecord,
   AttendanceSession,
   AttendanceStatus,
-  AttendanceStudent,
+  AttendanceEnrollmentRow,
   ATTENDANCE_LABELS,
   localDateKey,
   parseLocalDate,
@@ -30,12 +30,12 @@ import { AttendanceService } from '../../services/attendance.service';
   styleUrl: './attendance-student.component.css',
 })
 export class AttendanceStudentComponent implements OnChanges {
-  @Input({ required: true }) selectedStudent!: AttendanceStudent;
+  @Input({ required: true }) selectedStudent!: AttendanceEnrollmentRow;
   @Input({ required: true }) month!: string;
   @Input() dialog = false;
   @Output() close = new EventEmitter<void>();
   @Output() chooseClass = new EventEmitter<void>();
-  @Output() edit = new EventEmitter<{ student: AttendanceStudent; session: AttendanceSession }>();
+  @Output() edit = new EventEmitter<{ student: AttendanceEnrollmentRow; session: AttendanceSession }>();
   readonly attendance = inject(AttendanceService);
   private readonly studentsService = inject(StudentsService);
   readonly icons = {
@@ -54,22 +54,22 @@ export class AttendanceStudentComponent implements OnChanges {
   ngOnChanges(): void {
     this.detailTab = 'summary';
   }
-  fullName(student: AttendanceStudent): string {
+  fullName(student: AttendanceEnrollmentRow): string {
     return `${student.firstName} ${student.lastName}`;
   }
-  initials(student: AttendanceStudent): string {
+  initials(student: AttendanceEnrollmentRow): string {
     return `${student.firstName[0]}${student.lastName?.[0] ?? ''}`;
   }
-  levelLabel(student: AttendanceStudent): string {
+  levelLabel(student: AttendanceEnrollmentRow): string {
     return `${this.studentsService.getLevelGroup(student.level)} · ${student.level}`;
   }
-  enrolledClass(student: AttendanceStudent) {
+  enrolledClass(student: AttendanceEnrollmentRow) {
     return this.attendance.classes.find((activity) => activity.id === student.classId)!;
   }
-  classSchedule(student: AttendanceStudent): string {
+  classSchedule(student: AttendanceEnrollmentRow): string {
     return `${this.enrolledClass(student)
-      .weekdays.map((day) => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day])
-      .join(' y ')} · ${this.enrolledClass(student).time}`;
+      .schedule.weekdays.map((day) => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day])
+      .join(' y ')} · ${this.enrolledClass(student).schedule.startTime} – ${this.enrolledClass(student).schedule.endTime}`;
   }
   get monthLabel(): string {
     return new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(
@@ -96,20 +96,20 @@ export class AttendanceStudentComponent implements OnChanges {
   get calendarPadding() {
     return Array((this.days[0].weekday + 6) % 7).fill(0);
   }
-  daySession(student: AttendanceStudent, date: string) {
+  daySession(student: AttendanceEnrollmentRow, date: string) {
     return this.attendance.session(student.classId, date);
   }
-  dayStatus(student: AttendanceStudent, date: string): AttendanceStatus {
+  dayStatus(student: AttendanceEnrollmentRow, date: string): AttendanceStatus {
     const session = this.daySession(student, date);
     return session ? this.attendance.record(student.id, session.id).status : 'pending';
   }
-  history(student: AttendanceStudent) {
+  history(student: AttendanceEnrollmentRow) {
     return this.attendance
       .sessions(this.month)
       .filter((session) => session.classId === student.classId)
       .map((session) => ({ session, record: this.attendance.record(student.id, session.id) }));
   }
-  studentCounts(student: AttendanceStudent): Record<AttendanceStatus, number> {
+  studentCounts(student: AttendanceEnrollmentRow): Record<AttendanceStatus, number> {
     const counts = { present: 0, recovered: 0, justified: 0, absent: 0, pending: 0 };
     this.history(student).forEach((row) => counts[row.record.status]++);
     return counts;
@@ -122,10 +122,10 @@ export class AttendanceStudentComponent implements OnChanges {
       .find((session) => session.id === record.recoverySessionId);
     const activity = this.attendance.classes.find((activity) => activity.id === session?.classId);
     return session && activity
-      ? `${activity.name} · ${this.formatDate(session.date)} · ${activity.time}`
+      ? `${activity.name} · ${this.formatDate(session.date)} · ${activity.schedule.startTime}`
       : '';
   }
-  openEditor(student: AttendanceStudent, session: AttendanceSession): void {
+  openEditor(student: AttendanceEnrollmentRow, session: AttendanceSession): void {
     this.edit.emit({ student, session });
   }
 }

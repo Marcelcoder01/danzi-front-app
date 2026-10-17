@@ -11,7 +11,7 @@ import {
 import {
   AttendanceSession,
   AttendanceStatus,
-  AttendanceStudent,
+  AttendanceEnrollmentRow,
   ATTENDANCE_LABELS,
   ATTENDANCE_STATUSES,
   parseLocalDate,
@@ -36,14 +36,14 @@ export class AttendanceEditorComponent {
     absent: faXmark,
     pending: faCircle,
   };
-  editingStudent?: AttendanceStudent;
+  editingStudent?: AttendanceEnrollmentRow;
   editingSession?: AttendanceSession;
   editorStatus: AttendanceStatus = 'present';
   recoverySessionId = '';
   note = '';
   editorError = '';
   @ViewChild('markDialog') markDialog!: ElementRef<HTMLDialogElement>;
-  fullName(student: AttendanceStudent): string {
+  fullName(student: AttendanceEnrollmentRow): string {
     return `${student.firstName} ${student.lastName}`;
   }
   formatDate(date: string, long = false): string {
@@ -53,7 +53,7 @@ export class AttendanceEditorComponent {
       month: long ? 'long' : 'short',
     }).format(parseLocalDate(date));
   }
-  open(student: AttendanceStudent, session: AttendanceSession, status?: AttendanceStatus): void {
+  open(student: AttendanceEnrollmentRow, session: AttendanceSession, status?: AttendanceStatus): void {
     if (session.date > this.attendance.today) return;
     this.editingStudent = student;
     this.editingSession = session;
@@ -70,7 +70,8 @@ export class AttendanceEditorComponent {
       : [];
   }
   recoveryLabel(session: AttendanceSession): string {
-    return `${this.attendance.classes.find((activity) => activity.id === session.classId)?.name} · ${this.formatDate(session.date)} · ${this.attendance.classes.find((activity) => activity.id === session.classId)?.time}`;
+    const activity = this.attendance.classes.find((item) => item.id === session.classId);
+    return `${activity?.name} · ${this.formatDate(session.date)} · ${activity?.schedule.startTime}`;
   }
   applyEditor(): void {
     if (!this.editingStudent || !this.editingSession) return;

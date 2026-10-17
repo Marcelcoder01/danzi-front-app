@@ -1,7 +1,15 @@
 import { AttendanceEditorComponent } from './components/attendance-editor/attendance-editor.component';
 import { AttendanceRosterComponent } from './components/attendance-roster/attendance-roster.component';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, ViewChild, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  ViewChild,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
@@ -28,7 +36,7 @@ import {
   AttendanceRecord,
   AttendanceSession,
   AttendanceStatus,
-  AttendanceStudent,
+  AttendanceEnrollmentRow,
   ATTENDANCE_LABELS,
   ATTENDANCE_STATUSES,
   localDateKey,
@@ -85,73 +93,66 @@ export class AttendanceComponent {
     { id: 'missed', label: 'Faltas' },
     { id: 'pending', label: 'Pendientes' },
   ];
-  month = this.attendance.today.slice(0, 7);
-  sessionClassId = this.attendance.classes[0].id;
-  selectedDate = this.defaultSessionDate();
-  viewMode: 'auto' | 'session' | 'month' = 'auto';
-  viewportIsDesktop = window.innerWidth >= 1024;
-  get effectiveView(): 'session' | 'month' {
-    return this.viewMode === 'auto'
-      ? this.viewportIsDesktop
-        ? 'month'
-        : 'session'
-      : this.viewMode;
-  }
+  readonly month = signal(this.attendance.today.slice(0, 7));
+  readonly sessionClassId = signal(this.attendance.classes[0].id);
+  readonly selectedDate = signal(this.defaultSessionDate(this.month(), this.sessionClassId()));
+  readonly viewMode = signal<'auto' | 'session' | 'month'>('auto');
+  readonly viewportIsDesktop = signal(window.innerWidth >= 1024);
+  readonly effectiveView = computed(() =>
+    this.viewMode() === 'auto' ? (this.viewportIsDesktop() ? 'month' : 'session') : this.viewMode(),
+  );
   @HostListener('window:resize')
   updateViewport(): void {
-    this.viewportIsDesktop = window.innerWidth >= 1024;
+    this.viewportIsDesktop.set(window.innerWidth >= 1024);
   }
-  classFilter = '';
-  levelFilter = '';
-  searchTerm = '';
-  statusFilter = '';
-  filtersOpen = false;
-  selectedStudent = this.attendance.students[0];
-  detailTab: 'summary' | 'calendar' | 'history' = 'summary';
+  readonly classFilter = signal('');
+  readonly levelFilter = signal('');
+  readonly searchTerm = signal('');
+  readonly statusFilter = signal('');
+  readonly filtersOpen = signal(false);
+  readonly selectedStudent = signal(this.attendance.students[0]);
   @ViewChild('studentDialog') studentDialog!: ElementRef<HTMLDialogElement>;
   @ViewChild('editor') editor!: AttendanceEditorComponent;
 
-  get sessionClass() {
-    return this.attendance.classes.find((activity) => activity.id === this.sessionClassId)!;
-  }
+  readonly sessionClass = computed(() =>
+    this.attendance.classes.find((activity) => activity.id === this.sessionClassId())!,
+  );
 
-  get selectedSession() {
-    return this.attendance.session(this.sessionClassId, this.selectedDate);
-  }
+  readonly selectedSession = computed(() =>
+    this.attendance.session(this.sessionClassId(), this.selectedDate()),
+  );
 
-  get draftCount(): number {
-    return Object.keys(this.attendance.drafts()).length;
-  }
+  readonly draftCount = computed(() => Object.keys(this.attendance.drafts()).length);
 
-  get sessionStudents(): AttendanceStudent[] {
-    return this.attendance.students.filter((student) => student.classId === this.sessionClassId);
-  }
+  readonly sessionStudents = computed(() =>
+    this.attendance.students.filter((student) => student.classId === this.sessionClassId()),
+  );
 
-  get rosterStatuses(): Record<string, AttendanceStatus> {
+  readonly rosterStatuses = computed<Record<string, AttendanceStatus>>(() => {
     return Object.fromEntries(
-      this.sessionStudents.map((student) => [student.id, this.sessionStatus(student)]),
+      this.sessionStudents().map((student) => [student.id, this.sessionStatus(student)]),
     );
-  }
+  });
 
-  get roster(): AttendanceStudent[] {
-    return this.sessionStudents.filter(
+  readonly roster = computed(() =>
+    this.sessionStudents().filter(
       (student) =>
         this.matchesSearch(student) &&
-        this.matchesStatus(this.sessionStatus(student), this.statusFilter),
-    );
-  }
+        this.matchesStatus(this.sessionStatus(student), this.statusFilter()),
+    ),
+  );
 
-  get monthlyStudents(): AttendanceStudent[] {
-    return this.attendance.students.filter(
+  readonly monthlyStudents = computed(() =>
+    this.attendance.students.filter(
       (student) =>
         this.matchesSearch(student) &&
-        (!this.classFilter || student.classId === this.classFilter) &&
-        (!this.levelFilter || student.level.startsWith(this.levelFilter)),
-    );
-  }
+        (!this.classFilter() || student.classId === this.classFilter()) &&
+        (!this.levelFilter() || student.level.startsWith(this.levelFilter())),
+    ),
+  );
 
-  get days() {
-    const start = parseLocalDate(`${this.month}-01`);
+  readonly days = computed(() => {
+    const start = parseLocalDate(`${this.month()}-01`);
     const length = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
     return Array.from({ length }, (_, index) => {
       const date = new Date(start.getFullYear(), start.getMonth(), index + 1, 12);
@@ -162,11 +163,11 @@ export class AttendanceComponent {
         weekend: [0, 6].includes(date.getDay()),
       };
     });
-  }
+  });
 
-  get weeks() {
+  readonly weeks = computed(() => {
     const weeks: { label: string; start: number; end: number; span: number }[] = [];
-    for (const day of this.days) {
+    for (const day of this.days()) {
       if (!weeks.length || day.weekday === 1) {
         weeks.push({ label: `Semana ${weeks.length + 1}`, start: day.day, end: day.day, span: 1 });
       } else {
@@ -176,42 +177,45 @@ export class AttendanceComponent {
       }
     }
     return weeks;
-  }
+  });
 
-  get calendarPadding() {
-    return Array((this.days[0].weekday + 6) % 7).fill(0);
-  }
+  readonly calendarPadding = computed(() => Array((this.days()[0].weekday + 6) % 7).fill(0));
 
-  get monthCounts() {
-    const records = this.monthlyStudents
+  readonly monthCounts = computed(() => {
+    const records = this.monthlyStudents()
       .flatMap((student) => this.history(student))
       .filter((row) => row.session.date <= this.attendance.today)
       .map((row) => row.record);
     return this.counts(records);
-  }
+  });
 
-  get attendanceRate(): number {
-    const counts = this.monthCounts;
+  readonly attendanceRate = computed(() => {
+    const counts = this.monthCounts();
     const marked = counts.present + counts.recovered + counts.justified + counts.absent;
     return marked ? Math.round(((counts.present + counts.recovered) / marked) * 100) : 0;
-  }
+  });
+  readonly pendingVisibleCount = computed(
+    () => this.roster().filter((student) => this.sessionStatus(student) === 'pending').length,
+  );
 
-  fullName(student: AttendanceStudent): string {
+  fullName(student: AttendanceEnrollmentRow): string {
     return `${student.firstName} ${student.lastName}`;
   }
-  initials(student: AttendanceStudent): string {
+  initials(student: AttendanceEnrollmentRow): string {
     return `${student.firstName[0]}${student.lastName?.[0] ?? ''}`;
   }
-  levelLabel(student: AttendanceStudent): string {
+  levelLabel(student: AttendanceEnrollmentRow): string {
     return `${this.studentsService.getLevelGroup(student.level)} · ${student.level}`;
   }
-  enrolledClass(student: AttendanceStudent) {
+  enrolledClass(student: AttendanceEnrollmentRow) {
     return this.attendance.classes.find((activity) => activity.id === student.classId)!;
   }
-  classSchedule(student: AttendanceStudent): string {
+  classSchedule(student: AttendanceEnrollmentRow): string {
     return `${this.enrolledClass(student)
-      .weekdays.map((day) => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day])
-      .join(' y ')} · ${this.enrolledClass(student).time}`;
+      .schedule.weekdays.map((day) => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day])
+      .join(
+        ' y ',
+      )} · ${this.enrolledClass(student).schedule.startTime} – ${this.enrolledClass(student).schedule.endTime}`;
   }
   formatDate(date: string, long = false): string {
     return new Intl.DateTimeFormat('es-ES', {
@@ -220,70 +224,71 @@ export class AttendanceComponent {
       month: long ? 'long' : 'short',
     }).format(parseLocalDate(date));
   }
-  get monthLabel(): string {
-    return new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(
-      parseLocalDate(`${this.month}-01`),
-    );
-  }
+  readonly monthLabel = computed(() =>
+    new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(
+      parseLocalDate(`${this.month()}-01`),
+    ),
+  );
 
-  sessionStatus(student: AttendanceStudent): AttendanceStatus {
-    return this.selectedSession
-      ? this.attendance.record(student.id, this.selectedSession.id).status
+  sessionStatus(student: AttendanceEnrollmentRow): AttendanceStatus {
+    return this.selectedSession()
+      ? this.attendance.record(student.id, this.selectedSession()!.id).status
       : 'pending';
   }
-  daySession(student: AttendanceStudent, date: string) {
+  daySession(student: AttendanceEnrollmentRow, date: string) {
     return this.attendance.session(student.classId, date);
   }
-  dayStatus(student: AttendanceStudent, date: string): AttendanceStatus {
+  dayStatus(student: AttendanceEnrollmentRow, date: string): AttendanceStatus {
     const session = this.daySession(student, date);
     return session ? this.attendance.record(student.id, session.id).status : 'pending';
   }
   filterCount(filter: string): number {
-    return this.sessionStudents.filter((student) =>
+    return this.sessionStudents().filter((student) =>
       this.matchesStatus(this.sessionStatus(student), filter),
     ).length;
   }
-  get pendingVisibleCount(): number {
-    return this.roster.filter((student) => this.sessionStatus(student) === 'pending').length;
-  }
 
-  chooseClass(): void {
-    this.selectedDate = this.defaultSessionDate();
-    this.statusFilter = '';
+  chooseClass(classId = this.sessionClassId()): void {
+    this.sessionClassId.set(classId);
+    this.selectedDate.set(this.defaultSessionDate(this.month(), classId));
+    this.statusFilter.set('');
   }
-  changeDate(): void {
-    if (this.selectedDate) this.month = this.selectedDate.slice(0, 7);
+  changeDate(date: string): void {
+    this.selectedDate.set(date);
+    if (date) this.month.set(date.slice(0, 7));
   }
   changeMonth(month: string): void {
     if (/^\d{4}-\d{2}$/.test(month)) {
-      this.month = month;
-      this.selectedDate = this.defaultSessionDate();
+      this.month.set(month);
+      this.selectedDate.set(this.defaultSessionDate(month, this.sessionClassId()));
     }
   }
   shiftMonth(amount: number): void {
-    const date = parseLocalDate(`${this.month}-01`);
-    this.changeMonth(
-      localDateKey(new Date(date.getFullYear(), date.getMonth() + amount, 1, 12)).slice(0, 7),
+    const date = parseLocalDate(`${this.month()}-01`);
+    const month = localDateKey(new Date(date.getFullYear(), date.getMonth() + amount, 1, 12)).slice(
+      0,
+      7,
     );
+    this.changeMonth(month);
   }
   shiftSession(amount: number): void {
     const sessions = this.attendance
-      .sessions(this.month)
-      .filter((session) => session.classId === this.sessionClassId);
-    const index = sessions.findIndex((session) => session.date === this.selectedDate);
+      .sessions(this.month())
+      .filter((session) => session.classId === this.sessionClassId());
+    const index = sessions.findIndex((session) => session.date === this.selectedDate());
     const next = sessions[index + amount];
-    if (next) this.selectedDate = next.date;
+    if (next) this.changeDate(next.date);
   }
   canShiftSession(amount: number): boolean {
     const sessions = this.attendance
-      .sessions(this.month)
-      .filter((session) => session.classId === this.sessionClassId);
-    const index = sessions.findIndex((session) => session.date === this.selectedDate);
+      .sessions(this.month())
+      .filter((session) => session.classId === this.sessionClassId());
+    const index = sessions.findIndex((session) => session.date === this.selectedDate());
     return index >= 0 && !!sessions[index + amount];
   }
 
-  quickMark(student: AttendanceStudent, status: AttendanceStatus): void {
-    const session = this.selectedSession;
+  quickMark(student: AttendanceEnrollmentRow, status: AttendanceStatus): void {
+    const session = this.selectedSession();
     if (!session) return;
     if (status === 'recovered') {
       this.openEditor(student, session, status);
@@ -293,70 +298,68 @@ export class AttendanceComponent {
     this.attendance.stage(student, session, next);
   }
   markPending(): void {
-    const session = this.selectedSession;
+    const session = this.selectedSession();
     if (!session) return;
-    for (const student of this.roster) {
+    for (const student of this.roster()) {
       if (this.sessionStatus(student) === 'pending')
         this.attendance.stage(student, session, 'present');
     }
   }
-  openStudent(student: AttendanceStudent): void {
-    this.selectedStudent = student;
-    this.detailTab = 'summary';
-    if (this.viewMode === 'session' || window.matchMedia('(max-width: 1279px)').matches)
+  openStudent(student: AttendanceEnrollmentRow): void {
+    this.selectedStudent.set(student);
+    if (this.viewMode() === 'session' || window.matchMedia('(max-width: 1279px)').matches)
       this.studentDialog.nativeElement.showModal();
   }
   goToStudentClass(): void {
-    this.sessionClassId = this.selectedStudent.classId;
-    this.chooseClass();
-    this.viewMode = 'session';
+    this.chooseClass(this.selectedStudent().classId);
+    this.viewMode.set('session');
     this.studentDialog.nativeElement.close();
   }
   openEditor(
-    student: AttendanceStudent,
+    student: AttendanceEnrollmentRow,
     session: AttendanceSession,
     status?: AttendanceStatus,
   ): void {
     this.editor.open(student, session, status);
   }
-  history(student: AttendanceStudent) {
+  history(student: AttendanceEnrollmentRow) {
     return this.attendance
-      .sessions(this.month)
+      .sessions(this.month())
       .filter((session) => session.classId === student.classId)
       .map((session) => ({ session, record: this.attendance.record(student.id, session.id) }));
   }
   clearFilters(): void {
-    this.classFilter = '';
-    this.levelFilter = '';
-    this.searchTerm = '';
-    this.statusFilter = '';
+    this.classFilter.set('');
+    this.levelFilter.set('');
+    this.searchTerm.set('');
+    this.statusFilter.set('');
   }
 
   @HostListener('window:beforeunload', ['$event'])
   warnUnsaved(event: BeforeUnloadEvent): void {
-    if (this.draftCount) {
+    if (this.draftCount()) {
       event.preventDefault();
       event.returnValue = '';
     }
   }
 
-  private defaultSessionDate(): string {
+  private defaultSessionDate(month: string, classId: string): string {
     const sessions = this.attendance
-      .sessions(this.month)
-      .filter((session) => session.classId === this.sessionClassId);
+      .sessions(month)
+      .filter((session) => session.classId === classId);
     return (
       sessions.filter((session) => session.date <= this.attendance.today).at(-1)?.date ??
       sessions[0]?.date ??
       this.attendance.today
     );
   }
-  private matchesSearch(student: AttendanceStudent): boolean {
+  private matchesSearch(student: AttendanceEnrollmentRow): boolean {
     const normalize = (value: string) =>
       value
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase();
-    return normalize(this.fullName(student)).includes(normalize(this.searchTerm.trim()));
+    return normalize(this.fullName(student)).includes(normalize(this.searchTerm().trim()));
   }
   private matchesStatus(status: AttendanceStatus, filter: string): boolean {
     return (

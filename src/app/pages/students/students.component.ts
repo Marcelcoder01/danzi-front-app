@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Student } from '../../shared/interfaces/student.interface';
 import { AcademyDataService } from '../../shared/services/academy-data.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { StudentsService } from './services/students.service';
 import { StudentDialogComponent } from './student-dialog/student-dialog.component';
 
@@ -23,6 +24,8 @@ import { StudentDialogComponent } from './student-dialog/student-dialog.componen
   imports: [FormsModule, FaIconComponent, StudentDialogComponent]
 })
 export class StudentsComponent {
+  @ViewChild(StudentDialogComponent) private studentDialog?: StudentDialogComponent;
+
   faPlus = faPlus;
   faSearch = faSearch;
   faFilter = faFilter;
@@ -32,6 +35,7 @@ export class StudentsComponent {
   faXmark = faXmark;
   studentsService = inject(StudentsService);
   private readonly academyData = inject(AcademyDataService);
+  private readonly toastService = inject(ToastService);
   isFiltersVisible = false;
 
   filterStatus = '';
@@ -43,6 +47,7 @@ export class StudentsComponent {
   constructor() {}
 
   get students(): Student[] {
+    this.academyData.studentsVersion();
     return this.academyData.students.filter(student => {
       // Search term filter
       if (this.searchTerm) {
@@ -96,10 +101,34 @@ export class StudentsComponent {
   }
 
   openStudentDialog(): void {
-    const dialog = document.getElementById('student_dialog') as HTMLDialogElement;
-    if (dialog) {
-      dialog.showModal();
+    this.studentDialog?.openForCreate();
+  }
+
+  editStudent(student: Student): void {
+    this.studentDialog?.openForEdit(student);
+  }
+
+  createStudent(student: Omit<Student, 'id'>): void {
+    try {
+      this.academyData.addStudent({
+        ...student,
+        id: `student-${globalThis.crypto.randomUUID()}`,
+      });
+      this.clearFilters();
+      this.toastService.success(`Alumno ${student.firstName} creado correctamente.`);
+    } catch {
+      this.toastService.error('No se pudo crear el alumno. Inténtalo de nuevo.');
     }
+  }
+
+  updateStudent(student: Student): void {
+    if (!this.academyData.updateStudent(student)) {
+      this.toastService.error('No se pudo actualizar el alumno. Inténtalo de nuevo.');
+      return;
+    }
+
+    this.clearFilters();
+    this.toastService.success(`Alumno ${student.firstName} actualizado correctamente.`);
   }
 
 }

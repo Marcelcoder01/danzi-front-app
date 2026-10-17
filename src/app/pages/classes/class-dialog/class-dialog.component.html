@@ -1,0 +1,215 @@
+<dialog id="class_dialog" class="modal w-full max-w-3xl">
+  <div
+    class="modal-box max-h-[90vh] overflow-y-auto rounded-[28px] border border-white/10 bg-[var(--color-surface)]/95 p-0 shadow-[0_25px_80px_rgba(0,0,0,0.18),inset_1px_1px_0_rgba(255,255,255,0.45)]"
+  >
+    <div
+      class="flex items-start justify-between border-b border-[var(--color-border)]/60 px-7 pt-7 pb-6"
+    >
+      <div class="flex items-center gap-4">
+        <div
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.04),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]"
+        >
+          <fa-icon [icon]="faMusic" class="text-lg"></fa-icon>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold tracking-tight text-[var(--color-text)]">
+            {{ isEdit ? 'Editar clase' : 'Nueva clase' }}
+          </h3>
+          <p class="mt-1 text-sm text-[var(--color-text-muted)]">
+            {{ isEdit ? 'Actualiza los datos y el horario de la clase.' : 'Configura los datos y el horario de la actividad.' }}
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        aria-label="Cerrar diálogo"
+        class="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface-alt)]/70 text-[var(--color-text-muted)] shadow-[2px_2px_6px_rgba(0,0,0,0.05),-2px_-2px_6px_rgba(255,255,255,0.5)] transition-all duration-200 hover:-translate-y-0.5 hover:text-[var(--color-text)] hover:shadow-md"
+        (click)="closeDialog()"
+      >
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="px-7 py-6">
+      <section class="mb-7">
+        <div class="mb-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-accent)]">
+            Información de la clase
+          </p>
+          <p class="mt-1 text-xs text-[var(--color-text-muted)]">
+            Datos básicos para identificar y organizar la clase.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <label class="form-control">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Nombre <span class="text-[var(--color-accent)]">*</span>
+            </span>
+            <input
+              class="danzi-input"
+              type="text"
+              placeholder="Ej. Salsa Inicial"
+              [(ngModel)]="newClass.name"
+              name="name"
+              required
+            />
+          </label>
+
+          <label class="form-control">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Nivel</span>
+            <select class="danzi-select" [(ngModel)]="newClass.level" name="level">
+              @for (level of levels; track level) {
+                <option [ngValue]="level">{{ levelLabel(level) }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="form-control">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Profesor/a <span class="text-[var(--color-accent)]">*</span>
+            </span>
+            <input
+              class="danzi-input"
+              type="text"
+              placeholder="Nombre del profesor"
+              [(ngModel)]="newClass.teacher"
+              name="teacher"
+              required
+            />
+          </label>
+
+          <label class="form-control">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Sala <span class="text-[var(--color-accent)]">*</span>
+            </span>
+            <input
+              class="danzi-input"
+              type="text"
+              placeholder="Ej. Sala 1"
+              [(ngModel)]="newClass.room"
+              name="room"
+              required
+            />
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <div class="mb-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-accent)]">
+            Horario y disponibilidad
+          </p>
+          <p class="mt-1 text-xs text-[var(--color-text-muted)]">
+            Selecciona los días y el horario semanal de la clase.
+          </p>
+        </div>
+
+        <fieldset>
+          <legend class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+            Días de la semana <span class="text-[var(--color-accent)]">*</span>
+          </legend>
+          <div class="flex flex-wrap gap-2">
+            @for (day of weekdays; track day.value) {
+              <button
+                type="button"
+                [class]="newClass.schedule.weekdays.includes(day.value)
+                  ? 'rounded-xl border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-2 text-xs font-medium text-white transition-colors'
+                  : 'rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2 text-xs font-medium text-[var(--color-text-muted)] transition-colors'"
+                [attr.aria-pressed]="newClass.schedule.weekdays.includes(day.value)"
+                (click)="toggleWeekday(day.value)"
+              >
+                {{ day.label }}
+              </button>
+            }
+          </div>
+          @if (weekdaysError) {
+            <p class="mt-2 text-xs text-[var(--color-error-dark)]">
+              Selecciona al menos un día de la semana.
+            </p>
+          }
+        </fieldset>
+
+        <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <label class="form-control">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Hora de inicio <span class="text-[var(--color-accent)]">*</span>
+            </span>
+            <input
+              class="danzi-input"
+              type="time"
+              [(ngModel)]="newClass.schedule.startTime"
+              name="startTime"
+              required
+            />
+          </label>
+          <label class="form-control">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Hora de fin <span class="text-[var(--color-accent)]">*</span>
+            </span>
+            <input
+              class="danzi-input"
+              type="time"
+              [(ngModel)]="newClass.schedule.endTime"
+              name="endTime"
+              required
+            />
+          </label>
+          <label class="form-control">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Aforo <span class="text-[var(--color-accent)]">*</span>
+            </span>
+            <input
+              class="danzi-input"
+              type="number"
+              min="1"
+              step="1"
+              [(ngModel)]="newClass.capacity"
+              name="capacity"
+              required
+            />
+          </label>
+          <label class="form-control">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Estado</span>
+            <select class="danzi-select" [(ngModel)]="newClass.status" name="status">
+              @for (status of statuses; track status.value) {
+                <option [ngValue]="status.value">{{ status.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="form-control md:col-span-2">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Color</span>
+            <select class="danzi-select" [(ngModel)]="newClass.color" name="color">
+              @for (color of colors; track color.value) {
+                <option [ngValue]="color.value">{{ color.label }}</option>
+              }
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <div
+        class="mt-7 flex items-center justify-end gap-3 border-t border-[var(--color-border)]/60 pt-5"
+      >
+        <button
+          type="button"
+          class="rounded-xl px-5 py-2.5 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-text)]"
+          (click)="closeDialog()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="group flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(108,99,168,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_12px_25px_rgba(108,99,168,0.32)] active:translate-y-0"
+        >
+          <span>{{ isEdit ? 'Guardar cambios' : 'Crear clase' }}</span>
+          <fa-icon
+            [icon]="faArrowRight"
+            class="text-xs transition-transform duration-200 group-hover:translate-x-0.5"
+          ></fa-icon>
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>

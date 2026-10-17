@@ -9,9 +9,10 @@
 
     <button
       class="flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium text-[var(--color-text-on-accent)] bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-dark)] shadow-[0_8px_16px_-7px_rgba(108,99,168,.75)] transition-all duration-200 hover:shadow-[0_12px_20px_-8px_rgba(108,99,168,.85)]"
+      (click)="openActivityDialog()"
     >
       <fa-icon [icon]="faPlus"></fa-icon>
-      Crear actividad
+      Nueva actividad
     </button>
   </div>
 
@@ -187,12 +188,43 @@
               </div>
             </div>
 
-            <button
-              class="grid h-8 w-8 flex-none place-items-center rounded-[0.55rem] text-[var(--color-text-muted)] transition-all duration-200 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-alt)]"
-              [attr.aria-label]="'Opciones de ' + activity.name"
-            >
-              <fa-icon [icon]="faEllipsis"></fa-icon>
-            </button>
+            @if (activity.type === 'class') {
+              <div class="dropdown dropdown-end">
+                <button
+                  type="button"
+                  tabindex="0"
+                  class="btn btn-ghost btn-sm"
+                  [attr.aria-label]="'Opciones de ' + activity.name"
+                >
+                  <fa-icon [icon]="faEllipsis"></fa-icon>
+                </button>
+
+                <ul
+                  tabindex="0"
+                  class="dropdown-content menu bg-base-200 rounded-box z-50 w-56 p-2 shadow-lg"
+                >
+                  <li>
+                    <button type="button" (click)="editClass(activity)">
+                      <fa-icon [icon]="faEdit"></fa-icon>
+                      Editar
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" (click)="deleteClass(activity)">
+                      <fa-icon [icon]="faTrash"></fa-icon>
+                      Eliminar
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            } @else {
+              <button
+                class="grid h-8 w-8 flex-none place-items-center rounded-[0.55rem] text-[var(--color-text-muted)] transition-all duration-200 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-alt)]"
+                [attr.aria-label]="'Opciones de ' + activity.name"
+              >
+                <fa-icon [icon]="faEllipsis"></fa-icon>
+              </button>
+            }
           </div>
 
           <div class="mt-5 grid grid-cols-2 gap-3 text-sm">
@@ -306,3 +338,8 @@
     </section>
   }
 </div>
+
+<app-class-dialog
+  (createClass)="createClass($event)"
+  (updateClass)="updateClass($event)"
+></app-class-dialog>

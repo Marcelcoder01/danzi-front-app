@@ -1,14 +1,61 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { DEMO_CLASSES, DEMO_ENROLLMENTS, DEMO_STUDENTS } from '../data/demo-school.data';
-import { ClassActivity } from '../interfaces/class-activity.interface';
+import { ClassActivity, RegularClassActivity } from '../interfaces/class-activity.interface';
 import { Enrollment } from '../interfaces/enrollment.interface';
 import { Student } from '../interfaces/student.interface';
 
 @Injectable({ providedIn: 'root' })
 export class AcademyDataService {
   readonly students: Student[] = DEMO_STUDENTS;
+  readonly studentsVersion = signal(0);
   readonly classes: ClassActivity[] = DEMO_CLASSES;
+  readonly classesVersion = signal(0);
   readonly enrollments: Enrollment[] = DEMO_ENROLLMENTS;
+
+  addStudent(student: Student): void {
+    this.students.push(student);
+    this.studentsVersion.update((version) => version + 1);
+  }
+
+  updateStudent(updatedStudent: Student): boolean {
+    const currentStudent = this.students.find((student) => student.id === updatedStudent.id);
+    if (!currentStudent) return false;
+
+    Object.assign(currentStudent, updatedStudent);
+    this.studentsVersion.update((version) => version + 1);
+    return true;
+  }
+
+  addClass(activity: RegularClassActivity): void {
+    this.classes.push(activity);
+    this.classesVersion.update((version) => version + 1);
+  }
+
+  updateClass(updatedClass: RegularClassActivity): boolean {
+    const currentClass = this.classes.find(
+      (activity) => activity.id === updatedClass.id && activity.type === 'class',
+    );
+    if (!currentClass) return false;
+
+    Object.assign(currentClass, updatedClass);
+    this.classesVersion.update((version) => version + 1);
+    return true;
+  }
+
+  removeClass(classId: string): boolean {
+    const classIndex = this.classes.findIndex(
+      (activity) => activity.id === classId && activity.type === 'class',
+    );
+    if (classIndex < 0) return false;
+
+    this.classes.splice(classIndex, 1);
+    const remainingEnrollments = this.enrollments.filter(
+      (enrollment) => enrollment.classId !== classId,
+    );
+    this.enrollments.splice(0, this.enrollments.length, ...remainingEnrollments);
+    this.classesVersion.update((version) => version + 1);
+    return true;
+  }
 
   studentsForClass(classId: string, date?: string): Student[] {
     const enrollmentStudentIds = new Set(

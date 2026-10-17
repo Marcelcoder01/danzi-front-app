@@ -205,7 +205,11 @@
                   <button class="action-btn action-btn-view" title="Ver">
                     <fa-icon [icon]="faEye" class="text-sm"></fa-icon>
                   </button>
-                  <button class="action-btn action-btn-edit" title="Editar">
+                  <button
+                    class="action-btn action-btn-edit"
+                    title="Editar"
+                    (click)="editStudent(student)"
+                  >
                     <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
                   </button>
                   <button class="action-btn action-btn-delete" title="Eliminar">
@@ -307,7 +311,11 @@
           <button class="action-btn action-btn-view" title="Ver">
             <fa-icon [icon]="faEye" class="text-sm"></fa-icon>
           </button>
-          <button class="action-btn action-btn-edit" title="Editar">
+          <button
+            class="action-btn action-btn-edit"
+            title="Editar"
+            (click)="editStudent(student)"
+          >
             <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
           </button>
           <button class="action-btn action-btn-delete" title="Eliminar">
@@ -331,4 +339,7 @@
 </div>
 
 <!-- Student Dialog -->
-<app-student-dialog></app-student-dialog>
+<app-student-dialog
+  (createStudent)="createStudent($event)"
+  (updateStudent)="updateStudent($event)"
+></app-student-dialog>

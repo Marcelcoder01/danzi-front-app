@@ -20,6 +20,10 @@ module.exports = {
     },
   },
   plugins: [
-    require("daisyui"),
+    require("daisyui").default({
+      include: ["alert", "toast", "button", "dropdown", "menu"],
+      themes: ["light"],
+      logs: false,
+    }),
   ],
 }

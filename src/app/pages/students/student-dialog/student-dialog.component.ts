@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faXmark, faUserPlus, faUser, faEnvelope, faPhone, faArrowRight } from '@fortawesome/free-solid-svg-icons';
@@ -14,6 +14,9 @@ import type { StudentRole, StudentStatus } from '../../../shared/interfaces/stud
   imports: [FormsModule, FaIconComponent]
 })
 export class StudentDialogComponent {
+  @Output() createStudent = new EventEmitter<Omit<Student, 'id'>>();
+  @Output() updateStudent = new EventEmitter<Student>();
+
   faXmark = faXmark;
   faUserPlus = faUserPlus;
   faUser = faUser;
@@ -21,7 +24,12 @@ export class StudentDialogComponent {
   faPhone = faPhone;
   faArrowRight = faArrowRight;
 
-  newStudent: Partial<Student> = {
+  newStudent: Omit<Student, 'id'> = this.createEmptyStudent();
+  isEdit = false;
+  private editingStudentId: string | null = null;
+
+  private createEmptyStudent(): Omit<Student, 'id'> {
+    return {
     firstName: '',
     lastName: '',
     alias: '',
@@ -35,7 +43,8 @@ export class StudentDialogComponent {
     status: 'active',
     role: 'follower',
     hasPaid: false
-  };
+    };
+  }
   
   paymentPeriod: '1' | '2' | 'custom' = '1';   // por defecto 1 mes
   paymentFrom: string | null = null;
@@ -69,7 +78,35 @@ export class StudentDialogComponent {
   };
 
   onSubmit(): void {
-    console.log('Nuevo estudiante:', this.newStudent);
+    if (this.isEdit && this.editingStudentId) {
+      this.updateStudent.emit({ ...this.newStudent, id: this.editingStudentId });
+    } else {
+      this.createStudent.emit({ ...this.newStudent });
+    }
+    this.closeDialog();
+    this.newStudent = this.createEmptyStudent();
+    this.isEdit = false;
+    this.editingStudentId = null;
+  }
+
+  openForCreate(): void {
+    this.newStudent = this.createEmptyStudent();
+    this.isEdit = false;
+    this.editingStudentId = null;
+    this.showDialog();
+  }
+
+  openForEdit(student: Student): void {
+    const { id, ...studentDetails } = student;
+    this.newStudent = { ...this.createEmptyStudent(), ...studentDetails };
+    this.isEdit = true;
+    this.editingStudentId = id;
+    this.showDialog();
+  }
+
+  private showDialog(): void {
+    const dialog = document.getElementById('student_dialog') as HTMLDialogElement | null;
+    dialog?.showModal();
   }
 
   closeDialog(): void {

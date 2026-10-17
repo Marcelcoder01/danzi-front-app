@@ -15,11 +15,11 @@
 
         <div>
           <h3 class="text-xl font-semibold tracking-tight text-[var(--color-text)]">
-            Nuevo alumno
+            {{ isEdit ? 'Editar alumno' : 'Nuevo alumno' }}
           </h3>
 
           <p class="mt-1 text-sm text-[var(--color-text-muted)]">
-            Añade un nuevo estudiante a tu academia.
+            {{ isEdit ? 'Actualiza la información del alumno.' : 'Añade un nuevo estudiante a tu academia.' }}
           </p>
         </div>
       </div>
@@ -323,7 +323,7 @@
           type="submit"
           class="group flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(108,99,168,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_12px_25px_rgba(108,99,168,0.32)] active:translate-y-0"
         >
-          <span>Crear alumno</span>
+          <span>{{ isEdit ? 'Editar alumno' : 'Crear alumno' }}</span>
 
           <fa-icon
             [icon]="faArrowRight"

@@ -9,7 +9,13 @@ import { TopbarComponent } from './components/topbar/topbar.component';
 @Component({
   selector: 'app-home-layout',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, FontAwesomeModule, SidebarComponent, TopbarComponent],
+  imports: [
+    RouterOutlet,
+    CommonModule,
+    FontAwesomeModule,
+    SidebarComponent,
+    TopbarComponent,
+  ],
   templateUrl: './home-layout.component.html',
   styleUrl: './home-layout.component.css'
 })

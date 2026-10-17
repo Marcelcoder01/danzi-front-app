@@ -1,38 +1,51 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faCalendarDays,
   faClock,
+  faEdit,
   faEllipsis,
   faFilter,
   faMusic,
   faPlus,
   faSearch,
   faUsers,
+  faTrash,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
-import { ClassActivity } from '../../shared/interfaces/class-activity.interface';
+import {
+  ClassActivity,
+  RegularClassActivity,
+} from '../../shared/interfaces/class-activity.interface';
 import { StudentLevel, getLevelLabel } from '../../shared/interfaces/student-level.enum';
 import { AcademyDataService } from '../../shared/services/academy-data.service';
+import { ToastService } from '../../shared/services/toast.service';
+import { ClassDialogComponent } from './class-dialog/class-dialog.component';
+
 @Component({
   selector: 'app-classes',
   standalone: true,
   templateUrl: './classes.component.html',
   styleUrl: './classes.component.css',
-  imports: [CommonModule, FormsModule, FaIconComponent],
+  imports: [CommonModule, FormsModule, FaIconComponent, ClassDialogComponent],
 })
 export class ClassesComponent {
+  @ViewChild(ClassDialogComponent) private classDialog?: ClassDialogComponent;
+
   private readonly academyData = inject(AcademyDataService);
+  private readonly toastService = inject(ToastService);
   faCalendarDays = faCalendarDays;
   faClock = faClock;
+  faEdit = faEdit;
   faEllipsis = faEllipsis;
   faFilter = faFilter;
   faMusic = faMusic;
   faPlus = faPlus;
   faSearch = faSearch;
   faUsers = faUsers;
+  faTrash = faTrash;
   faXmark = faXmark;
 
   readonly isFiltersVisible = signal(false);
@@ -41,7 +54,10 @@ export class ClassesComponent {
   readonly filterLevel = signal('');
   readonly filterStatus = signal('active');
 
-  readonly allActivities = computed(() => this.academyData.classes);
+  readonly allActivities = computed(() => {
+    this.academyData.classesVersion();
+    return this.academyData.classes;
+  });
   readonly regularClassCount = computed(
     () => this.allActivities().filter((activity) => activity.type === 'class').length,
   );
@@ -79,6 +95,53 @@ export class ClassesComponent {
     this.filterType.set('');
     this.filterLevel.set('');
     this.filterStatus.set('');
+  }
+
+  openActivityDialog(): void {
+    this.classDialog?.openForCreate();
+  }
+
+  editClass(activity: ClassActivity): void {
+    if (activity.type === 'class') this.classDialog?.openForEdit(activity);
+  }
+
+  createClass(activity: Omit<RegularClassActivity, 'id'>): void {
+    try {
+      this.academyData.addClass({
+        ...activity,
+        id: `class-${globalThis.crypto.randomUUID()}`,
+      });
+      this.searchTerm.set('');
+      this.filterType.set('class');
+      this.filterLevel.set('');
+      this.filterStatus.set(activity.status);
+      this.toastService.success(`Clase «${activity.name}» creada correctamente.`);
+    } catch {
+      this.toastService.error('No se pudo crear la clase. Inténtalo de nuevo.');
+    }
+  }
+
+  updateClass(activity: RegularClassActivity): void {
+    if (!this.academyData.updateClass(activity)) {
+      this.toastService.error('No se pudo actualizar la clase. Inténtalo de nuevo.');
+      return;
+    }
+
+    this.searchTerm.set('');
+    this.filterType.set('class');
+    this.filterLevel.set('');
+    this.filterStatus.set(activity.status);
+    this.toastService.success(`Clase «${activity.name}» actualizada correctamente.`);
+  }
+
+  deleteClass(activity: ClassActivity): void {
+    if (activity.type !== 'class') return;
+    if (!this.academyData.removeClass(activity.id)) {
+      this.toastService.error('No se pudo eliminar la clase. Inténtalo de nuevo.');
+      return;
+    }
+
+    this.toastService.success(`Clase «${activity.name}» eliminada correctamente.`);
   }
 
   getOccupancy(activity: ClassActivity): number {

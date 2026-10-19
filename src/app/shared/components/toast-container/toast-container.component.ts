@@ -66,6 +66,11 @@ import { ToastService } from '../../services/toast.service';
       .animate-slide-in {
         animation: slideIn 0.3s ease-out;
       }
+
+      /* Forzar color blanco en todos los toasts */
+      :host ::ng-deep .pointer-events-auto {
+        color: #ffffff !important;
+      }
     `,
   ],
 })

@@ -118,9 +118,15 @@ export class ClassDialogComponent {
   }
 
   private createEmptyClass(): NewClassActivity {
+    const today = new Date();
+    const localStartDate = [today.getFullYear(), today.getMonth() + 1, today.getDate()]
+      .map((part, index) => (index === 0 ? String(part) : String(part).padStart(2, '0')))
+      .join('-');
+
     return {
       name: '',
       type: 'class',
+      startDate: localStartDate,
       level: StudentLevel.A1,
       teacher: '',
       schedule: { weekdays: [], startTime: '18:00', endTime: '19:00' },

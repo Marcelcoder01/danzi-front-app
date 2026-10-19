@@ -16,9 +16,10 @@ export interface OneOffSchedule {
   endTime: string;
 }
 
-interface ActivityBase {
+export interface ActivityBase {
   id: string;
   name: string;
+  startDate: string;
   level: StudentLevel | string;
   teacher: string;
   room: string;

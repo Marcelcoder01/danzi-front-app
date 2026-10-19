@@ -1,5 +1,5 @@
-import { DecimalPipe } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { ChangeDetectorRef, Component, computed, inject, OnInit } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faPlus,
@@ -11,16 +11,23 @@ import {
   faUserPlus,
   faCreditCard,
   faCalendarPlus,
-  faCircleInfo
+  faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons';
+import { AcademyDataService } from '../../shared/services/academy-data.service';
+import {
+  ClassActivity,
+  RegularClassActivity,
+} from '../../shared/interfaces/class-activity.interface';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
-  imports: [FaIconComponent, DecimalPipe]
+  imports: [CommonModule, FaIconComponent, DecimalPipe],
 })
 export class DashboardComponent implements OnInit {
+  private readonly academyData = inject(AcademyDataService);
 
   faPlus = faPlus;
   faUsers = faUsers;
@@ -40,12 +47,87 @@ export class DashboardComponent implements OnInit {
   monthlyIncome = 0;
   occupancy = 0;
 
-  // Target values
-  private readonly targetStudents = 42;
-  private readonly targetClasses = 8;
-  private readonly targetAttendance = 94;
-  private readonly targetIncome = 3240;
-  private readonly targetOccupancy = 78;
+  // Datos reales
+  readonly allClasses = computed(() => this.academyData.classes);
+  readonly allStudents = computed(() => this.academyData.students);
+
+  readonly upcomingClasses = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalizar a medianoche
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    console.log(
+      'Today:',
+      today.toDateString(),
+      'Day:',
+      today.getDay(),
+      'Tomorrow:',
+      tomorrow.toDateString(),
+      'Day:',
+      tomorrow.getDay(),
+    );
+
+    return this.allClasses()
+      .filter((activity) => {
+        if (activity.status !== 'active') return false;
+
+        if (activity.type === 'event') {
+          // Para eventos únicos, verificar la fecha exacta
+          const eventDate = new Date(`${activity.schedule.date}T12:00:00`);
+          return (
+            eventDate.getTime() === today.getTime() || eventDate.getTime() === tomorrow.getTime()
+          );
+        }
+
+        if (activity.type === 'class') {
+          return [today, tomorrow].some(
+            (sessionDate) =>
+              this.toLocalDateString(sessionDate) >= activity.startDate &&
+              activity.schedule.weekdays.includes(sessionDate.getDay()),
+          );
+        }
+
+        return false;
+      })
+      .map((activity) => {
+        // Agregar información de si es hoy o mañana
+        const isToday = this.isActivityToday(activity, today);
+        return { ...activity, isToday };
+      })
+      .sort((a, b) => {
+        // Ordenar: primero hoy, luego mañana, y por hora
+        if (a.isToday && !b.isToday) return -1;
+        if (!a.isToday && b.isToday) return 1;
+
+        const timeA = a.schedule.startTime.split(':').map(Number);
+        const timeB = b.schedule.startTime.split(':').map(Number);
+        return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
+      });
+  });
+
+  private isActivityToday(activity: ClassActivity, today: Date): boolean {
+    if (activity.type === 'event') {
+      const eventDate = new Date(`${activity.schedule.date}T12:00:00`);
+      return eventDate.getTime() === today.getTime();
+    }
+
+    if (activity.type === 'class') {
+      const todayWeekday = today.getDay();
+      return (
+        this.toLocalDateString(today) >= activity.startDate &&
+        activity.schedule.weekdays.includes(todayWeekday)
+      );
+    }
+
+    return false;
+  }
+
+  private toLocalDateString(date: Date): string {
+    return [date.getFullYear(), date.getMonth() + 1, date.getDate()]
+      .map((part, index) => (index === 0 ? String(part) : String(part).padStart(2, '0')))
+      .join('-');
+  }
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -64,24 +146,31 @@ export class DashboardComponent implements OnInit {
       // Ease-out: rápido al principio y suave al final
       const easedProgress = 1 - Math.pow(1 - progress, 3);
 
-      this.totalStudents = Math.round(
-        this.targetStudents * easedProgress
-      );
+      this.totalStudents = Math.round(this.allStudents().length * easedProgress);
 
       this.activeClasses = Math.round(
-        this.targetClasses * easedProgress
+        this.allClasses().filter((c: ClassActivity) => c.type === 'class' && c.status === 'active')
+          .length * easedProgress,
       );
 
       this.attendance = Math.round(
-        this.targetAttendance * easedProgress
+        94 * easedProgress, // TODO: Calcular desde datos reales de asistencia
       );
 
       this.monthlyIncome = Math.round(
-        this.targetIncome * easedProgress
+        3240 * easedProgress, // TODO: Calcular desde datos reales de pagos
       );
 
       this.occupancy = Math.round(
-        this.targetOccupancy * easedProgress
+        this.allClasses().length > 0
+          ? (this.allClasses().reduce(
+              (sum, c: ClassActivity) => sum + this.academyData.enrollmentCount(c.id),
+              0,
+            ) /
+              this.allClasses().reduce((sum, c: ClassActivity) => sum + c.capacity, 0)) *
+              100 *
+              easedProgress
+          : 0,
       );
 
       this.cdr.detectChanges();
@@ -92,5 +181,23 @@ export class DashboardComponent implements OnInit {
     };
 
     requestAnimationFrame(animate);
+  }
+
+  getEnrollmentCount(activity: ClassActivity): number {
+    return this.academyData.enrollmentCount(activity.id);
+  }
+
+  getAvailabilityLabel(activity: ClassActivity): string {
+    const remaining = activity.capacity - this.getEnrollmentCount(activity);
+    if (remaining === 0) return 'Completa';
+    if (remaining <= 3) return `${remaining} plazas`;
+    return `${remaining} plazas libres`;
+  }
+
+  getAvailabilityClass(activity: ClassActivity): string {
+    if (this.getEnrollmentCount(activity) === activity.capacity) return 'bg-red-50 text-red-700';
+    if (activity.capacity - this.getEnrollmentCount(activity) <= 3)
+      return 'bg-orange-50 text-orange-700';
+    return 'bg-emerald-50 text-emerald-700';
   }
 }

@@ -146,74 +146,40 @@
         </button>
       </div>
 
-      <!-- Clase -->
-      <div
-        class="flex items-center gap-4 rounded-xl p-3 transition-colors duration-200 hover:bg-[#f8f9fa]"
-      >
+      @for (activity of upcomingClasses(); track activity.id) {
         <div
-          class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-[#f4f5f9] text-[#514989] shadow-[inset_2px_2px_5px_rgba(26,26,46,0.08),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]"
+          class="flex items-center gap-4 rounded-xl p-3 transition-colors duration-200 hover:bg-[#f8f9fa]"
         >
-          <span class="text-xs font-bold">18:00</span>
+          <div
+            class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-[#f4f5f9] text-[#514989] shadow-[inset_2px_2px_5px_rgba(26,26,46,0.08),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]"
+          >
+            <span class="text-[0.65rem] font-semibold">{{
+              activity.isToday ? 'Hoy' : 'Mañana'
+            }}</span>
+            <span class="text-xs font-bold">{{ activity.schedule.startTime }}</span>
+          </div>
+
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-semibold text-[#1a1a2e]">{{ activity.name }}</p>
+
+            <p class="mt-0.5 text-xs text-[#718096]">
+              {{ getEnrollmentCount(activity) }} alumnos · {{ activity.room }}
+            </p>
+          </div>
+
+          <span
+            class="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold"
+            [ngClass]="getAvailabilityClass(activity)"
+          >
+            {{ getAvailabilityLabel(activity) }}
+          </span>
         </div>
-
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-semibold text-[#1a1a2e]">Salsa Intermedio</p>
-
-          <p class="mt-0.5 text-xs text-[#718096]">12 alumnos · Sala 1</p>
+      } @empty {
+        <div class="flex flex-col items-center justify-center py-8 text-center">
+          <fa-icon [icon]="faCalendarPlus" class="text-2xl text-[#718096] mb-2"></fa-icon>
+          <p class="text-sm text-[#718096]">No hay clases programadas para hoy ni mañana</p>
         </div>
-
-        <span
-          class="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
-        >
-          Completa
-        </span>
-      </div>
-
-      <!-- Clase -->
-      <div
-        class="flex items-center gap-4 rounded-xl p-3 transition-colors duration-200 hover:bg-[#f8f9fa]"
-      >
-        <div
-          class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-[#f4f5f9] text-[#514989] shadow-[inset_2px_2px_5px_rgba(26,26,46,0.08),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]"
-        >
-          <span class="text-xs font-bold">19:30</span>
-        </div>
-
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-semibold text-[#1a1a2e]">Bachata Principiante</p>
-
-          <p class="mt-0.5 text-xs text-[#718096]">8 alumnos · Sala 2</p>
-        </div>
-
-        <span
-          class="shrink-0 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700"
-        >
-          2 plazas
-        </span>
-      </div>
-
-      <!-- Clase -->
-      <div
-        class="flex items-center gap-4 rounded-xl p-3 transition-colors duration-200 hover:bg-[#f8f9fa]"
-      >
-        <div
-          class="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-[#f4f5f9] text-[#514989] shadow-[inset_2px_2px_5px_rgba(26,26,46,0.08),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]"
-        >
-          <span class="text-xs font-bold">21:00</span>
-        </div>
-
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-semibold text-[#1a1a2e]">Salsa Avanzado</p>
-
-          <p class="mt-0.5 text-xs text-[#718096]">14 alumnos · Sala 1</p>
-        </div>
-
-        <span
-          class="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700"
-        >
-          Lista de espera
-        </span>
-      </div>
+      }
     </div>
 
     <!-- Ocupación -->

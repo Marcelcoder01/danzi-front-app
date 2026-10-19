@@ -58,6 +58,19 @@
           </label>
 
           <label class="form-control">
+            <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+              Fecha de inicio <span class="text-[var(--color-accent)]">*</span>
+            </span>
+            <input
+              class="danzi-input"
+              type="date"
+              [(ngModel)]="newClass.startDate"
+              name="startDate"
+              required
+            />
+          </label>
+
+          <label class="form-control">
             <span class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Nivel</span>
             <select class="danzi-select" [(ngModel)]="newClass.level" name="level">
               @for (level of levels; track level) {

@@ -26,6 +26,7 @@ import { AcademyDataService } from '../../shared/services/academy-data.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ClassDialogComponent } from './class-dialog/class-dialog.component';
 import { ParticipantsDialogComponent } from './participants-dialog/participants-dialog.component';
+import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-classes',
@@ -38,11 +39,13 @@ import { ParticipantsDialogComponent } from './participants-dialog/participants-
     FaIconComponent,
     ClassDialogComponent,
     ParticipantsDialogComponent,
+    ConfirmationDialogComponent,
   ],
 })
 export class ClassesComponent {
   @ViewChild(ClassDialogComponent) private classDialog?: ClassDialogComponent;
   @ViewChild(ParticipantsDialogComponent) private participantsDialog?: ParticipantsDialogComponent;
+  @ViewChild(ConfirmationDialogComponent) private confirmationDialog?: ConfirmationDialogComponent;
 
   private readonly academyData = inject(AcademyDataService);
   private readonly toastService = inject(ToastService);
@@ -65,6 +68,7 @@ export class ClassesComponent {
   readonly filterType = signal('');
   readonly filterLevel = signal('');
   readonly filterStatus = signal('active');
+  private pendingDelete: ClassActivity | null = null;
 
   readonly allActivities = computed(() => {
     this.academyData.classesVersion();
@@ -153,6 +157,19 @@ export class ClassesComponent {
 
   deleteClass(activity: ClassActivity): void {
     if (activity.type !== 'class') return;
+    this.pendingDelete = activity;
+    this.confirmationDialog?.open({
+      title: '¿Eliminar esta clase?',
+      message: `Vas a eliminar «${activity.name}». Esta acción no se puede deshacer.`,
+      confirmLabel: 'Sí, eliminar',
+    });
+  }
+
+  confirmDeleteClass(): void {
+    const activity = this.pendingDelete;
+    this.pendingDelete = null;
+    if (!activity || activity.type !== 'class') return;
+
     if (!this.academyData.removeClass(activity.id)) {
       this.toastService.error('No se pudo eliminar la clase. Inténtalo de nuevo.');
       return;

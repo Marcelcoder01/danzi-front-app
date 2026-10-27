@@ -17,29 +17,37 @@ export class AttendanceService {
   private readonly academyData = inject(AcademyDataService);
   private readonly storage = inject(LocalStorageService);
   readonly today = localDateKey(new Date());
-  readonly classes: RegularClassActivity[] = this.academyData.classes.filter(
-    (activity): activity is RegularClassActivity =>
-      activity.type === 'class' && activity.status === 'active',
-  );
-  readonly students: AttendanceEnrollmentRow[] = this.academyData.enrollments
-    .filter(
-      (enrollment) =>
-        enrollment.enrolledAt <= this.today &&
-        (!enrollment.withdrawnAt || enrollment.withdrawnAt > this.today),
-    )
-    .flatMap((enrollment, index) => {
-      const student = this.academyData.students.find((item) => item.id === enrollment.studentId);
-      const activity = this.classes.find((item) => item.id === enrollment.classId);
-      return student && activity
-        ? [
-            {
-              ...student,
-              classId: activity.id,
-              avatarColor: ['lilac', 'peach', 'mint', 'sky'][index % 4],
-            },
-          ]
-        : [];
-    });
+  get classes(): RegularClassActivity[] {
+    this.academyData.classesVersion();
+    return this.academyData.classes.filter(
+      (activity): activity is RegularClassActivity =>
+        activity.type === 'class' && activity.status === 'active',
+    );
+  }
+  get students(): AttendanceEnrollmentRow[] {
+    this.academyData.enrollmentsVersion();
+    this.academyData.studentsVersion();
+    const classes = this.classes;
+    return this.academyData.enrollments
+      .filter(
+        (enrollment) =>
+          enrollment.enrolledAt <= this.today &&
+          (!enrollment.withdrawnAt || enrollment.withdrawnAt > this.today),
+      )
+      .flatMap((enrollment, index) => {
+        const student = this.academyData.students.find((item) => item.id === enrollment.studentId);
+        const activity = classes.find((item) => item.id === enrollment.classId);
+        return student && activity
+          ? [
+              {
+                ...student,
+                classId: activity.id,
+                avatarColor: ['lilac', 'peach', 'mint', 'sky'][index % 4],
+              },
+            ]
+          : [];
+      });
+  }
   readonly records = signal<Record<string, AttendanceRecord>>({});
   readonly drafts = signal<Record<string, AttendanceRecord>>({});
   readonly feedback = signal('');
@@ -58,7 +66,8 @@ export class AttendanceService {
   }
 
   sessions(month: string): AttendanceSession[] {
-    const cached = this.sessionCache.get(month);
+    const cacheKey = `${month}:${this.academyData.classesVersion()}`;
+    const cached = this.sessionCache.get(cacheKey);
     if (cached) return cached;
     const [year, monthNumber] = month.split('-').map(Number);
     const length = new Date(year, monthNumber, 0).getDate();
@@ -68,11 +77,13 @@ export class AttendanceService {
       for (const activity of this.classes) {
         if (activity.schedule.weekdays.includes(date.getDay())) {
           const key = localDateKey(date);
-          sessions.push({ id: `${activity.id}:${key}`, classId: activity.id, date: key });
+          if (key >= activity.startDate) {
+            sessions.push({ id: `${activity.id}:${key}`, classId: activity.id, date: key });
+          }
         }
       }
     }
-    this.sessionCache.set(month, sessions);
+    this.sessionCache.set(cacheKey, sessions);
     return sessions;
   }
 
@@ -80,6 +91,71 @@ export class AttendanceService {
     return this.sessions(date.slice(0, 7)).find(
       (session) => session.classId === classId && session.date === date,
     );
+  }
+
+  isStudentEnrolledForSession(studentId: string, session: AttendanceSession): boolean {
+    return this.academyData.isEnrolled(studentId, session.classId, session.date);
+  }
+
+  studentsEnrolledDuring(month: string): AttendanceEnrollmentRow[] {
+    this.academyData.enrollmentsVersion();
+    this.academyData.studentsVersion();
+    const sessions = this.sessions(month).filter((session) => this.isSessionDue(session));
+    const rows: AttendanceEnrollmentRow[] = [];
+    const rowKeys = new Set<string>();
+    for (const [index, enrollment] of this.academyData.enrollments.entries()) {
+      const student = this.academyData.students.find((item) => item.id === enrollment.studentId);
+      const activity = this.classes.find((item) => item.id === enrollment.classId);
+      if (!student || !activity) continue;
+      const rowKey = `${student.id}|${activity.id}`;
+      if (rowKeys.has(rowKey)) continue;
+      if (!sessions.some((session) =>
+        session.classId === enrollment.classId &&
+        enrollment.enrolledAt <= session.date &&
+        (!enrollment.withdrawnAt || enrollment.withdrawnAt > session.date),
+      )) continue;
+      rowKeys.add(rowKey);
+      rows.push({
+        ...student,
+        classId: activity.id,
+        avatarColor: ['lilac', 'peach', 'mint', 'sky'][index % 4],
+      });
+    }
+    return rows;
+  }
+
+  monthlyStats(month: string, students = this.studentsEnrolledDuring(month)) {
+    const counts: Record<AttendanceStatus, number> = {
+      present: 0,
+      recovered: 0,
+      justified: 0,
+      absent: 0,
+      pending: 0,
+    };
+    let expected = 0;
+
+    for (const student of students) {
+      for (const session of this.sessions(month)) {
+        if (
+          session.classId !== student.classId ||
+          !this.isSessionDue(session) ||
+          !this.academyData.isEnrolled(student.id, session.classId, session.date)
+        ) continue;
+        expected++;
+        counts[this.record(student.id, session.id).status]++;
+      }
+    }
+
+    const marked = expected - counts.pending;
+    const attended = counts.present + counts.recovered;
+    return {
+      counts,
+      expected,
+      marked,
+      attended,
+      completionRate: expected ? Math.round((marked / expected) * 100) : 0,
+      attendanceRate: expected ? Math.round((attended / expected) * 100) : 0,
+    };
   }
 
   record(studentId: string, sessionId: string): AttendanceRecord {
@@ -208,5 +284,15 @@ export class AttendanceService {
     const classId = sessionId.slice(0, separator);
     const date = sessionId.slice(separator + 1);
     return this.session(classId, date);
+  }
+
+  private isSessionDue(session: AttendanceSession): boolean {
+    if (session.date < this.today) return true;
+    if (session.date > this.today) return false;
+    const activity = this.classes.find((item) => item.id === session.classId);
+    if (!activity) return false;
+    const [hour, minute] = activity.schedule.startTime.split(':').map(Number);
+    const now = new Date();
+    return now.getHours() * 60 + now.getMinutes() >= hour * 60 + minute;
   }
 }

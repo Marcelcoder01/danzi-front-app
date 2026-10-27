@@ -1,5 +1,6 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { ChangeDetectorRef, Component, computed, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faPlus,
@@ -14,6 +15,10 @@ import {
   faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons';
 import { AcademyDataService } from '../../shared/services/academy-data.service';
+import { AttendanceService } from '../attendance/services/attendance.service';
+import { localDateKey } from '../attendance/interfaces/attendance.interface';
+import type { Student } from '../../shared/interfaces/student.interface';
+import { getPaymentPeriodMonths } from '../../shared/utils/payment-period.util';
 import {
   ClassActivity,
   RegularClassActivity,
@@ -28,6 +33,8 @@ import {
 })
 export class DashboardComponent implements OnInit {
   private readonly academyData = inject(AcademyDataService);
+  private readonly attendanceService = inject(AttendanceService);
+  private readonly router = inject(Router);
 
   faPlus = faPlus;
   faUsers = faUsers;
@@ -43,30 +50,56 @@ export class DashboardComponent implements OnInit {
   // Animated values
   totalStudents = 0;
   activeClasses = 0;
-  attendance = 0;
-  monthlyIncome = 0;
   occupancy = 0;
 
   // Datos reales
-  readonly allClasses = computed(() => this.academyData.classes);
-  readonly allStudents = computed(() => this.academyData.students);
+  readonly allClasses = computed(() => {
+    this.academyData.classesVersion();
+    return [...this.academyData.classes];
+  });
+  readonly allStudents = computed(() => {
+    this.academyData.studentsVersion();
+    return [...this.academyData.students];
+  });
+  readonly paidStudentCount = computed(
+    () => this.allStudents().filter((student) => student.hasPaid).length,
+  );
+  readonly monthlyIncome = computed(() =>
+    this.allStudents()
+      .filter((student) => student.hasPaid)
+      .reduce(
+        (total, student) =>
+          total + Math.max(0, Number(student.monthlyFee ?? 40) || 0) * this.paymentMonths(student),
+        0,
+      ),
+  );
+  readonly currentMonth = localDateKey(new Date()).slice(0, 7);
+  readonly attendanceStats = computed(() =>
+    this.attendanceService.monthlyStats(
+      this.currentMonth,
+      this.attendanceService.studentsEnrolledDuring(this.currentMonth),
+    ),
+  );
+  readonly attendance = computed(() => this.attendanceStats().attendanceRate);
+
+  attendanceLabel(): string {
+    const rate = this.attendance();
+    if (!this.attendanceStats().expected) return 'Sin sesiones este mes';
+    if (!this.attendanceStats().marked) return 'Sin listas pasadas';
+    if (rate >= 90) return 'Excelente';
+    if (rate >= 75) return 'Buen nivel';
+    return 'Puede mejorar';
+  }
+
+  createClass(): void {
+    void this.router.navigate(['/admin/classes'], { queryParams: { createClass: 'true' } });
+  }
 
   readonly upcomingClasses = computed(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalizar a medianoche
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-
-    console.log(
-      'Today:',
-      today.toDateString(),
-      'Day:',
-      today.getDay(),
-      'Tomorrow:',
-      tomorrow.toDateString(),
-      'Day:',
-      tomorrow.getDay(),
-    );
 
     return this.allClasses()
       .filter((activity) => {
@@ -153,14 +186,6 @@ export class DashboardComponent implements OnInit {
           .length * easedProgress,
       );
 
-      this.attendance = Math.round(
-        94 * easedProgress, // TODO: Calcular desde datos reales de asistencia
-      );
-
-      this.monthlyIncome = Math.round(
-        3240 * easedProgress, // TODO: Calcular desde datos reales de pagos
-      );
-
       this.occupancy = Math.round(
         this.allClasses().length > 0
           ? (this.allClasses().reduce(
@@ -185,6 +210,10 @@ export class DashboardComponent implements OnInit {
 
   getEnrollmentCount(activity: ClassActivity): number {
     return this.academyData.enrollmentCount(activity.id);
+  }
+
+  private paymentMonths(student: Student): number {
+    return getPaymentPeriodMonths(student.paymentPeriod, student.paymentFrom, student.paymentTo);
   }
 
   getAvailabilityLabel(activity: ClassActivity): string {

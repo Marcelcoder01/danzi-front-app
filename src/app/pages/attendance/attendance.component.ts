@@ -33,7 +33,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { StudentsService } from '../students/services/students.service';
 import {
-  AttendanceRecord,
   AttendanceSession,
   AttendanceStatus,
   AttendanceEnrollmentRow,
@@ -145,7 +144,7 @@ export class AttendanceComponent {
   );
 
   readonly monthlyStudents = computed(() =>
-    this.attendance.students.filter(
+    this.attendance.studentsEnrolledDuring(this.month()).filter(
       (student) =>
         this.matchesSearch(student) &&
         (!this.classFilter() || student.classId === this.classFilter()) &&
@@ -183,19 +182,11 @@ export class AttendanceComponent {
 
   readonly calendarPadding = computed(() => Array((this.days()[0].weekday + 6) % 7).fill(0));
 
-  readonly monthCounts = computed(() => {
-    const records = this.monthlyStudents()
-      .flatMap((student) => this.history(student))
-      .filter((row) => row.session.date <= this.attendance.today)
-      .map((row) => row.record);
-    return this.counts(records);
-  });
-
-  readonly attendanceRate = computed(() => {
-    const counts = this.monthCounts();
-    const marked = counts.present + counts.recovered + counts.justified + counts.absent;
-    return marked ? Math.round(((counts.present + counts.recovered) / marked) * 100) : 0;
-  });
+  readonly monthStats = computed(() =>
+    this.attendance.monthlyStats(this.month(), this.monthlyStudents()),
+  );
+  readonly monthCounts = computed(() => this.monthStats().counts);
+  readonly attendanceRate = computed(() => this.monthStats().attendanceRate);
   readonly pendingVisibleCount = computed(
     () => this.roster().filter((student) => this.sessionStatus(student) === 'pending').length,
   );
@@ -335,7 +326,11 @@ export class AttendanceComponent {
   history(student: AttendanceEnrollmentRow) {
     return this.attendance
       .sessions(this.month())
-      .filter((session) => session.classId === student.classId)
+      .filter(
+        (session) =>
+          session.classId === student.classId &&
+          this.attendance.isStudentEnrolledForSession(student.id, session),
+      )
       .map((session) => ({ session, record: this.attendance.record(student.id, session.id) }));
   }
   clearFilters(): void {
@@ -378,10 +373,5 @@ export class AttendanceComponent {
       (filter === 'missed' && ['absent', 'justified'].includes(status)) ||
       (filter === 'pending' && status === 'pending')
     );
-  }
-  private counts(records: AttendanceRecord[]): Record<AttendanceStatus, number> {
-    const counts = { present: 0, recovered: 0, justified: 0, absent: 0, pending: 0 };
-    records.forEach((record) => counts[record.status]++);
-    return counts;
   }
 }

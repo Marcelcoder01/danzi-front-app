@@ -1,6 +1,7 @@
-import { Component, computed, inject, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faCalendarDays,
@@ -42,13 +43,15 @@ import { ConfirmationDialogComponent } from '../../shared/components/confirmatio
     ConfirmationDialogComponent,
   ],
 })
-export class ClassesComponent {
+export class ClassesComponent implements AfterViewInit {
   @ViewChild(ClassDialogComponent) private classDialog?: ClassDialogComponent;
   @ViewChild(ParticipantsDialogComponent) private participantsDialog?: ParticipantsDialogComponent;
   @ViewChild(ConfirmationDialogComponent) private confirmationDialog?: ConfirmationDialogComponent;
 
   private readonly academyData = inject(AcademyDataService);
   private readonly toastService = inject(ToastService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   faCalendarDays = faCalendarDays;
   faClock = faClock;
   faCrown = faCrown;
@@ -102,6 +105,17 @@ export class ClassesComponent {
       return matchesSearch && matchesType && matchesLevel && matchesStatus;
     });
   });
+
+  ngAfterViewInit(): void {
+    if (this.route.snapshot.queryParamMap.get('createClass') !== 'true') return;
+    this.openActivityDialog();
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { createClass: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
 
   toggleFilters(): void {
     this.isFiltersVisible.update((open) => !open);

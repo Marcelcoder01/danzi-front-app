@@ -127,7 +127,12 @@
         </thead>
         <tbody>
           @for (student of students; track student.id) {
-            <tr>
+            <tr
+              class="student-row"
+              [class.student-row-expanded]="expandedStudentId === student.id"
+              [attr.aria-expanded]="expandedStudentId === student.id"
+              (click)="toggleEnrollments(student.id)"
+            >
               <!-- Name -->
               <td>
                 <div class="flex items-center gap-3">
@@ -139,6 +144,22 @@
                       {{ studentsService.getDisplayName(student) }}
                     </p>
                     <p class="text-sm text-muted">{{ student.email }}</p>
+                    <button
+                      type="button"
+                      class="enrollment-toggle mt-1 inline-flex items-center gap-1.5 text-xs font-semibold"
+                      [attr.aria-expanded]="expandedStudentId === student.id"
+                      [attr.aria-label]="
+                        (expandedStudentId === student.id
+                          ? 'Ocultar clases de '
+                          : 'Ver clases de ') + studentsService.getDisplayName(student)
+                      "
+                      (click)="$event.stopPropagation(); toggleEnrollments(student.id)"
+                    >
+                      <fa-icon
+                        [icon]="expandedStudentId === student.id ? faChevronUp : faChevronDown"
+                      ></fa-icon>
+                      {{ expandedStudentId === student.id ? 'Ocultar clases' : 'Ver clases' }}
+                    </button>
                   </div>
                 </div>
               </td>
@@ -202,22 +223,72 @@
               <!-- Actions -->
               <td class="text-right">
                 <div class="flex items-center justify-end gap-2">
-                  <button class="action-btn action-btn-view" title="Ver">
-                    <fa-icon [icon]="faEye" class="text-sm"></fa-icon>
-                  </button>
                   <button
                     class="action-btn action-btn-edit"
                     title="Editar"
-                    (click)="editStudent(student)"
+                    (click)="$event.stopPropagation(); editStudent(student)"
                   >
                     <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
                   </button>
-                  <button class="action-btn action-btn-delete" title="Eliminar">
+                  <button
+                    class="action-btn action-btn-delete"
+                    title="Eliminar"
+                    (click)="$event.stopPropagation()"
+                  >
                     <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
                   </button>
                 </div>
               </td>
             </tr>
+            @if (expandedStudentId === student.id) {
+              <tr class="enrollment-detail-row">
+                <td colspan="8">
+                  <div class="enrollment-panel">
+                    <div class="mb-3 flex items-center gap-2">
+                      <span class="enrollment-heading-icon">
+                        <fa-icon [icon]="faMusic"></fa-icon>
+                      </span>
+                      <div>
+                        <h3 class="text-sm font-bold text-primary">Clases matriculadas</h3>
+                        <p class="text-xs text-muted">Inscripciones activas del alumno</p>
+                      </div>
+                    </div>
+                    @if (studentClasses(student.id).length) {
+                      <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                        @for (activity of studentClasses(student.id); track activity.id) {
+                          <article class="enrollment-class-card">
+                            <div class="flex min-w-0 items-center gap-3">
+                              <span class="class-color-dot"></span>
+                              <div class="min-w-0">
+                                <p class="truncate text-sm font-semibold text-primary">
+                                  {{ activity.name }}
+                                </p>
+                                <p class="truncate text-xs text-muted">{{ activity.teacher }}</p>
+                              </div>
+                            </div>
+                            <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+                              <span class="inline-flex items-center gap-1.5">
+                                <fa-icon [icon]="faClock"></fa-icon>
+                                {{ classSchedule(activity) }}
+                              </span>
+                              <span class="inline-flex items-center gap-1.5">
+                                <fa-icon [icon]="faLocationDot"></fa-icon>
+                                {{ activity.room }}
+                              </span>
+                            </div>
+                          </article>
+                        }
+                      </div>
+                    } @else {
+                      <div class="enrollment-empty-state">
+                        <fa-icon [icon]="faMusic"></fa-icon>
+                        <span>No matriculado en ninguna clase</span>
+                      </div>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>
@@ -251,6 +322,57 @@
             <p class="text-sm text-muted truncate">{{ student.email }}</p>
           </div>
         </div>
+
+        <button
+          type="button"
+          class="enrollment-mobile-toggle mb-4 flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold"
+          [attr.aria-expanded]="expandedStudentId === student.id"
+          (click)="toggleEnrollments(student.id)"
+        >
+          <span class="flex items-center gap-2">
+            <fa-icon [icon]="faMusic"></fa-icon>
+            {{ expandedStudentId === student.id ? 'Ocultar clases' : 'Ver clases matriculadas' }}
+          </span>
+          <fa-icon
+            [icon]="expandedStudentId === student.id ? faChevronUp : faChevronDown"
+          ></fa-icon>
+        </button>
+        @if (expandedStudentId === student.id) {
+          <div class="enrollment-mobile-panel mb-4">
+            @if (studentClasses(student.id).length) {
+              <div class="space-y-2">
+                @for (activity of studentClasses(student.id); track activity.id) {
+                  <article class="enrollment-class-card">
+                    <div class="flex min-w-0 items-center gap-3">
+                      <span class="class-color-dot"></span>
+                      <div class="min-w-0">
+                        <p class="truncate text-sm font-semibold text-primary">
+                          {{ activity.name }}
+                        </p>
+                        <p class="truncate text-xs text-muted">{{ activity.teacher }}</p>
+                      </div>
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+                      <span class="inline-flex items-center gap-1.5">
+                        <fa-icon [icon]="faClock"></fa-icon>
+                        {{ classSchedule(activity) }}
+                      </span>
+                      <span class="inline-flex items-center gap-1.5">
+                        <fa-icon [icon]="faLocationDot"></fa-icon>
+                        {{ activity.room }}
+                      </span>
+                    </div>
+                  </article>
+                }
+              </div>
+            } @else {
+              <div class="enrollment-empty-state">
+                <fa-icon [icon]="faMusic"></fa-icon>
+                <span>No matriculado en ninguna clase</span>
+              </div>
+            }
+          </div>
+        }
 
         <!-- Details -->
         <div class="grid grid-cols-2 gap-3 mb-4">
@@ -311,11 +433,7 @@
           <button class="action-btn action-btn-view" title="Ver">
             <fa-icon [icon]="faEye" class="text-sm"></fa-icon>
           </button>
-          <button
-            class="action-btn action-btn-edit"
-            title="Editar"
-            (click)="editStudent(student)"
-          >
+          <button class="action-btn action-btn-edit" title="Editar" (click)="editStudent(student)">
             <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
           </button>
           <button class="action-btn action-btn-delete" title="Eliminar">

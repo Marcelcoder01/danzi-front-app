@@ -2,8 +2,16 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { PaymentCheckboxComponent } from './payment-checkbox/payment-checkbox.component';
-import { faXmark, faUserPlus, faUser, faEnvelope, faPhone, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { Student } from '../../../shared/interfaces/student.interface';
+import {
+  faXmark,
+  faUserPlus,
+  faUser,
+  faEnvelope,
+  faPhone,
+  faArrowRight,
+} from '@fortawesome/free-solid-svg-icons';
+import type { Student } from '../../../shared/interfaces/student.interface';
+import { getPaymentPeriodMonths } from '../../../shared/utils/payment-period.util';
 import { StudentLevel } from '../../../shared/interfaces/student-level.enum';
 import type { StudentRole, StudentStatus } from '../../../shared/interfaces/student-status.type';
 
@@ -12,7 +20,7 @@ import type { StudentRole, StudentStatus } from '../../../shared/interfaces/stud
   standalone: true,
   templateUrl: './student-dialog.component.html',
   styleUrl: './student-dialog.component.css',
-  imports: [FormsModule, FaIconComponent, PaymentCheckboxComponent]
+  imports: [FormsModule, FaIconComponent, PaymentCheckboxComponent],
 })
 export class StudentDialogComponent {
   @Output() createStudent = new EventEmitter<Omit<Student, 'id'>>();
@@ -31,25 +39,45 @@ export class StudentDialogComponent {
 
   private createEmptyStudent(): Omit<Student, 'id'> {
     return {
-    firstName: '',
-    lastName: '',
-    alias: '',
-    email: '',
-    phone: '',
-    instagram: '',
-    photoUrl: '',
-    birthDate: '',
-    startDate: '',
-    level: StudentLevel.A1,
-    status: 'active',
-    role: 'follower',
-    hasPaid: false
+      firstName: '',
+      lastName: '',
+      alias: '',
+      email: '',
+      phone: '',
+      instagram: '',
+      photoUrl: '',
+      birthDate: '',
+      startDate: '',
+      level: StudentLevel.A1,
+      status: 'active',
+      role: 'follower',
+      hasPaid: false,
+      monthlyFee: 40,
+      paymentPeriod: '1',
+      paymentFrom: null,
+      paymentTo: null,
     };
   }
-  
-  paymentPeriod: '1' | '2' | 'custom' = '1';   // por defecto 1 mes
-  paymentFrom: string | null = null;
-  paymentTo: string | null = null;
+
+  get paymentMonths(): number {
+    if (
+      this.newStudent.paymentPeriod === 'custom' &&
+      (!this.newStudent.paymentFrom ||
+        !this.newStudent.paymentTo ||
+        this.newStudent.paymentTo < this.newStudent.paymentFrom)
+    ) {
+      return 0;
+    }
+    return getPaymentPeriodMonths(
+      this.newStudent.paymentPeriod,
+      this.newStudent.paymentFrom,
+      this.newStudent.paymentTo,
+    );
+  }
+
+  get paymentTotal(): number {
+    return Math.max(0, Number(this.newStudent.monthlyFee) || 0) * this.paymentMonths;
+  }
 
   studentLevels = Object.values(StudentLevel);
   studentLevelsLabels: { [key: string]: string } = {
@@ -79,6 +107,19 @@ export class StudentDialogComponent {
   };
 
   onSubmit(): void {
+    if (
+      this.newStudent.hasPaid &&
+      this.newStudent.paymentPeriod === 'custom' &&
+      (!this.newStudent.paymentFrom ||
+        !this.newStudent.paymentTo ||
+        this.newStudent.paymentTo < this.newStudent.paymentFrom)
+    ) {
+      return;
+    }
+
+    const monthlyFee = Number(this.newStudent.monthlyFee);
+    if (!Number.isFinite(monthlyFee) || monthlyFee < 0) return;
+
     if (this.isEdit && this.editingStudentId) {
       this.updateStudent.emit({ ...this.newStudent, id: this.editingStudentId });
     } else {
@@ -99,7 +140,12 @@ export class StudentDialogComponent {
 
   openForEdit(student: Student): void {
     const { id, ...studentDetails } = student;
-    this.newStudent = { ...this.createEmptyStudent(), ...studentDetails };
+    this.newStudent = {
+      ...this.createEmptyStudent(),
+      ...studentDetails,
+      monthlyFee: student.monthlyFee ?? 40,
+      paymentPeriod: student.paymentPeriod ?? '1',
+    };
     this.isEdit = true;
     this.editingStudentId = id;
     this.showDialog();

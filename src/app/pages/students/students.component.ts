@@ -8,8 +8,14 @@ import {
   faEdit,
   faTrash,
   faEye,
-  faXmark
+  faXmark,
+  faChevronDown,
+  faChevronUp,
+  faMusic,
+  faClock,
+  faLocationDot,
 } from '@fortawesome/free-solid-svg-icons';
+import { ClassActivity } from '../../shared/interfaces/class-activity.interface';
 import { Student } from '../../shared/interfaces/student.interface';
 import { AcademyDataService } from '../../shared/services/academy-data.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -33,6 +39,11 @@ export class StudentsComponent {
   faTrash = faTrash;
   faEye = faEye;
   faXmark = faXmark;
+  faChevronDown = faChevronDown;
+  faChevronUp = faChevronUp;
+  faMusic = faMusic;
+  faClock = faClock;
+  faLocationDot = faLocationDot;
   studentsService = inject(StudentsService);
   private readonly academyData = inject(AcademyDataService);
   private readonly toastService = inject(ToastService);
@@ -43,6 +54,7 @@ export class StudentsComponent {
   filterPayment = '';
   filterRole = '';
   searchTerm = '';
+  expandedStudentId: string | null = null;
 
   constructor() {}
 
@@ -86,6 +98,25 @@ export class StudentsComponent {
 
       return true;
     });
+  }
+
+  toggleEnrollments(studentId: string): void {
+    this.expandedStudentId = this.expandedStudentId === studentId ? null : studentId;
+  }
+
+  studentClasses(studentId: string): ClassActivity[] {
+    this.academyData.enrollmentsVersion();
+    this.academyData.classesVersion();
+    return this.academyData.classesForStudent(studentId);
+  }
+
+  classSchedule(activity: ClassActivity): string {
+    const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    if (activity.type === 'event') {
+      return `${activity.schedule.date} · ${activity.schedule.startTime}–${activity.schedule.endTime}`;
+    }
+    const weekdays = activity.schedule.weekdays.map((day) => days[day]).join(', ');
+    return `${weekdays} · ${activity.schedule.startTime}–${activity.schedule.endTime}`;
   }
 
   toggleFilters() {

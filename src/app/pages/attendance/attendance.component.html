@@ -232,10 +232,16 @@
         <div>
           <strong>{{ attendanceRate() }}%</strong>
           <p>de asistencia</p>
-          <small>sobre sesiones marcadas</small>
+          <small>{{ monthStats().attended }} / {{ monthStats().expected }} plazas previstas</small>
         </div>
       </article>
     </div>
+    <p class="month-summary-note">
+      Listas pasadas: {{ monthStats().marked }} de {{ monthStats().expected }} plazas previstas
+      ({{ monthStats().completionRate }}%). El porcentaje cuenta las asistencias sobre todas las
+      matrículas activas en sesiones celebradas; las pendientes aún no suman como asistencia y las
+      sesiones futuras quedan fuera.
+    </p>
 
     <div class="monthly-content">
       <app-attendance-matrix

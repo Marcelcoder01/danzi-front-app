@@ -276,17 +276,11 @@
       type="button"
       class="primary-button"
       [disabled]="!draftCount()"
-      (click)="attendance.save()"
+      (click)="saveAttendance()"
     >
       <fa-icon [icon]="icons.save"></fa-icon> Guardar asistencia
     </button>
   </div>
-  @if (attendance.feedback()) {
-    <p class="save-feedback" [class.error]="attendance.saveError()" role="status">
-      {{ attendance.feedback() }}
-    </p>
-  }
-
   <dialog #studentDialog class="student-dialog" aria-labelledby="student-dialog-title">
     <app-attendance-student
       [selectedStudent]="selectedStudent()"

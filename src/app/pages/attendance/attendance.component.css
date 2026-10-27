@@ -430,27 +430,6 @@ select:focus {
   padding: 12px;
   font-size: 10px;
 }
-.save-feedback {
-  position: fixed;
-  bottom: 91px;
-  left: 16px;
-  right: 16px;
-  z-index: 30;
-  width: fit-content;
-  max-width: calc(100% - 32px);
-  margin: auto;
-  padding: 10px 16px;
-  border: 1px solid #b9e2ca;
-  border-radius: 10px;
-  background: #eaf8f0;
-  color: #248457;
-  font-size: 11px;
-  box-shadow: 0 3px 15px #1a1a2e10;
-}
-.error {
-  color: #c34354;
-  background: #fff0f2;
-}
 .empty-state {
   padding: 40px 20px;
   text-align: center;

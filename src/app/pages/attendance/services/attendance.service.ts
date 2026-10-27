@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { AcademyDataService } from '../../../shared/services/academy-data.service';
+import { LocalStorageService } from '../../../shared/services/local-storage.service';
 import { RegularClassActivity } from '../../../shared/interfaces/class-activity.interface';
 import {
   AttendanceRecord,
@@ -9,12 +10,12 @@ import {
   ATTENDANCE_STATUSES,
   attendanceKey,
   localDateKey,
-  parseLocalDate,
 } from '../interfaces/attendance.interface';
 
 @Injectable({ providedIn: 'root' })
 export class AttendanceService {
   private readonly academyData = inject(AcademyDataService);
+  private readonly storage = inject(LocalStorageService);
   readonly today = localDateKey(new Date());
   readonly classes: RegularClassActivity[] = this.academyData.classes.filter(
     (activity): activity is RegularClassActivity =>
@@ -47,26 +48,13 @@ export class AttendanceService {
   private readonly sessionCache = new Map<string, AttendanceSession[]>();
 
   constructor() {
-    this.records.set(this.demoRecords());
-    try {
-      const raw = localStorage.getItem(this.storageKey);
-      if (raw) {
-        const saved: unknown = JSON.parse(raw);
-        if (Array.isArray(saved)) {
-          const valid = saved.filter((record): record is AttendanceRecord =>
-            this.isValidRecord(record),
-          );
-          this.records.update((records) => ({
-            ...records,
-            ...Object.fromEntries(
-              valid.map((record) => [attendanceKey(record.studentId, record.sessionId), record]),
-            ),
-          }));
-        }
-      }
-    } catch {
-      this.feedback.set('No pudimos leer el guardado local. Puedes seguir pasando lista.');
-    }
+    const saved = this.storage.read<unknown[]>(this.storageKey, [], Array.isArray);
+    const valid = saved.filter((record): record is AttendanceRecord => this.isValidRecord(record));
+    this.records.set(
+      Object.fromEntries(
+        valid.map((record) => [attendanceKey(record.studentId, record.sessionId), record]),
+      ),
+    );
   }
 
   sessions(month: string): AttendanceSession[] {
@@ -162,7 +150,7 @@ export class AttendanceService {
     if (!Object.keys(this.drafts()).length) return true;
     const effective = { ...this.records(), ...this.drafts() };
     try {
-      localStorage.setItem(this.storageKey, JSON.stringify(Object.values(effective)));
+      this.storage.write(this.storageKey, Object.values(effective));
       this.records.set(effective);
       this.drafts.set({});
       this.feedback.set('Asistencia guardada en este dispositivo.');
@@ -212,57 +200,6 @@ export class AttendanceService {
         return false;
     }
     return true;
-  }
-
-  private demoRecords(): Record<string, AttendanceRecord> {
-    const records: Record<string, AttendanceRecord> = {};
-    const current = parseLocalDate(this.today);
-    for (let offset = -1; offset <= 0; offset++) {
-      const month = localDateKey(
-        new Date(current.getFullYear(), current.getMonth() + offset, 1, 12),
-      ).slice(0, 7);
-      for (const [studentIndex, student] of this.students.entries()) {
-        const sessions = this.sessions(month).filter(
-          (session) =>
-            session.classId === student.classId &&
-            session.date < this.today &&
-            this.academyData.isEnrolled(student.id, session.classId, session.date),
-        );
-        sessions.forEach((session, index) => {
-          const pattern = (index + studentIndex) % 8;
-          const status: AttendanceStatus =
-            pattern === 0 ? 'absent' : pattern === 1 ? 'justified' : 'present';
-          records[attendanceKey(student.id, session.id)] = {
-            studentId: student.id,
-            sessionId: session.id,
-            status,
-            ...(status === 'justified' ? { note: 'Falta justificada por el alumno.' } : {}),
-          };
-        });
-        const source = sessions.find((session, index) => index === 0);
-        const target =
-          source &&
-          this.sessions(month).find(
-            (target) =>
-              target.classId !== source.classId &&
-              (this.classes.find((activity) => activity.id === target.classId)?.level ===
-                student.level ||
-                this.classes.find((activity) => activity.id === target.classId)?.level ===
-                  'ALL_LEVELS') &&
-              target.date >= source.date &&
-              target.date < this.today,
-          );
-        if (source && target && studentIndex % 3 === 0) {
-          records[attendanceKey(student.id, source.id)] = {
-            studentId: student.id,
-            sessionId: source.id,
-            status: 'recovered',
-            recoverySessionId: target.id,
-          };
-        }
-      }
-    }
-    return records;
   }
 
   private sessionFromId(sessionId: string): AttendanceSession | undefined {

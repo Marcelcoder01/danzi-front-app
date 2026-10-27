@@ -45,6 +45,7 @@ import {
 import { AttendanceService } from './services/attendance.service';
 import { AttendanceStudentComponent } from './components/attendance-student/attendance-student.component';
 import { AttendanceMatrixComponent } from './components/attendance-matrix/attendance-matrix.component';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-attendance',
@@ -63,6 +64,7 @@ import { AttendanceMatrixComponent } from './components/attendance-matrix/attend
 })
 export class AttendanceComponent {
   readonly attendance = inject(AttendanceService);
+  private readonly toastService = inject(ToastService);
   private readonly studentsService = inject(StudentsService);
   readonly icons = {
     present: faCheck,
@@ -197,6 +199,14 @@ export class AttendanceComponent {
   readonly pendingVisibleCount = computed(
     () => this.roster().filter((student) => this.sessionStatus(student) === 'pending').length,
   );
+
+  saveAttendance(): void {
+    if (this.attendance.save()) {
+      this.toastService.success('Asistencia guardada en este dispositivo.');
+    } else {
+      this.toastService.error('No se pudo guardar. Conservamos tus cambios para que lo intentes de nuevo.');
+    }
+  }
 
   fullName(student: AttendanceEnrollmentRow): string {
     return `${student.firstName} ${student.lastName}`;

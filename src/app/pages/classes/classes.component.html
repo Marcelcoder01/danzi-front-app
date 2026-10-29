@@ -233,7 +233,7 @@
                 class="grid h-[1.65rem] w-[1.65rem] flex-none place-items-center rounded-[0.45rem] text-[0.7rem] text-[var(--color-text-muted)] bg-[var(--color-surface-alt)]"
                 ><fa-icon [icon]="faCalendarDays"></fa-icon
               ></span>
-              <div>
+              <div class="min-w-0 flex-1">
                 <p class="text-[0.68rem] font-semibold text-[var(--color-text-light)]">
                   Próxima sesión
                 </p>
@@ -249,10 +249,10 @@
                 class="grid h-[1.65rem] w-[1.65rem] flex-none place-items-center rounded-[0.45rem] text-[0.7rem] text-[var(--color-text-muted)] bg-[var(--color-surface-alt)]"
                 ><fa-icon [icon]="faClock"></fa-icon
               ></span>
-              <div>
+              <div class="min-w-0 flex-1">
                 <p class="text-[0.68rem] font-semibold text-[var(--color-text-light)]">Horario</p>
                 <p
-                  class="overflow-hidden truncate text-[0.74rem] font-semibold text-[var(--color-text)] leading-5 whitespace-nowrap"
+                  class="schedule-label overflow-hidden truncate text-[0.74rem] font-semibold text-[var(--color-text)] leading-5 whitespace-nowrap"
                 >
                   {{ scheduleLabel(activity) }}
                 </p>

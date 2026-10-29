@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -23,7 +23,6 @@ import {
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent {
-  @Output() navigate = new EventEmitter<void>();
   @Input() isCollapsed = false;
 
   faGauge = faGauge;
@@ -45,6 +44,5 @@ export class SidebarComponent {
     this.authService.signOut().subscribe(() => {
       this.router.navigate(['/login']);
     });
-    this.navigate.emit();
   }
 }

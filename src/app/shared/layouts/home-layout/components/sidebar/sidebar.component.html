@@ -1,6 +1,6 @@
-<div class="h-full flex flex-col p-4">
+<div class="sidebar-content h-full flex flex-col p-4">
   <!-- Brand -->
-  <div class="mb-4 pb-2 lg:mb-3 lg:pb-1 xl:mb-2 xl:pb-1 border-b border-white/10">
+  <div class="sidebar-brand mb-4 pb-2 lg:mb-3 lg:pb-1 xl:mb-2 xl:pb-1 border-b border-white/10">
     <div class="flex items-center justify-center">
       <img
         src="/assets/img/00-LOGO-BLANCO-PNG.png"
@@ -14,36 +14,36 @@
     </div>
   </div>
   <!-- Navigation -->
-  <nav class="flex-1 space-y-1">
+  <nav class="sidebar-nav flex-1 space-y-1">
     <a
       routerLink="/admin"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
-      (click)="navigate.emit()"
     >
       <fa-icon [icon]="faGauge" size="lg"></fa-icon>
-      <span [class.hidden]="isCollapsed">Panel Principal</span>
+      <span class="desktop-label" [class.hidden]="isCollapsed">Panel Principal</span>
+      <span class="mobile-label">Inicio</span>
     </a>
     <a
       routerLink="/admin/students"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
-      (click)="navigate.emit()"
     >
       <fa-icon [icon]="faUsers" size="lg"></fa-icon>
-      <span [class.hidden]="isCollapsed">Alumnos</span>
+      <span class="desktop-label" [class.hidden]="isCollapsed">Alumnos</span>
+      <span class="mobile-label">Alumnos</span>
     </a>
     <a
       routerLink="/admin/classes"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
-      (click)="navigate.emit()"
     >
       <fa-icon [icon]="faMusic" size="lg"></fa-icon>
-      <span [class.hidden]="isCollapsed">Clases</span>
+      <span class="desktop-label" [class.hidden]="isCollapsed">Clases</span>
+      <span class="mobile-label">Clases</span>
     </a>
     <!-- <a
       routerLink="/admin/calendar"
@@ -60,10 +60,10 @@
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
-      (click)="navigate.emit()"
     >
       <fa-icon [icon]="faSquareCheck" size="lg"></fa-icon>
-      <span [class.hidden]="isCollapsed">Asistencia</span>
+      <span class="desktop-label" [class.hidden]="isCollapsed">Asistencia</span>
+      <span class="mobile-label">Asistencia</span>
     </a>
     <!-- <a
       routerLink="/admin/payments"
@@ -98,13 +98,14 @@
   </nav>
 
   <!-- Logout -->
-  <div class="pt-4 border-t border-white-10">
+  <div class="sidebar-logout pt-4 border-t border-white-10">
     <button
       class="flex items-center gap-3 px-5 py-3 w-full rounded-lg transition-colors"
       (click)="logout()"
     >
       <fa-icon [icon]="faRightFromBracket" size="lg"></fa-icon>
-      <span [class.hidden]="isCollapsed">Cerrar Sesión</span>
+      <span class="desktop-label" [class.hidden]="isCollapsed">Cerrar Sesión</span>
+      <span class="mobile-label">Salir</span>
     </button>
   </div>
 </div>

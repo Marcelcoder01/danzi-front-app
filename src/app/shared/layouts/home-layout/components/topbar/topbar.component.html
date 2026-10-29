@@ -2,19 +2,6 @@
   class="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between px-6 shadow-lg topbar-header"
 >
   <div class="flex items-center gap-4">
-    <!-- Mobile Menu Button -->
-    <button
-      class="lg:hidden p-2 rounded-lg hover:bg-base-200 transition-colors"
-      (click)="menuClick.emit()"
-      aria-label="Toggle menu"
-    >
-      @if (isCollapsed) {
-        <fa-icon [icon]="faChevronRight" size="lg"></fa-icon>
-      } @else {
-        <fa-icon [icon]="faChevronLeft" size="lg"></fa-icon>
-      }
-    </button>
-
     <!-- Desktop Sidebar Toggle Button -->
     <button
       class="hidden lg:flex p-2 rounded-lg hover:bg-base-200 transition-all hover:shadow-md toggle-btn-bg"

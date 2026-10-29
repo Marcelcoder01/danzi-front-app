@@ -1,14 +1,7 @@
 import { Component, Output, EventEmitter, Input, ViewChild } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ConfirmationDialogComponent } from '../../../../components/confirmation-dialog/confirmation-dialog.component';
-import {
-  faBars,
-  faChevronRight,
-  faChevronLeft,
-  faBarsStaggered,
-  faRightFromBracket,
-  faRotate,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faChevronLeft, faRotate } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-topbar',
@@ -20,16 +13,11 @@ import {
 export class TopbarComponent {
   @ViewChild(ConfirmationDialogComponent) private confirmationDialog?: ConfirmationDialogComponent;
 
-  @Output() menuClick = new EventEmitter<void>();
   @Output() toggleCollapse = new EventEmitter<void>();
   @Input() isCollapsed = false;
 
-  faBars = faBars;
   faChevronRight = faChevronRight;
   faChevronLeft = faChevronLeft;
-
-  faBarsStaggered = faBarsStaggered;
-  faRightFromBracket = faRightFromBracket;
   faRotate = faRotate;
 
   clearData(): void {

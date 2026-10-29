@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faTriangleExclamation, faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -16,6 +16,8 @@ export interface ConfirmationDialogOptions {
   imports: [FaIconComponent],
 })
 export class ConfirmationDialogComponent {
+  @ViewChild('dialog') private dialog?: ElementRef<HTMLDialogElement>;
+
   @Output() confirmed = new EventEmitter<void>();
 
   readonly faTriangleExclamation = faTriangleExclamation;
@@ -24,11 +26,11 @@ export class ConfirmationDialogComponent {
 
   open(options: ConfirmationDialogOptions): void {
     this.options = options;
-    (document.getElementById('confirmation_dialog') as HTMLDialogElement | null)?.showModal();
+    this.dialog?.nativeElement.showModal();
   }
 
   close(): void {
-    (document.getElementById('confirmation_dialog') as HTMLDialogElement | null)?.close();
+    this.dialog?.nativeElement.close();
   }
 
   confirm(): void {

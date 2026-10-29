@@ -1,0 +1,73 @@
+@if (open) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4"
+    (click)="close()"
+    (keydown.escape)="close()"
+  >
+    <section
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payment-due-title"
+      class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h2 id="payment-due-title" class="text-lg font-bold text-[#1a1a2e]">
+            Pagos pendientes
+          </h2>
+          <p class="mt-1 text-sm text-[#718096]">
+            Alumnos con el pago vencido o cuyo período vence en los próximos 7 días.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="rounded-lg p-2 text-[#718096] transition-colors hover:bg-slate-100"
+          aria-label="Cerrar diálogo"
+          (click)="close()"
+        >
+          <fa-icon [icon]="faXmark"></fa-icon>
+        </button>
+      </div>
+
+      <ul class="mt-5 divide-y divide-slate-100">
+        @for (student of students; track student.id) {
+          <li class="flex items-center justify-between gap-4 py-3">
+            <div class="min-w-0">
+              <span class="block truncate font-medium text-[#1a1a2e]">
+                {{ student.firstName }} {{ student.lastName }}
+              </span>
+              <span class="block text-sm text-[#718096]">
+                @if (isOverdue(student.nextPaymentDate!)) {
+                  Vencido el {{ formatPaymentDate(student.nextPaymentDate!) }}
+                } @else {
+                  Vence el {{ formatPaymentDate(student.nextPaymentDate!) }}
+                }
+              </span>
+            </div>
+            <div class="w-44 shrink-0">
+              <app-payment-checkbox
+                [checked]="isSelected(student)"
+                title="Registrar pago"
+                description="Se guardará al cerrar"
+                (checkedChange)="togglePayment(student, $event)"
+              ></app-payment-checkbox>
+            </div>
+          </li>
+        } @empty {
+          <li class="py-8 text-center text-sm text-[#718096]">No hay pagos pendientes.</li>
+        }
+      </ul>
+
+      <div class="mt-5 flex justify-end border-t border-slate-100 pt-4">
+        <button
+          type="button"
+          class="rounded-xl bg-[#514989] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#423b78]"
+          (click)="close()"
+        >
+          Cerrar
+        </button>
+      </div>
+    </section>
+  </div>
+}

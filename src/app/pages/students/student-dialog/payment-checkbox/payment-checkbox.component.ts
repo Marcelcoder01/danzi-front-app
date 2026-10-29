@@ -8,6 +8,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class PaymentCheckboxComponent {
   @Input() checked = false;
+  @Input() title = 'Pago realizado';
+  @Input() description = 'Marcar como pagado';
   @Output() checkedChange = new EventEmitter<boolean>();
 
   onChange(event: Event): void {

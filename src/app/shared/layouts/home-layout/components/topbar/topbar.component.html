@@ -40,6 +40,15 @@
 
   <!-- Right side content (placeholder for future user menu) -->
   <div class="flex items-center gap-2">
+    <button
+      type="button"
+      class="rounded-lg p-2 transition-colors hover:bg-base-200"
+      (click)="clearData()"
+      aria-label="Borrar los datos guardados y empezar de cero"
+      title="Limpiar datos"
+    >
+      <fa-icon [icon]="faRotate" aria-hidden="true"></fa-icon>
+    </button>
     <div
       class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold shadow-md avatar-bg"
     >
@@ -47,3 +56,4 @@
     </div>
   </div>
 </header>
+<app-confirmation-dialog (confirmed)="confirmClearData()"></app-confirmation-dialog>

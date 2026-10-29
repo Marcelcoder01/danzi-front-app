@@ -6,7 +6,10 @@ import { ClassesDataService } from './classes-data.service';
 import { EnrollmentsDataService } from './enrollments-data.service';
 import { StudentsDataService } from './students-data.service';
 import { AcademyActivityService } from './academy-activity.service';
-import { getPaymentPeriodMonths } from '../utils/payment-period.util';
+import {
+  getPaymentPeriodDays,
+  getPaymentPeriodMonths,
+} from '../utils/payment-period.util';
 
 /** Coordinates relationships between the domain stores used by current screens. */
 @Injectable({ providedIn: 'root' })
@@ -18,8 +21,7 @@ export class AcademyDataService {
 
   constructor() {
     this.initializeLegacyPaymentCycles();
-    this.processDuePayments();
-    globalThis.setInterval(() => this.processDuePayments(), 60_000);
+    globalThis.setInterval(() => this.expirePaymentCycles(), 60_000);
   }
   get students(): Student[] { return this.studentStore.items; }
   get studentsVersion() { return this.studentStore.version; }
@@ -46,11 +48,8 @@ export class AcademyDataService {
 
     if (updated.status === 'inactive') {
       updated.hasPaid = false;
-      updated.nextPaymentDate = null;
     } else if (updated.hasPaid && (!wasPaid || !updated.nextPaymentDate)) {
       this.startPaymentCycle(updated, this.today());
-    } else if (!updated.hasPaid) {
-      updated.nextPaymentDate = null;
     }
 
     if (!this.studentStore.update(updated)) return false;
@@ -119,50 +118,60 @@ export class AcademyDataService {
   private startPaymentCycle(student: Student, paidAt: string): void {
     const months = this.paymentMonths(student);
     const amount = this.monthlyFee(student) * months;
-    student.hasPaid = true;
-    student.status = 'active';
-    student.paymentHistory = [...(student.paymentHistory ?? []), { paidAt, amount }];
-    student.nextPaymentDate = this.addMonths(paidAt, months);
+    const paymentDate = student.paymentHistory?.length ? paidAt : student.startDate || paidAt;
+    const nextPaymentDate = this.addDays(paymentDate, this.paymentDays(student));
+    student.hasPaid = nextPaymentDate > this.today();
+    student.status = student.hasPaid ? 'active' : 'inactive';
+    student.paymentHistory = [...(student.paymentHistory ?? []), { paidAt: paymentDate, amount }];
+    student.nextPaymentDate = nextPaymentDate;
     this.studentStore.update(student);
-    this.recordPaymentActivity(student, paidAt, amount);
-  }
-
-  private processDuePayments(): void {
-    const today = this.today();
-    for (const student of [...this.students]) {
-      if (student.status !== 'active' || !student.hasPaid || !student.nextPaymentDate) continue;
-      if (student.nextPaymentDate > today) continue;
-
-      const updated = { ...student, paymentHistory: [...(student.paymentHistory ?? [])] };
-      let dueDate = updated.nextPaymentDate;
-      let processed = 0;
-      while (dueDate && dueDate <= today && processed < 240) {
-        const months = this.paymentMonths(updated);
-        const amount = this.monthlyFee(updated) * months;
-        updated.paymentHistory.push({ paidAt: dueDate, amount });
-        this.recordPaymentActivity(updated, dueDate, amount);
-        dueDate = this.addMonths(dueDate, months);
-        processed++;
-      }
-      updated.nextPaymentDate = dueDate;
-      if (processed) this.studentStore.update(updated);
-    }
+    this.recordPaymentActivity(student, paymentDate, amount);
   }
 
   private initializeLegacyPaymentCycles(): void {
-    const today = this.today();
     for (const student of this.students) {
-      if (student.status !== 'active' || !student.hasPaid || student.nextPaymentDate) continue;
-      const months = this.paymentMonths(student);
+      if (student.status !== 'active' || (!student.hasPaid && !student.nextPaymentDate)) continue;
       const paymentHistory = [...(student.paymentHistory ?? [])];
       if (!paymentHistory.length) {
-        paymentHistory.push({ paidAt: today, amount: this.monthlyFee(student) * months });
+        if (!student.hasPaid) continue;
+        paymentHistory.push({
+          paidAt: student.startDate || this.today(),
+          amount: this.monthlyFee(student) * this.paymentMonths(student),
+        });
       }
+      const cycleStart = paymentHistory.length === 1
+        ? student.startDate || paymentHistory[0].paidAt
+        : paymentHistory[paymentHistory.length - 1].paidAt;
+      const nextPaymentDate = this.addDays(cycleStart, this.paymentDays(student));
+      const hasPaid = nextPaymentDate > this.today();
+      const status = hasPaid ? 'active' : 'inactive';
+      if (
+        student.nextPaymentDate === nextPaymentDate &&
+        student.paymentHistory?.length &&
+        student.hasPaid === hasPaid &&
+        student.status === status
+      ) continue;
       this.studentStore.update({
         ...student,
         paymentHistory,
-        nextPaymentDate: this.addMonths(today, months),
+        nextPaymentDate,
+        hasPaid,
+        status,
       });
+    }
+  }
+
+  private expirePaymentCycles(): void {
+    const today = this.today();
+    for (const student of this.students) {
+      if (
+        student.status === 'active' &&
+        student.hasPaid &&
+        student.nextPaymentDate &&
+        student.nextPaymentDate <= today
+      ) {
+        this.studentStore.update({ ...student, hasPaid: false, status: 'inactive' });
+      }
     }
   }
 
@@ -180,15 +189,17 @@ export class AcademyDataService {
     return getPaymentPeriodMonths(student.paymentPeriod, student.paymentFrom, student.paymentTo);
   }
 
+  private paymentDays(student: Student): number {
+    return getPaymentPeriodDays(student.paymentPeriod, student.paymentFrom, student.paymentTo);
+  }
+
   private monthlyFee(student: Student): number {
     return Math.max(0, Number(student.monthlyFee ?? 40) || 0);
   }
 
-  private addMonths(date: string, months: number): string {
-    const [year, month, day] = date.split('-').map(Number);
-    const target = new Date(Date.UTC(year, month - 1 + months, 1));
-    const lastDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
-    target.setUTCDate(Math.min(day, lastDay));
-    return `${target.getUTCFullYear()}-${String(target.getUTCMonth() + 1).padStart(2, '0')}-${String(target.getUTCDate()).padStart(2, '0')}`;
+  private addDays(date: string, days: number): string {
+    const result = new Date(`${date}T00:00:00Z`);
+    result.setUTCDate(result.getUTCDate() + days);
+    return `${result.getUTCFullYear()}-${String(result.getUTCMonth() + 1).padStart(2, '0')}-${String(result.getUTCDate()).padStart(2, '0')}`;
   }
 }

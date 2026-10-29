@@ -19,6 +19,7 @@ import { AttendanceService } from '../attendance/services/attendance.service';
 import { localDateKey } from '../attendance/interfaces/attendance.interface';
 import type { Student } from '../../shared/interfaces/student.interface';
 import { getPaymentPeriodMonths } from '../../shared/utils/payment-period.util';
+import { PaymentDueDialogComponent } from '../../shared/components/payment-due-dialog/payment-due-dialog.component';
 import { AcademyActivityService } from '../../shared/services/academy-activity.service';
 import {
   ClassActivity,
@@ -30,7 +31,7 @@ import {
   standalone: true,
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
-  imports: [CommonModule, FaIconComponent, DecimalPipe],
+  imports: [CommonModule, FaIconComponent, DecimalPipe, PaymentDueDialogComponent],
 })
 export class DashboardComponent implements OnInit {
   private readonly academyData = inject(AcademyDataService);
@@ -64,20 +65,47 @@ export class DashboardComponent implements OnInit {
     return [...this.academyData.students];
   });
   readonly paidStudentCount = computed(
-    () => this.allStudents().filter((student) => student.status === 'active' && student.hasPaid).length,
+    () =>
+      this.allStudents().filter((student) => student.status === 'active' && student.hasPaid).length,
   );
+  readonly paymentDueSoon = computed(() => {
+    const todayKey = this.today();
+    const today = new Date(`${todayKey}T00:00:00`);
+    const limit = new Date(today);
+    limit.setDate(limit.getDate() + 7);
+
+    return this.allStudents()
+      .filter((student) => {
+        if (!student.nextPaymentDate) return false;
+        const dueDate = new Date(`${student.nextPaymentDate}T00:00:00`);
+        const isExpiredInactive = student.status === 'inactive' && dueDate <= today;
+        return (
+          !Number.isNaN(dueDate.getTime()) &&
+          dueDate <= limit &&
+          (student.status === 'active' || isExpiredInactive)
+        );
+      })
+      .sort((first, second) => first.nextPaymentDate!.localeCompare(second.nextPaymentDate!));
+  });
+  readonly isPaymentDueDialogOpen = signal(false);
+  readonly today = signal(localDateKey(new Date()));
   readonly currentMonth = signal(localDateKey(new Date()).slice(0, 7));
   readonly monthlyIncome = computed(() =>
     this.allStudents()
-      .filter((student) => student.status === 'active' && student.hasPaid)
       .reduce((total, student) => {
         if (student.paymentHistory?.length) {
-          return total + student.paymentHistory
-            .filter((payment) => payment.paidAt.slice(0, 7) === this.currentMonth())
-            .reduce((sum, payment) => sum + payment.amount, 0);
+          return (
+            total +
+            student.paymentHistory
+              .filter((payment) => payment.paidAt.slice(0, 7) === this.currentMonth())
+              .reduce((sum, payment) => sum + payment.amount, 0)
+          );
         }
         // Compatibilidad con alumnos existentes antes del historial de pagos.
-        return total + Math.max(0, Number(student.monthlyFee ?? 40) || 0) * this.paymentMonths(student);
+        if (student.status !== 'active' || !student.hasPaid) return total;
+        return (
+          total + Math.max(0, Number(student.monthlyFee ?? 40) || 0) * this.paymentMonths(student)
+        );
       }, 0),
   );
   readonly attendanceStats = computed(() =>
@@ -106,6 +134,17 @@ export class DashboardComponent implements OnInit {
     return new Intl.DateTimeFormat('es', { dateStyle: 'medium' }).format(new Date(occurredAt));
   }
 
+  openPaymentDueDialog(): void {
+    this.isPaymentDueDialogOpen.set(true);
+  }
+
+  closePaymentDueDialog(studentsToPay: Student[] = []): void {
+    for (const student of studentsToPay) {
+      this.academyData.updateStudent({ ...student, hasPaid: true, status: 'active' });
+    }
+    this.isPaymentDueDialogOpen.set(false);
+  }
+
   attendanceLabel(): string {
     const rate = this.attendance();
     if (!this.attendanceStats().expected) return 'Sin sesiones este mes';
@@ -113,10 +152,6 @@ export class DashboardComponent implements OnInit {
     if (rate >= 90) return 'Excelente';
     if (rate >= 75) return 'Buen nivel';
     return 'Puede mejorar';
-  }
-
-  createClass(): void {
-    void this.router.navigate(['/admin/classes'], { queryParams: { createClass: 'true' } });
   }
 
   readonly upcomingClasses = computed(() => {
@@ -188,7 +223,9 @@ export class DashboardComponent implements OnInit {
 
   constructor(private cdr: ChangeDetectorRef) {
     globalThis.setInterval(() => {
-      const month = localDateKey(new Date()).slice(0, 7);
+      const date = localDateKey(new Date());
+      if (date !== this.today()) this.today.set(date);
+      const month = date.slice(0, 7);
       if (month !== this.currentMonth()) this.currentMonth.set(month);
     }, 60_000);
   }

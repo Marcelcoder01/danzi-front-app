@@ -1,14 +1,14 @@
 <label class="payment-control">
   <span class="payment-copy">
-    <span class="payment-title">Pago realizado</span>
-    <span class="payment-description">Marcar como pagado</span>
+    <span class="payment-title">{{ title }}</span>
+    <span class="payment-description">{{ description }}</span>
   </span>
   <input
     class="payment-input"
     type="checkbox"
     [checked]="checked"
     (change)="onChange($event)"
-    aria-label="Pago realizado"
+    [attr.aria-label]="title"
   />
   <span class="payment-switch" aria-hidden="true"></span>
 </label>

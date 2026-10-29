@@ -12,7 +12,10 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import type { Student } from '../../../shared/interfaces/student.interface';
-import { getPaymentPeriodMonths } from '../../../shared/utils/payment-period.util';
+import {
+  getPaymentPeriodDays,
+  getPaymentPeriodMonths,
+} from '../../../shared/utils/payment-period.util';
 import { StudentLevel } from '../../../shared/interfaces/student-level.enum';
 import type { StudentRole, StudentStatus } from '../../../shared/interfaces/student-status.type';
 import { PaymentCheckboxComponent } from './payment-checkbox/payment-checkbox.component';
@@ -110,8 +113,13 @@ export class StudentDialogComponent {
   );
   readonly nextPaymentLabel = computed(() => {
     if (!this.isPaid()) return '';
-    const date =
-      this.paymentMetadata().nextPaymentDate ?? this.addMonths(this.today(), this.paymentMonths());
+    const value = this.formValue();
+    const date = this.paymentMetadata().nextPaymentDate ??
+      this.addDays(value.startDate || this.today(), getPaymentPeriodDays(
+        value.paymentPeriod,
+        value.paymentFrom,
+        value.paymentTo,
+      ));
     return new Intl.DateTimeFormat('es-ES', { dateStyle: 'long' }).format(
       new Date(`${date}T12:00:00`),
     );
@@ -201,8 +209,6 @@ export class StudentDialogComponent {
     this.form.controls.hasPaid.setValue(checked);
     if (checked) {
       this.form.controls.status.setValue('active');
-    } else {
-      this.paymentMetadata.update((metadata) => ({ ...metadata, nextPaymentDate: null }));
     }
   }
 
@@ -252,14 +258,10 @@ export class StudentDialogComponent {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   }
 
-  private addMonths(date: string, months: number): string {
-    const [year, month, day] = date.split('-').map(Number);
-    const target = new Date(Date.UTC(year, month - 1 + months, 1));
-    const lastDay = new Date(
-      Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0),
-    ).getUTCDate();
-    target.setUTCDate(Math.min(day, lastDay));
-    return `${target.getUTCFullYear()}-${String(target.getUTCMonth() + 1).padStart(2, '0')}-${String(target.getUTCDate()).padStart(2, '0')}`;
+  private addDays(date: string, days: number): string {
+    const result = new Date(`${date}T00:00:00Z`);
+    result.setUTCDate(result.getUTCDate() + days);
+    return `${result.getUTCFullYear()}-${String(result.getUTCMonth() + 1).padStart(2, '0')}-${String(result.getUTCDate()).padStart(2, '0')}`;
   }
 
   private showDialog(): void {

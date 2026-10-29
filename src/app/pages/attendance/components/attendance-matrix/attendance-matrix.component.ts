@@ -69,6 +69,15 @@ export class AttendanceMatrixComponent {
       month: 'short',
     }).format(parseLocalDate(date));
   }
+  formatCompactDate(date: string): { weekday: string; day: number } {
+    const parsed = parseLocalDate(date);
+    return {
+      weekday: new Intl.DateTimeFormat('es-ES', { weekday: 'short' })
+        .format(parsed)
+        .replace('.', ''),
+      day: parsed.getDate(),
+    };
+  }
   get days() {
     const start = parseLocalDate(`${this.month}-01`);
     return Array.from(
@@ -103,6 +112,16 @@ export class AttendanceMatrixComponent {
   dayStatus(student: AttendanceEnrollmentRow, date: string): AttendanceStatus {
     const session = this.daySession(student, date);
     return session ? this.attendance.record(student.id, session.id).status : 'pending';
+  }
+  studentSessions(student: AttendanceEnrollmentRow): {
+    date: string;
+    session: AttendanceSession;
+    status: AttendanceStatus;
+  }[] {
+    return this.days.flatMap(({ date }) => {
+      const session = this.daySession(student, date);
+      return session ? [{ date, session, status: this.dayStatus(student, date) }] : [];
+    });
   }
   openStudent(student: AttendanceEnrollmentRow): void {
     this.selectStudent.emit(student);

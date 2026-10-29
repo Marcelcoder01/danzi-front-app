@@ -101,8 +101,60 @@
       </tbody>
     </table>
   </div>
+  <div class="mobile-attendance-list">
+    @for (student of monthlyStudents; track student.id + ':' + student.classId) {
+      <article
+        class="mobile-student-card"
+        [class.selected-mobile-student]="student.id === selectedStudentId && student.classId === selectedClassId"
+      >
+        <button
+          type="button"
+          class="mobile-student-heading"
+          (click)="openStudent(student)"
+          [attr.aria-label]="'Ver ficha de ' + fullName(student)"
+        >
+          <span class="mobile-avatar" [class]="student.avatarColor">{{ initials(student) }}</span>
+          <span class="mobile-student-copy">
+            <strong>{{ fullName(student) }}</strong>
+            <small>{{ enrolledClass(student).name }} · {{ levelLabel(student) }}</small>
+          </span>
+          <fa-icon [icon]="icons.info" aria-hidden="true"></fa-icon>
+        </button>
+
+        <div class="mobile-session-grid" aria-label="Sesiones del mes">
+          @for (item of studentSessions(student); track item.session.id) {
+            <button
+              type="button"
+              class="mobile-session"
+              [class.present]="item.status === 'present'"
+              [class.recovered]="item.status === 'recovered'"
+              [class.absent]="item.status === 'absent'"
+              [class.justified]="item.status === 'justified'"
+              [class.pending]="item.status === 'pending'"
+              [disabled]="item.date > attendance.today"
+              [attr.aria-label]="fullName(student) + ', ' + formatDate(item.date) + ': ' + statusLabels[item.status]"
+              (click)="openEditor(student, item.session)"
+            >
+              <small>{{ formatCompactDate(item.date).weekday }}</small>
+              <strong>{{ formatCompactDate(item.date).day }}</strong>
+              <fa-icon [icon]="icons[item.status]"></fa-icon>
+            </button>
+          } @empty {
+            <p class="no-mobile-sessions">Sin sesiones este mes.</p>
+          }
+        </div>
+      </article>
+    } @empty {
+      <div class="mobile-empty-state">No hay alumnos con estos filtros.</div>
+    }
+  </div>
   <p class="matrix-hint">
-    <fa-icon [icon]="icons.info"></fa-icon> Toca un estado para editarlo. Los puntos claros indican
-    días sin clase.
+    <fa-icon [icon]="icons.info"></fa-icon>
+    <span class="desktop-matrix-hint">
+      Toca un estado para editarlo. Los puntos claros indican días sin clase.
+    </span>
+    <span class="mobile-matrix-hint">
+      Toca una sesión para editarla o el nombre para ver la ficha del alumno.
+    </span>
   </p>
 </div>

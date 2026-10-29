@@ -3,6 +3,11 @@ import type { StudentRole, StudentStatus } from './student-status.type';
 
 export type StudentPaymentPeriod = '1' | '2' | 'custom';
 
+export interface StudentPayment {
+  paidAt: string;
+  amount: number;
+}
+
 export interface Student {
   id: string;
   firstName: string;
@@ -22,4 +27,6 @@ export interface Student {
   paymentPeriod?: StudentPaymentPeriod;
   paymentFrom?: string | null;
   paymentTo?: string | null;
+  nextPaymentDate?: string | null;
+  paymentHistory?: StudentPayment[];
 }

@@ -233,7 +233,7 @@
                   <button
                     class="action-btn action-btn-delete"
                     title="Eliminar"
-                    (click)="$event.stopPropagation()"
+                    (click)="$event.stopPropagation(); deleteStudent(student)"
                   >
                     <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
                   </button>
@@ -436,7 +436,11 @@
           <button class="action-btn action-btn-edit" title="Editar" (click)="editStudent(student)">
             <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
           </button>
-          <button class="action-btn action-btn-delete" title="Eliminar">
+          <button
+            class="action-btn action-btn-delete"
+            title="Eliminar"
+            (click)="deleteStudent(student)"
+          >
             <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
           </button>
         </div>
@@ -461,3 +465,4 @@
   (createStudent)="createStudent($event)"
   (updateStudent)="updateStudent($event)"
 ></app-student-dialog>
+<app-confirmation-dialog (confirmed)="confirmDeleteStudent()"></app-confirmation-dialog>

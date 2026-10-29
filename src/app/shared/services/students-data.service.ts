@@ -19,5 +19,12 @@ export class StudentsDataService {
     if (!current) return false;
     Object.assign(current, updated); this.persist(); return true;
   }
+  remove(id: string): boolean {
+    const index = this.items.findIndex((item) => item.id === id);
+    if (index < 0) return false;
+    this.items.splice(index, 1);
+    this.persist();
+    return true;
+  }
   private persist(): void { this.storage.write(KEY, this.items); this.version.update((v) => v + 1); }
 }

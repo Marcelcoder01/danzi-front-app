@@ -17,6 +17,11 @@ export class EnrollmentsDataService {
     const remaining = this.items.filter((item) => item.classId !== id);
     this.items.splice(0, this.items.length, ...remaining); this.persist();
   }
+  removeForStudent(id: string): void {
+    const remaining = this.items.filter((item) => item.studentId !== id);
+    if (remaining.length === this.items.length) return;
+    this.items.splice(0, this.items.length, ...remaining); this.persist();
+  }
   persistChanges(): void { this.persist(); }
   private persist(): void { this.storage.write(KEY, this.items); this.version.update((v) => v + 1); }
 }

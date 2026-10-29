@@ -254,71 +254,32 @@
     </div>
 
     <div class="space-y-5">
-      <!-- Alumno nuevo -->
-      <div class="flex gap-3">
-        <div
-          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#6c63a8]/10 text-[#6c63a8]"
-        >
-          <fa-icon [icon]="faUserPlus"></fa-icon>
+      @for (activity of recentActivities(); track activity.id) {
+        <div class="flex gap-3">
+          <div
+            class="flex size-9 shrink-0 items-center justify-center rounded-full"
+            [ngClass]="{
+              'bg-[#6c63a8]/10 text-[#6c63a8]': activity.type === 'student' || activity.type === 'enrollment',
+              'bg-emerald-500/10 text-emerald-600': activity.type === 'payment',
+              'bg-[#16213e]/10 text-[#16213e]': activity.type === 'class'
+            }"
+          >
+            @if (activity.type === 'payment') {
+              <fa-icon [icon]="faCreditCard"></fa-icon>
+            } @else if (activity.type === 'class') {
+              <fa-icon [icon]="faCalendarPlus"></fa-icon>
+            } @else {
+              <fa-icon [icon]="faUserPlus"></fa-icon>
+            }
+          </div>
+          <div class="flex-1">
+            <p class="text-sm text-[#2d3748]">{{ activity.description }}</p>
+            <p class="mt-1 text-xs text-[#a0aec0]">{{ activityTime(activity.occurredAt) }}</p>
+          </div>
         </div>
-
-        <div class="flex-1">
-          <p class="text-sm text-[#2d3748]">
-            <span class="font-semibold">Laura Martínez</span>
-            se ha unido a Salsa Principiante.
-          </p>
-
-          <p class="mt-1 text-xs text-[#a0aec0]">Hace 15 minutos</p>
-        </div>
-      </div>
-
-      <!-- Pago -->
-      <div class="flex gap-3">
-        <div
-          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600"
-        >
-          <fa-icon [icon]="faCreditCard"></fa-icon>
-        </div>
-
-        <div class="flex-1">
-          <p class="text-sm text-[#2d3748]">
-            <span class="font-semibold">Carlos Pérez</span>
-            ha realizado un pago de 45 €.
-          </p>
-
-          <p class="mt-1 text-xs text-[#a0aec0]">Hace 1 hora</p>
-        </div>
-      </div>
-
-      <!-- Nueva clase -->
-      <div class="flex gap-3">
-        <div
-          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#16213e]/10 text-[#16213e]"
-        >
-          <fa-icon [icon]="faCalendarPlus"></fa-icon>
-        </div>
-
-        <div class="flex-1">
-          <p class="text-sm text-[#2d3748]">Se ha creado una nueva clase de Bachata.</p>
-
-          <p class="mt-1 text-xs text-[#a0aec0]">Hace 3 horas</p>
-        </div>
-      </div>
-
-      <!-- Asistencia -->
-      <div class="flex gap-3">
-        <div
-          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-600"
-        >
-          <fa-icon [icon]="faUserCheck"></fa-icon>
-        </div>
-
-        <div class="flex-1">
-          <p class="text-sm text-[#2d3748]">11 alumnos registrados en la clase de las 18:00.</p>
-
-          <p class="mt-1 text-xs text-[#a0aec0]">Hace 4 horas</p>
-        </div>
-      </div>
+      } @empty {
+        <p class="py-4 text-sm text-[#718096]">Todavía no hay movimientos registrados.</p>
+      }
     </div>
   </div>
 </div>

@@ -36,9 +36,13 @@
     <div class="surface session-controls">
       <label class="field"
         ><span>Clase</span>
-        <select [ngModel]="sessionClassId()" (ngModelChange)="chooseClass($event)">
+        <select
+          class="danzi-select"
+          [ngModel]="sessionClassId()"
+          (ngModelChange)="chooseClass($event)"
+        >
           @for (activity of attendance.classes; track activity.id) {
-            <option [value]="activity.id">{{ activity.name }} · {{ activity.level }}</option>
+            <option [value]="activity.id">{{ activity.name }}</option>
           }
         </select>
       </label>
@@ -161,7 +165,11 @@
     <div class="monthly-filters">
       <label class="field"
         ><span>Clase</span
-        ><select [ngModel]="classFilter()" (ngModelChange)="classFilter.set($event)">
+        ><select
+          class="danzi-select"
+          [ngModel]="classFilter()"
+          (ngModelChange)="classFilter.set($event)"
+        >
           <option value="">Todas las clases</option>
           @for (activity of attendance.classes; track activity.id) {
             <option [value]="activity.id">{{ activity.name }}</option>
@@ -170,7 +178,11 @@
       >
       <label class="field"
         ><span>Nivel</span
-        ><select [ngModel]="levelFilter()" (ngModelChange)="levelFilter.set($event)">
+        ><select
+          class="danzi-select"
+          [ngModel]="levelFilter()"
+          (ngModelChange)="levelFilter.set($event)"
+        >
           <option value="">Todos los niveles</option>
           <option value="A">Principiante</option>
           <option value="B">Intermedio</option>

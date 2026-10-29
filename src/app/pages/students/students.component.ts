@@ -21,16 +21,19 @@ import { AcademyDataService } from '../../shared/services/academy-data.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { StudentsService } from './services/students.service';
 import { StudentDialogComponent } from './student-dialog/student-dialog.component';
+import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-students',
   standalone: true,
   templateUrl: './students.component.html',
   styleUrl: './students.component.css',
-  imports: [FormsModule, FaIconComponent, StudentDialogComponent]
+  imports: [FormsModule, FaIconComponent, StudentDialogComponent, ConfirmationDialogComponent],
 })
 export class StudentsComponent {
   @ViewChild(StudentDialogComponent) private studentDialog?: StudentDialogComponent;
+  @ViewChild(ConfirmationDialogComponent) private confirmationDialog?: ConfirmationDialogComponent;
+  private pendingDeleteStudent: Student | null = null;
 
   faPlus = faPlus;
   faSearch = faSearch;
@@ -60,12 +63,15 @@ export class StudentsComponent {
 
   get students(): Student[] {
     this.academyData.studentsVersion();
-    return this.academyData.students.filter(student => {
+    return this.academyData.students.filter((student) => {
       // Search term filter
       if (this.searchTerm) {
         const searchLower = this.searchTerm.toLowerCase();
         const fullName = `${student.firstName} ${student.lastName} ${student.alias}`.toLowerCase();
-        if (!fullName.includes(searchLower) && !student.email?.toLowerCase().includes(searchLower)) {
+        if (
+          !fullName.includes(searchLower) &&
+          !student.email?.toLowerCase().includes(searchLower)
+        ) {
           return false;
         }
       }
@@ -162,4 +168,27 @@ export class StudentsComponent {
     this.toastService.success(`Alumno ${student.firstName} actualizado correctamente.`);
   }
 
+  deleteStudent(student: Student): void {
+    this.pendingDeleteStudent = student;
+    this.confirmationDialog?.open({
+      title: '¿Eliminar este alumno?',
+      message:
+        '¿Estás seguro de querer borrar al alumno de la academia? Se borrará todo el historial y la matrícula de todas las clases. No hay vuelta atrás.',
+      confirmLabel: 'Sí, borrar alumno',
+    });
+  }
+
+  confirmDeleteStudent(): void {
+    const student = this.pendingDeleteStudent;
+    this.pendingDeleteStudent = null;
+    if (!student) return;
+
+    if (!this.academyData.removeStudent(student.id)) {
+      this.toastService.error('No se pudo borrar el alumno. Inténtalo de nuevo.');
+      return;
+    }
+
+    if (this.expandedStudentId === student.id) this.expandedStudentId = null;
+    this.toastService.success(`Alumno ${student.firstName} eliminado correctamente.`);
+  }
 }

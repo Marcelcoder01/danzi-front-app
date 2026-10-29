@@ -15,12 +15,12 @@
 
         <div>
           <h3 class="text-xl font-semibold tracking-tight text-[var(--color-text)]">
-            {{ isEdit ? 'Editar alumno' : 'Nuevo alumno' }}
+            {{ isEdit() ? 'Editar alumno' : 'Nuevo alumno' }}
           </h3>
 
           <p class="mt-1 text-sm text-[var(--color-text-muted)]">
             {{
-              isEdit
+              isEdit()
                 ? 'Actualiza la información del alumno.'
                 : 'Añade un nuevo estudiante a tu academia.'
             }}
@@ -38,7 +38,7 @@
       </button>
     </div>
 
-    <form (ngSubmit)="onSubmit()" class="px-7 py-6">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="px-7 py-6">
       <section class="mb-7">
         <div class="mb-4">
           <p class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-accent)]">
@@ -63,8 +63,7 @@
                 type="text"
                 placeholder="Nombre del alumno"
                 class="danzi-input"
-                [(ngModel)]="newStudent.firstName"
-                name="firstName"
+                formControlName="firstName"
                 required
               />
             </div>
@@ -83,8 +82,7 @@
                 type="text"
                 placeholder="Apellido del alumno"
                 class="danzi-input"
-                [(ngModel)]="newStudent.lastName"
-                name="lastName"
+                formControlName="lastName"
               />
             </div>
           </div>
@@ -97,8 +95,7 @@
               type="text"
               placeholder="Nombre artístico"
               class="danzi-input"
-              [(ngModel)]="newStudent.alias"
-              name="alias"
+              formControlName="alias"
             />
           </div>
 
@@ -112,8 +109,7 @@
               type="text"
               placeholder="@usuario"
               class="danzi-input"
-              [(ngModel)]="newStudent.instagram"
-              name="instagram"
+              formControlName="instagram"
             />
           </div>
 
@@ -128,8 +124,7 @@
                 type="email"
                 placeholder="correo@ejemplo.com"
                 class="danzi-input"
-                [(ngModel)]="newStudent.email"
-                name="email"
+                formControlName="email"
               />
             </div>
           </div>
@@ -147,8 +142,7 @@
                 type="tel"
                 placeholder="+34 600 000 000"
                 class="danzi-input"
-                [(ngModel)]="newStudent.phone"
-                name="phone"
+                formControlName="phone"
               />
             </div>
           </div>
@@ -176,12 +170,7 @@
               Fecha de nacimiento
             </label>
 
-            <input
-              type="date"
-              class="danzi-input"
-              [(ngModel)]="newStudent.birthDate"
-              name="birthDate"
-            />
+            <input type="date" class="danzi-input" formControlName="birthDate" />
           </div>
 
           <!-- Fecha alta -->
@@ -191,20 +180,14 @@
               <span class="text-[var(--color-accent)]">*</span>
             </label>
 
-            <input
-              type="date"
-              class="danzi-input"
-              [(ngModel)]="newStudent.startDate"
-              name="startDate"
-              required
-            />
+            <input type="date" class="danzi-input" formControlName="startDate" required />
           </div>
 
           <!-- Nivel -->
           <div class="form-control">
             <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]"> Nivel </label>
 
-            <select class="danzi-select" [(ngModel)]="newStudent.level" name="level">
+            <select class="danzi-select" formControlName="level">
               @for (level of studentLevels; track level) {
                 <option [value]="level">
                   {{ studentLevelsLabels[level] }}
@@ -217,7 +200,7 @@
           <div class="form-control">
             <label class="mb-2 text-xs font-medium text-[var(--color-text-muted)]"> Estado </label>
 
-            <select class="danzi-select" [(ngModel)]="newStudent.status" name="status">
+            <select class="danzi-select" formControlName="status">
               @for (status of studentStatuses; track status) {
                 <option [value]="status">
                   {{ studentStatusesLabels[status] }}
@@ -232,7 +215,7 @@
               Rol en pareja
             </label>
 
-            <select class="danzi-select" [(ngModel)]="newStudent.role" name="role">
+            <select class="danzi-select" formControlName="role">
               @for (role of studentRoles; track role) {
                 <option [value]="role">
                   {{ studentRolesLabels[role] }}
@@ -257,8 +240,7 @@
                 min="0"
                 step="0.01"
                 required
-                [(ngModel)]="newStudent.monthlyFee"
-                name="monthlyFee"
+                formControlName="monthlyFee"
                 aria-describedby="student-monthly-fee-hint"
                 style="padding-left: 1rem !important"
               />
@@ -276,27 +258,23 @@
           <div
             class="rounded-2xl border border-[var(--color-border)]/60 bg-[var(--color-surface-alt)]/70 px-4 py-3 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.04),inset_-1px_-1px_3px_rgba(255,255,255,0.7)] transition-all duration-200 hover:border-[var(--color-accent)]/30"
           >
-            <app-payment-checkbox [(checked)]="newStudent.hasPaid" />
+            <app-payment-checkbox [checked]="isPaid()" (checkedChange)="onPaymentChange($event)" />
 
             <!-- Controles de período (solo visibles cuando está pagado) -->
-            @if (newStudent.hasPaid) {
+            @if (isPaid()) {
               <div class="mt-3 border-t border-[var(--color-border)]/40 pt-3">
                 <label class="mb-1.5 block text-xs font-medium text-[var(--color-text-muted)]">
                   Período de pago
                 </label>
 
-                <select
-                  class="danzi-select"
-                  [(ngModel)]="newStudent.paymentPeriod"
-                  name="paymentPeriod"
-                >
+                <select class="danzi-select" formControlName="paymentPeriod">
                   <option value="1">1 mes</option>
                   <option value="2">2 meses</option>
                   <option value="custom">Otro período</option>
                 </select>
 
                 <!-- Rango de fechas (solo cuando se elige "Otro período") -->
-                @if (newStudent.paymentPeriod === 'custom') {
+                @if (formValue().paymentPeriod === 'custom') {
                   <div class="mt-3 grid grid-cols-2 gap-3">
                     <div>
                       <label
@@ -307,8 +285,7 @@
                       <input
                         type="date"
                         class="danzi-input"
-                        [(ngModel)]="newStudent.paymentFrom"
-                        name="paymentFrom"
+                        formControlName="paymentFrom"
                         required
                       />
                     </div>
@@ -322,17 +299,25 @@
                       <input
                         type="date"
                         class="danzi-input"
-                        [(ngModel)]="newStudent.paymentTo"
-                        name="paymentTo"
-                        [min]="newStudent.paymentFrom ?? ''"
+                        formControlName="paymentTo"
+                        [min]="formValue().paymentFrom ?? ''"
                         required
                       />
                     </div>
                   </div>
                 }
                 <p class="mt-3 text-sm font-semibold text-[var(--color-text)]">
-                  Total del período: {{ paymentTotal.toFixed(2) }} €
+                  Total del período: {{ paymentTotal().toFixed(2) }} €
                 </p>
+                @if (formValue().status === 'active') {
+                  <p class="mt-1 text-xs text-[var(--color-text-muted)]">
+                    Próximo pago: {{ nextPaymentLabel() }} (se registrará automáticamente)
+                  </p>
+                } @else {
+                  <p class="mt-1 text-xs text-[var(--color-text-muted)]">
+                    Al poner el estado inactivo no se programarán más pagos.
+                  </p>
+                }
               </div>
             }
           </div>
@@ -354,7 +339,7 @@
           type="submit"
           class="group flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(108,99,168,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_12px_25px_rgba(108,99,168,0.32)] active:translate-y-0"
         >
-          <span>{{ isEdit ? 'Editar alumno' : 'Crear alumno' }}</span>
+          <span>{{ isEdit() ? 'Editar alumno' : 'Crear alumno' }}</span>
 
           <fa-icon
             [icon]="faArrowRight"

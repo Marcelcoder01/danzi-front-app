@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { ChangeDetectorRef, Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
@@ -19,6 +19,7 @@ import { AttendanceService } from '../attendance/services/attendance.service';
 import { localDateKey } from '../attendance/interfaces/attendance.interface';
 import type { Student } from '../../shared/interfaces/student.interface';
 import { getPaymentPeriodMonths } from '../../shared/utils/payment-period.util';
+import { AcademyActivityService } from '../../shared/services/academy-activity.service';
 import {
   ClassActivity,
   RegularClassActivity,
@@ -34,6 +35,7 @@ import {
 export class DashboardComponent implements OnInit {
   private readonly academyData = inject(AcademyDataService);
   private readonly attendanceService = inject(AttendanceService);
+  private readonly activityService = inject(AcademyActivityService);
   private readonly router = inject(Router);
 
   faPlus = faPlus;
@@ -62,25 +64,47 @@ export class DashboardComponent implements OnInit {
     return [...this.academyData.students];
   });
   readonly paidStudentCount = computed(
-    () => this.allStudents().filter((student) => student.hasPaid).length,
+    () => this.allStudents().filter((student) => student.status === 'active' && student.hasPaid).length,
   );
+  readonly currentMonth = signal(localDateKey(new Date()).slice(0, 7));
   readonly monthlyIncome = computed(() =>
     this.allStudents()
-      .filter((student) => student.hasPaid)
-      .reduce(
-        (total, student) =>
-          total + Math.max(0, Number(student.monthlyFee ?? 40) || 0) * this.paymentMonths(student),
-        0,
-      ),
+      .filter((student) => student.status === 'active' && student.hasPaid)
+      .reduce((total, student) => {
+        if (student.paymentHistory?.length) {
+          return total + student.paymentHistory
+            .filter((payment) => payment.paidAt.slice(0, 7) === this.currentMonth())
+            .reduce((sum, payment) => sum + payment.amount, 0);
+        }
+        // Compatibilidad con alumnos existentes antes del historial de pagos.
+        return total + Math.max(0, Number(student.monthlyFee ?? 40) || 0) * this.paymentMonths(student);
+      }, 0),
   );
-  readonly currentMonth = localDateKey(new Date()).slice(0, 7);
   readonly attendanceStats = computed(() =>
     this.attendanceService.monthlyStats(
-      this.currentMonth,
-      this.attendanceService.studentsEnrolledDuring(this.currentMonth),
+      this.currentMonth(),
+      this.attendanceService.studentsEnrolledDuring(this.currentMonth()),
     ),
   );
   readonly attendance = computed(() => this.attendanceStats().attendanceRate);
+  readonly recentActivities = computed(() => {
+    this.activityService.version();
+    return [...this.activityService.items].slice(0, 8);
+  });
+
+  activityTime(occurredAt: string): string {
+    const elapsedMinutes = Math.max(
+      0,
+      Math.floor((Date.now() - new Date(occurredAt).getTime()) / 60000),
+    );
+    if (elapsedMinutes < 1) return 'Ahora mismo';
+    if (elapsedMinutes < 60) return `Hace ${elapsedMinutes} min`;
+    const hours = Math.floor(elapsedMinutes / 60);
+    if (hours < 24) return `Hace ${hours} h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `Hace ${days} día${days === 1 ? '' : 's'}`;
+    return new Intl.DateTimeFormat('es', { dateStyle: 'medium' }).format(new Date(occurredAt));
+  }
 
   attendanceLabel(): string {
     const rate = this.attendance();
@@ -162,7 +186,12 @@ export class DashboardComponent implements OnInit {
       .join('-');
   }
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef) {
+    globalThis.setInterval(() => {
+      const month = localDateKey(new Date()).slice(0, 7);
+      if (month !== this.currentMonth()) this.currentMonth.set(month);
+    }, 60_000);
+  }
 
   ngOnInit(): void {
     this.animateDashboardNumbers();

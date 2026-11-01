@@ -78,3 +78,51 @@
   color: var(--color-text-muted);
   font-size: 0.78rem;
 }
+
+/* Responsive mejoras para móviles */
+@media (max-width: 768px) {
+  /* Por defecto ocultar secciones en móvil */
+  .participants-section {
+    display: none;
+  }
+
+  /* Mostrar cuando tiene la clase active */
+  .participants-section.active {
+    display: flex;
+  }
+
+  /* Estilos de tabs */
+  .tab-button {
+    color: var(--color-text-muted);
+    border-bottom: 2px solid transparent;
+  }
+
+  .tab-button.tab-active {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+
+  /* Asegurar que los badges de roles no se corten en móvil */
+  .role-badge {
+    flex-shrink: 0;
+    min-width: fit-content;
+  }
+
+  /* Mejorar espaciado en móviles */
+  article {
+    gap: 0.5rem;
+  }
+
+  /* Asegurar que el modal ocupe casi toda la pantalla en móvil */
+  #participants_dialog .modal-box {
+    max-height: 95vh;
+    width: calc(100% - 1rem);
+  }
+}
+
+/* Desktop: ambas secciones siempre visibles */
+@media (min-width: 768px) {
+  .participants-section {
+    display: flex !important;
+  }
+}

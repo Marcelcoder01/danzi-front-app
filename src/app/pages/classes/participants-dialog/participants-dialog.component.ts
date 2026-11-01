@@ -29,6 +29,7 @@ export class ParticipantsDialogComponent {
 
   readonly selectedClass = signal<RegularClassActivity | null>(null);
   readonly searchTerm = signal('');
+  readonly activeTab = signal<'enrolled' | 'available'>('enrolled');
   readonly faArrowRight = faArrowRight;
   readonly faCrown = faCrown;
   readonly faMagnifyingGlass = faMagnifyingGlass;
@@ -65,6 +66,7 @@ export class ParticipantsDialogComponent {
   openFor(activity: RegularClassActivity): void {
     this.selectedClass.set(activity);
     this.searchTerm.set('');
+    this.activeTab.set('enrolled');
     // Guardar el estado inicial de matrículas
     this.initialEnrollments = new Set(
       this.academyData.studentsForClass(activity.id).map((s) => s.id),

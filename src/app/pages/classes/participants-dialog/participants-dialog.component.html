@@ -4,7 +4,7 @@
       class="modal-box w-[calc(100%-2rem)] max-w-5xl max-h-[90vh] p-0 flex flex-col bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-2xl shadow-[0_30px_90px_rgba(23,31,56,0.24),0_3px_12px_rgba(23,31,56,0.08)]"
     >
       <header
-        class="flex items-center justify-between gap-4 p-6 pb-4 border-b border-[var(--color-border-light)]"
+        class="flex items-center justify-between gap-3 p-4 md:p-6 pb-3 md:pb-4 border-b border-[var(--color-border-light)]"
       >
         <div class="flex items-center gap-4">
           <div
@@ -62,7 +62,9 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-4 px-6 py-3 border-b border-[var(--color-border-light)]">
+      <div
+        class="flex flex-wrap items-center gap-2 px-4 md:px-6 py-3 border-b border-[var(--color-border-light)]"
+      >
         <span
           class="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold text-[#955b14] bg-[#fff2d8]"
         >
@@ -83,9 +85,30 @@
         </span>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 flex-1 min-h-0 overflow-auto p-6">
+      <!-- Tabs para móvil -->
+      <div class="flex md:hidden border-b border-[var(--color-border-light)]">
+        <button
+          type="button"
+          class="tab-button flex-1 py-3 text-sm font-bold transition-colors"
+          [class.tab-active]="activeTab() === 'enrolled'"
+          (click)="activeTab.set('enrolled')"
+        >
+          Matriculados ({{ enrolledStudents().length }})
+        </button>
+        <button
+          type="button"
+          class="tab-button flex-1 py-3 text-sm font-bold transition-colors"
+          [class.tab-active]="activeTab() === 'available'"
+          (click)="activeTab.set('available')"
+        >
+          Disponibles ({{ availableStudents().length }})
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0 overflow-auto p-4 md:p-6">
         <section
-          class="flex flex-col min-h-0 overflow-hidden border border-[var(--color-border-light)] rounded-xl bg-white shadow-sm"
+          class="participants-section enrolled-section flex flex-col min-h-0 overflow-hidden border border-[var(--color-border-light)] rounded-xl bg-white shadow-sm"
+          [class.active]="activeTab() === 'enrolled'"
           aria-labelledby="enrolled-title"
         >
           <div class="flex items-center justify-between gap-3 p-4 pb-3">
@@ -100,10 +123,10 @@
             <span class="badge badge-primary">{{ enrolledStudents().length }}</span>
           </div>
 
-          <div class="flex-1 min-h-0 overflow-auto px-3 pb-3">
+          <div class="flex-1 min-h-0 overflow-auto px-2 md:px-3 pb-3">
             @for (student of enrolledStudents(); track student.id) {
               <article
-                class="flex items-center gap-3 py-2 px-3 border-b border-[var(--color-border-light)] last:border-b-0"
+                class="flex items-center gap-2 md:gap-3 py-2 px-2 md:px-3 border-b border-[var(--color-border-light)] last:border-b-0"
               >
                 <div
                   class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent-dark)] text-xs font-extrabold"
@@ -160,7 +183,8 @@
         </section>
 
         <section
-          class="flex flex-col min-h-0 overflow-hidden border border-[var(--color-border-light)] rounded-xl bg-white shadow-sm"
+          class="participants-section available-section flex flex-col min-h-0 overflow-hidden border border-[var(--color-border-light)] rounded-xl bg-white shadow-sm"
+          [class.active]="activeTab() === 'available'"
           aria-labelledby="available-title"
         >
           <div class="flex items-center justify-between gap-3 p-4 pb-3">
@@ -175,7 +199,7 @@
             <span class="badge badge-ghost">{{ availableStudents().length }}</span>
           </div>
 
-          <div class="relative m-4 mb-3">
+          <div class="relative m-3 md:m-4 mb-3">
             <fa-icon [icon]="faMagnifyingGlass" class="search-icon"></fa-icon>
             <input
               type="search"
@@ -186,10 +210,10 @@
             />
           </div>
 
-          <div class="flex-1 min-h-0 overflow-auto px-3 pb-3">
+          <div class="flex-1 min-h-0 overflow-auto px-2 md:px-3 pb-3">
             @for (student of availableStudents(); track student.id) {
               <article
-                class="flex items-center gap-3 py-2 px-3 border-b border-[var(--color-border-light)] last:border-b-0"
+                class="flex items-center gap-2 md:gap-3 py-2 px-2 md:px-3 border-b border-[var(--color-border-light)] last:border-b-0"
               >
                 <div
                   class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent-dark)] text-xs font-extrabold"

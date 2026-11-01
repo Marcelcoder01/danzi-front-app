@@ -76,8 +76,6 @@ export class ClassesComponent implements AfterViewInit {
   readonly allActivities = computed(() => {
     this.academyData.classesVersion();
     this.academyData.enrollmentsVersion();
-    // The stores mutate their arrays in place. Return a new reference so this
-    // computed notifies the template when either store version changes.
     return [...this.academyData.classes];
   });
   readonly regularClassCount = computed(

@@ -79,6 +79,22 @@
   font-size: 0.78rem;
 }
 
+/* Eliminar outline azul en iOS/Safari para botones */
+#participants_dialog button {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#participants_dialog button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#participants_dialog button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* Responsive mejoras para móviles */
 @media (max-width: 768px) {
   /* Por defecto ocultar secciones en móvil */

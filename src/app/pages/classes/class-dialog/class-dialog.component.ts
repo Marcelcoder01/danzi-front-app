@@ -16,6 +16,7 @@ type NewClassActivity = Omit<RegularClassActivity, 'id'>;
   selector: 'app-class-dialog',
   standalone: true,
   templateUrl: './class-dialog.component.html',
+  styleUrl: './class-dialog.component.css',
   imports: [FormsModule, FaIconComponent],
 })
 export class ClassDialogComponent {

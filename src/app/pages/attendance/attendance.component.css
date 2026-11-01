@@ -68,13 +68,6 @@ button:focus-visible {
   font-size: 11px;
   line-height: 1.6;
 }
-.demo-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  color: var(--color-text-muted);
-}
 .view-toggle {
   display: flex;
   padding: 4px;

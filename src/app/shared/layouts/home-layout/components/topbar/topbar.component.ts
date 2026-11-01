@@ -31,10 +31,11 @@ export class TopbarComponent {
 
   confirmClearData(): void {
     const storage = globalThis.localStorage;
-    storage.setItem('danzi.students.v1', '[]');
-    storage.setItem('danzi.classes.v1', '[]');
-    storage.setItem('danzi.enrollments.v1', '[]');
+    storage.setItem('danzi.students.v2', '[]');
+    storage.setItem('danzi.classes.v2', '[]');
+    storage.setItem('danzi.enrollments.v2', '[]');
     storage.setItem('danzi.activity.v1', '[]');
+    storage.setItem('danzi.attendance.v3', '[]');
     globalThis.location.reload();
   }
 }

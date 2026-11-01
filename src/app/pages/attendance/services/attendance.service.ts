@@ -52,7 +52,7 @@ export class AttendanceService {
   readonly drafts = signal<Record<string, AttendanceRecord>>({});
   readonly feedback = signal('');
   readonly saveError = signal(false);
-  private readonly storageKey = 'danzi.attendance.demo.v2';
+  private readonly storageKey = 'danzi.attendance.v3';
   private readonly sessionCache = new Map<string, AttendanceSession[]>();
 
   constructor() {

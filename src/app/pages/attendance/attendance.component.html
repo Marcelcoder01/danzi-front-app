@@ -32,6 +32,7 @@
     </div>
   </header>
 
+  @if (attendance.classes.length && attendance.students.length) {
   <section class="session-mode" aria-label="Registro rápido de asistencias">
     <div class="surface session-controls">
       <label class="field"
@@ -310,4 +311,10 @@
     ></app-attendance-student>
   </dialog>
   <app-attendance-editor #editor></app-attendance-editor>
+  } @else {
+    <section class="surface session-controls" aria-live="polite">
+      <h2>Sin datos de asistencia</h2>
+      <p>Añade una clase, alumnos y sus matrículas para empezar a pasar lista.</p>
+    </section>
+  }
 </div>

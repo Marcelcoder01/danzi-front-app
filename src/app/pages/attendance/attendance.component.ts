@@ -95,7 +95,7 @@ export class AttendanceComponent {
     { id: 'pending', label: 'Pendientes' },
   ];
   readonly month = signal(this.attendance.today.slice(0, 7));
-  readonly sessionClassId = signal(this.attendance.classes[0].id);
+  readonly sessionClassId = signal(this.attendance.classes[0]?.id ?? '');
   readonly selectedDate = signal(this.defaultSessionDate(this.month(), this.sessionClassId()));
   readonly viewMode = signal<'auto' | 'session' | 'month'>('auto');
   readonly viewportIsDesktop = signal(window.innerWidth >= 1024);
@@ -111,7 +111,7 @@ export class AttendanceComponent {
   readonly searchTerm = signal('');
   readonly statusFilter = signal('');
   readonly filtersOpen = signal(false);
-  readonly selectedStudent = signal(this.attendance.students[0]);
+  readonly selectedStudent = signal(this.attendance.students[0] ?? null);
   @ViewChild('studentDialog') studentDialog!: ElementRef<HTMLDialogElement>;
   @ViewChild('editor') editor!: AttendanceEditorComponent;
 
@@ -312,7 +312,9 @@ export class AttendanceComponent {
       this.studentDialog.nativeElement.showModal();
   }
   goToStudentClass(): void {
-    this.chooseClass(this.selectedStudent().classId);
+    const student = this.selectedStudent();
+    if (!student) return;
+    this.chooseClass(student.classId);
     this.viewMode.set('session');
     this.studentDialog.nativeElement.close();
   }

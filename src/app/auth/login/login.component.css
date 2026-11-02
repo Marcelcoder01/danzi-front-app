@@ -37,6 +37,15 @@
   overscroll-behavior: none;
 }
 
+/* Permitir scroll dentro del contenido principal */
+.login-wrapper > main {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  height: 100%;
+}
+
 /* Responsive padding for mobile */
 @media (max-width: 480px) {
   .login-wrapper > main {

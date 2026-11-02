@@ -25,6 +25,18 @@
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
 }
 
+/* Prevenir scroll no deseado en iOS */
+.login-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
 /* Responsive padding for mobile */
 @media (max-width: 480px) {
   .login-wrapper > main {

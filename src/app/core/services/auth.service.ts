@@ -1,101 +1,92 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-// import { SupabaseClient, Session, User, AuthError } from '@supabase/supabase-js';
-import { SupabaseClientService } from './supabase-client.service';
-
-// Tipos temporales para funcionamiento sin Supabase
-interface User {
-  id: string;
-  app_metadata?: { role?: string };
-  user_metadata?: { role?: string };
-}
-
-interface Session {
-  user: User;
-}
-
-interface AuthError {
-  message: string;
-}
+import { Injectable, signal } from '@angular/core';
+import { Session, User } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  private session = signal<Session | null>(null);
-  private loading = signal(true);
-  // private supabase: SupabaseClient;
+  private get supabase() {
+    return this.supabaseService.client;
+  }
 
-  readonly user = computed(() => this.session()?.user ?? null);
-  readonly session$ = computed(() => this.session());
-  readonly loading$ = computed(() => this.loading());
+  readonly currentUser = signal<User | null>(null);
+  readonly currentSession = signal<Session | null>(null);
+  readonly isAuthenticated = signal(false);
+  readonly isLoading = signal(true);
 
-  constructor(private supabaseClientService: SupabaseClientService) {
-    // this.supabase = this.supabaseClientService.getClient();
+  constructor(private supabaseService: SupabaseService) {
     this.initializeAuth();
   }
 
-  private initializeAuth(): void {
-    // Conexión con Supabase comentada temporalmente
-    // if (!this.supabaseClientService.isConfigured) {
-    //   this.loading.set(false);
-    //   return;
-    // }
+  // Inicializar autenticación y escuchar cambios
+  private async initializeAuth(): Promise<void> {
+    const { data, error } = await this.supabase.auth.getSession();
 
-    // this.supabase.auth.getSession().then(({ data, error }) => {
-    //   if (error) {
-    //     console.error('No se pudo leer la sesión actual:', error.message);
-    //   }
-    //   this.session.set(data.session ?? null);
-    //   this.loading.set(false);
-    // });
+    if (!error) {
+      this.updateAuthState(data.session);
+    }
 
-    // this.supabase.auth.onAuthStateChange((_event, session) => {
-    //   this.session.set(session);
-    //   this.loading.set(false);
-    // });
-
-    // Temporal: Sin autenticación real
-    this.loading.set(false);
-  }
-
-  signIn(email: string, password: string): Observable<{ error: AuthError | null }> {
-    // return from(this.supabase.auth.signInWithPassword({ email, password })).pipe(
-    //   map(({ error }) => ({ error })),
-    //   catchError((error) => of({ error }))
-    // );
-
-    // Temporal: Simula login exitoso para pruebas
-    console.log('Login simulado:', email);
-    this.session.set({
-      user: {
-        id: 'temp-user-id',
-        app_metadata: { role: 'admin' }
-      }
+    this.supabase.auth.onAuthStateChange((_event, session) => {
+      this.updateAuthState(session);
     });
-    return of({ error: null });
+
+    this.isLoading.set(false);
   }
 
-  signOut(): Observable<{ error: AuthError | null }> {
-    // return from(this.supabase.auth.signOut()).pipe(
-    //   map(({ error }) => ({ error })),
-    //   catchError((error) => of({ error }))
-    // );
-
-    // Temporal: Simula logout
-    this.session.set(null);
-    return of({ error: null });
+  private updateAuthState(session: Session | null): void {
+    this.currentSession.set(session);
+    this.currentUser.set(session?.user ?? null);
+    this.isAuthenticated.set(!!session);
   }
 
-  isAdmin(): boolean {
-    const user = this.user();
-    // Temporal: Retorna true para pruebas
-    return true;
-    // return user?.app_metadata?.role === 'admin' || user?.user_metadata?.role === 'admin';
+  // Registro
+  async signUp(email: string, password: string, fullName: string) {
+    return await this.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+        emailRedirectTo: `${window.location.origin}/login`,
+      },
+    });
+  }
+  // Login
+  async signIn(email: string, password: string) {
+    return await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
   }
 
-  isConfigured(): boolean {
-    return this.supabaseClientService.isConfigured;
+  // Logout
+  async signOut() {
+    return await this.supabase.auth.signOut();
+  }
+
+  // Obtener sesión
+  async getSession() {
+    return await this.supabase.auth.getSession();
+  }
+
+  // Obtener usuario validado
+  async getUser() {
+    return await this.supabase.auth.getUser();
+  }
+
+  // Recuperación de contraseña
+  async resetPassword(email: string) {
+    return await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+  }
+
+  // Guardar nueva contraseña
+  async updatePassword(newPassword: string) {
+    return await this.supabase.auth.updateUser({
+      password: newPassword,
+    });
   }
 }

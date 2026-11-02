@@ -46,8 +46,8 @@
   /* Ajustar altura para considerar safe areas - usar dvh para iOS */
   height: 100dvh;
   max-height: 100dvh;
-  /* Ajustar para safe areas de iOS - aumentar padding */
-  padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+  /* Ajustar para safe areas de iOS - padding moderado */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 40px);
   padding-top: calc(env(safe-area-inset-top) + 20px);
   /* Box sizing para que el padding se incluya en el cálculo de altura */
   box-sizing: border-box;
@@ -57,12 +57,12 @@
 @media (max-width: 480px) {
   .login-wrapper > main {
     padding: 1rem;
-    padding-bottom: calc(1rem + env(safe-area-inset-bottom) + 80px);
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom) + 40px);
   }
 
   .login-wrapper > main > section {
     padding: 2rem 1.5rem;
-    padding-bottom: calc(2rem + env(safe-area-inset-bottom) + 80px);
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom) + 40px);
     border-radius: 20px;
   }
 }

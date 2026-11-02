@@ -94,6 +94,9 @@ body {
   background-color: var(--color-background);
   color: var(--color-text);
   line-height: 1.6;
+  /* Prevenir efecto de rebote en iOS */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* DaisyUI Theme Override */

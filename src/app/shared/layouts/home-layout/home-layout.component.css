@@ -6,6 +6,9 @@
 /* Main content background */
 .main-bg {
   background: var(--color-background);
+  /* Prevenir efecto de rebote en iOS */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 1023px) {

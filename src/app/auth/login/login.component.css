@@ -43,17 +43,26 @@
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
+  /* Ajustar altura para considerar safe areas */
   height: 100%;
+  max-height: 100vh;
+  /* Ajustar para safe areas de iOS */
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+  padding-top: env(safe-area-inset-top, 20px);
+  /* Box sizing para que el padding se incluya en el cálculo de altura */
+  box-sizing: border-box;
 }
 
 /* Responsive padding for mobile */
 @media (max-width: 480px) {
   .login-wrapper > main {
     padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 20px));
   }
 
   .login-wrapper > main > section {
     padding: 2rem 1.5rem;
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 20px));
     border-radius: 20px;
   }
 }

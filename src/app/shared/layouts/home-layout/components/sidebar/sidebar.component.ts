@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../../../../core/services/auth.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import {
@@ -12,7 +11,7 @@ import {
   faCreditCard,
   faShieldHalved,
   faGear,
-  faRightFromBracket
+  faRightFromBracket,
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -20,7 +19,7 @@ import {
   standalone: true,
   imports: [RouterLink, RouterLinkActive, FontAwesomeModule],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.css'
+  styleUrl: './sidebar.component.css',
 })
 export class SidebarComponent {
   @Input() isCollapsed = false;
@@ -37,12 +36,12 @@ export class SidebarComponent {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    // private authService: AuthService
   ) {}
 
   logout(): void {
-    this.authService.signOut().subscribe(() => {
-      this.router.navigate(['/login']);
-    });
+    // this.authService.signOut().subscribe(() => {
+    //   this.router.navigate(['/login']);
+    // });
   }
 }

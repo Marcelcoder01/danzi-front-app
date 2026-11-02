@@ -41,30 +41,77 @@
       <!-- Header -->
       <div class="mb-8">
         <h1 class="m-0 text-[clamp(1.8rem,5vw,2.15rem)] font-semibold tracking-[-.04em]">
-          Bienvenido de nuevo
+          @if (isRegisterMode()) {
+            Crea tu cuenta
+          } @else {
+            Bienvenido de nuevo
+          }
         </h1>
 
-        <p class="mt-3 text-white/55 text-[.88rem] leading-[1.55]">Introduce tus credenciales</p>
+        <p class="mt-3 text-white/55 text-[.88rem] leading-[1.55]">
+          @if (isRegisterMode()) {
+            Rellena el formulario para registrarte
+          } @else {
+            Introduce tus credenciales
+          }
+        </p>
       </div>
 
       <!-- Form -->
-      <form class="flex flex-col gap-[1.15rem]" (ngSubmit)="onSubmit()">
+      <form [formGroup]="loginForm" class="flex flex-col gap-[1.15rem]" (ngSubmit)="onSubmit()">
+        <!-- Name (solo en registro) -->
+        @if (isRegisterMode()) {
+          <label class="flex flex-col gap-[.5rem]">
+            <span class="text-white/72 text-[.76rem]">Nombre completo</span>
+
+            <div
+              class="login-input-wrapper h-[50px] flex items-center gap-[.7rem] px-[.9rem] rounded-xl bg-black/16"
+              [class.border]="fullNameControl!.invalid && fullNameControl!.touched"
+              [class.border-red-500]="fullNameControl!.invalid && fullNameControl!.touched"
+            >
+              <fa-icon [icon]="faUser" size="sm" class="text-white/40"></fa-icon>
+
+              <input
+                type="text"
+                formControlName="fullName"
+                placeholder="Tu nombre"
+                autocomplete="name"
+                class="w-full h-full border-0 outline-none focus:outline-none focus:ring-0 bg-transparent text-white placeholder-white/28"
+              />
+            </div>
+            @if (fullNameControl!.invalid && fullNameControl!.touched) {
+              <span class="text-red-400 text-[.7rem]">El nombre es obligatorio</span>
+            }
+          </label>
+        }
+
         <!-- Email -->
         <label class="flex flex-col gap-[.5rem]">
           <span class="text-white/72 text-[.76rem]">Email</span>
 
           <div
             class="login-input-wrapper h-[50px] flex items-center gap-[.7rem] px-[.9rem] rounded-xl bg-black/16"
+            [class.border]="emailControl!.invalid && emailControl!.touched"
+            [class.border-red-500]="emailControl!.invalid && emailControl!.touched"
           >
             <fa-icon [icon]="faEnvelope" size="sm" class="text-white/40"></fa-icon>
 
             <input
               type="email"
+              formControlName="email"
               placeholder="tu@email.com"
               autocomplete="email"
               class="w-full h-full border-0 outline-none focus:outline-none focus:ring-0 bg-transparent text-white placeholder-white/28"
             />
           </div>
+          @if (emailControl!.invalid && emailControl!.touched) {
+            @if (emailControl!.errors?.['required']) {
+              <span class="text-red-400 text-[.7rem]">El email es obligatorio</span>
+            }
+            @if (emailControl!.errors?.['email']) {
+              <span class="text-red-400 text-[.7rem]">Introduce un email válido</span>
+            }
+          }
         </label>
 
         <!-- Password -->
@@ -75,6 +122,7 @@
             <button
               type="button"
               class="p-0 border-0 bg-none text-white/60 text-[.72rem] cursor-pointer hover:text-white"
+              (click)="forgotPassword()"
             >
               ¿La olvidaste?
             </button>
@@ -82,26 +130,81 @@
 
           <div
             class="login-input-wrapper h-[50px] flex items-center gap-[.7rem] px-[.9rem] rounded-xl bg-black/16"
+            [class.border]="passwordControl!.invalid && passwordControl!.touched"
+            [class.border-red-500]="passwordControl!.invalid && passwordControl!.touched"
           >
             <fa-icon [icon]="faLock" size="sm" class="text-white/40"></fa-icon>
 
             <input
-              [type]="showPassword ? 'text' : 'password'"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
               placeholder="••••••••"
-              autocomplete="current-password"
+              [autocomplete]="isRegisterMode() ? 'new-password' : 'current-password'"
               class="w-full h-full border-0 outline-none focus:outline-none focus:ring-0 bg-transparent text-white placeholder-white/28"
             />
 
             <button
               type="button"
               class="w-[30px] h-[30px] grid place-items-center border-0 rounded-lg bg-transparent text-white/40 cursor-pointer hover:text-white hover:bg-white/6"
-              [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
               (click)="togglePassword()"
             >
               <fa-icon [icon]="passwordIcon" size="sm"></fa-icon>
             </button>
           </div>
+          @if (passwordControl!.invalid && passwordControl!.touched) {
+            @if (passwordControl!.errors?.['required']) {
+              <span class="text-red-400 text-[.7rem]">La contraseña es obligatoria</span>
+            }
+            @if (passwordControl!.errors?.['minlength']) {
+              <span class="text-red-400 text-[.7rem]">Mínimo 8 caracteres</span>
+            }
+          }
         </label>
+
+        <!-- Confirm Password (solo en registro) -->
+        @if (isRegisterMode()) {
+          <label class="flex flex-col gap-[.5rem]">
+            <span class="text-white/72 text-[.76rem]">Confirmar contraseña</span>
+
+            <div
+              class="login-input-wrapper h-[50px] flex items-center gap-[.7rem] px-[.9rem] rounded-xl bg-black/16"
+              [class.border]="confirmPasswordControl!.invalid && confirmPasswordControl!.touched"
+              [class.border-red-500]="
+                confirmPasswordControl!.invalid && confirmPasswordControl!.touched
+              "
+            >
+              <fa-icon [icon]="faLock" size="sm" class="text-white/40"></fa-icon>
+
+              <input
+                [type]="showConfirmPassword() ? 'text' : 'password'"
+                formControlName="confirmPassword"
+                placeholder="••••••••"
+                autocomplete="new-password"
+                class="w-full h-full border-0 outline-none focus:outline-none focus:ring-0 bg-transparent text-white placeholder-white/28"
+              />
+
+              <button
+                type="button"
+                class="w-[30px] h-[30px] grid place-items-center border-0 rounded-lg bg-transparent text-white/40 cursor-pointer hover:text-white hover:bg-white/6"
+                [attr.aria-label]="
+                  showConfirmPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                "
+                (click)="toggleConfirmPassword()"
+              >
+                <fa-icon [icon]="confirmPasswordIcon" size="sm"></fa-icon>
+              </button>
+            </div>
+            @if (confirmPasswordControl!.invalid && confirmPasswordControl!.touched) {
+              @if (confirmPasswordControl!.errors?.['required']) {
+                <span class="text-red-400 text-[.7rem]">Confirma tu contraseña</span>
+              }
+              @if (confirmPasswordControl!.errors?.['passwordMismatch']) {
+                <span class="text-red-400 text-[.7rem]">Las contraseñas no coinciden</span>
+              }
+            }
+          </label>
+        }
 
         <!-- Remember -->
         <label class="flex items-center gap-[.5rem] text-white/50 text-[.74rem] cursor-pointer">
@@ -111,27 +214,51 @@
 
         <!-- Submit -->
         <button
-          (click)="onSubmit()"
-          class="w-full h-[50px] flex items-center justify-between px-[1.15rem] py-[.35rem] border-0 rounded-xl bg-[var(--color-accent)] text-white text-[.84rem] font-semibold cursor-pointer shadow-[0_10px_25px_rgba(80,70,150,.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-[1.08]"
+          type="submit"
+          [disabled]="isLoading() || loginForm.invalid"
+          class="w-full h-[50px] flex items-center justify-between px-[1.15rem] py-[.35rem] border-0 rounded-xl bg-[var(--color-accent)] text-white text-[.84rem] font-semibold cursor-pointer shadow-[0_10px_25px_rgba(80,70,150,.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
         >
-          <span>Iniciar sesión</span>
-
-          <span class="w-9 h-9 grid place-items-center rounded-lg bg-white/12">
-            <fa-icon [icon]="faArrowRight" size="sm"></fa-icon>
+          <span>
+            @if (isLoading()) {
+              Procesando...
+            } @else {
+              @if (isRegisterMode()) {
+                Crear cuenta
+              } @else {
+                Iniciar sesión
+              }
+            }
           </span>
+
+          @if (!isLoading()) {
+            <span class="w-9 h-9 grid place-items-center rounded-lg bg-white/12">
+              <fa-icon [icon]="faArrowRight" size="sm"></fa-icon>
+            </span>
+          }
         </button>
       </form>
 
       <!-- Footer -->
       <div class="flex justify-center gap-[.3rem] mt-[1.6rem] text-white/40 text-[.72rem]">
-        <span>¿Todavía no tienes una cuenta?</span>
-
-        <button
-          type="button"
-          class="p-0 border-0 bg-none text-white/75 font-semibold hover:text-white"
-        >
-          Regístrate
-        </button>
+        @if (isRegisterMode()) {
+          <span>¿Ya tienes una cuenta?</span>
+          <button
+            type="button"
+            class="p-0 border-0 bg-none text-white/75 font-semibold hover:text-white"
+            (click)="toggleMode()"
+          >
+            Inicia sesión
+          </button>
+        } @else {
+          <span>¿Todavía no tienes una cuenta?</span>
+          <button
+            type="button"
+            class="p-0 border-0 bg-none text-white/75 font-semibold hover:text-white"
+            (click)="toggleMode()"
+          >
+            Regístrate
+          </button>
+        }
       </div>
     </section>
   </main>

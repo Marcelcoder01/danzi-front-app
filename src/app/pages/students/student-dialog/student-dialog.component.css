@@ -10,3 +10,18 @@
   outline: none;
   box-shadow: none;
 }
+
+/* Prevenir zoom automático en iOS al hacer focus en inputs */
+#student_dialog input,
+#student_dialog select,
+#student_dialog textarea {
+  font-size: 16px !important;
+}
+
+/* Asegurar que el viewport no cambie en mobile */
+@media (max-width: 768px) {
+  #student_dialog .danzi-input,
+  #student_dialog .danzi-select {
+    font-size: 16px !important;
+  }
+}

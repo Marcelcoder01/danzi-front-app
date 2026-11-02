@@ -53,6 +53,13 @@
   box-sizing: border-box;
 }
 
+/* Prevenir zoom automático en iOS al hacer focus en inputs */
+.login-wrapper input,
+.login-wrapper select,
+.login-wrapper textarea {
+  font-size: 16px !important;
+}
+
 /* Responsive padding for mobile */
 @media (max-width: 480px) {
   .login-wrapper > main {

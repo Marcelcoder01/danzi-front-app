@@ -67,6 +67,9 @@
                 required
               />
             </div>
+            @if (form.get('firstName')?.invalid && form.get('firstName')?.touched) {
+              <p class="mt-1 text-xs text-red-500">El nombre es obligatorio</p>
+            }
           </div>
 
           <!-- Apellido -->
@@ -127,6 +130,9 @@
                 formControlName="email"
               />
             </div>
+            @if (form.get('email')?.invalid && form.get('email')?.touched) {
+              <p class="mt-1 text-xs text-red-500">Introduce un email válido</p>
+            }
           </div>
 
           <!-- Teléfono -->
@@ -181,6 +187,9 @@
             </label>
 
             <input type="date" class="danzi-input" formControlName="startDate" required />
+            @if (form.get('startDate')?.invalid && form.get('startDate')?.touched) {
+              <p class="mt-1 text-xs text-red-500">La fecha de alta es obligatoria</p>
+            }
           </div>
 
           <!-- Nivel -->
@@ -325,11 +334,11 @@
       </section>
 
       <div
-        class="mt-7 flex items-center justify-end gap-3 border-t border-[var(--color-border)]/60 pt-5"
+        class="mt-7 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-[var(--color-border)]/60 pt-5"
       >
         <button
           type="button"
-          class="rounded-xl px-5 py-2.5 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-text)]"
+          class="w-full sm:w-auto rounded-xl px-5 py-2.5 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-text)]"
           (click)="closeDialog()"
         >
           Cancelar
@@ -337,7 +346,7 @@
 
         <button
           type="submit"
-          class="group flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(108,99,168,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_12px_25px_rgba(108,99,168,0.32)] active:translate-y-0"
+          class="w-full sm:w-auto group flex items-center justify-center gap-2 rounded-xl bg-[var(--color-accent)] px-8 py-3.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(108,99,168,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_12px_25px_rgba(108,99,168,0.32)] active:translate-y-0"
         >
           <span>{{ isEdit() ? 'Editar alumno' : 'Crear alumno' }}</span>
 

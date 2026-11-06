@@ -114,12 +114,12 @@ export class StudentDialogComponent {
   readonly nextPaymentLabel = computed(() => {
     if (!this.isPaid()) return '';
     const value = this.formValue();
-    const date = this.paymentMetadata().nextPaymentDate ??
-      this.addDays(value.startDate || this.today(), getPaymentPeriodDays(
-        value.paymentPeriod,
-        value.paymentFrom,
-        value.paymentTo,
-      ));
+    const date =
+      this.paymentMetadata().nextPaymentDate ??
+      this.addDays(
+        value.startDate || this.today(),
+        getPaymentPeriodDays(value.paymentPeriod, value.paymentFrom, value.paymentTo),
+      );
     return new Intl.DateTimeFormat('es-ES', { dateStyle: 'long' }).format(
       new Date(`${date}T12:00:00`),
     );

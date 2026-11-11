@@ -1,29 +1,73 @@
-import { Component, Output, EventEmitter, Input, ViewChild } from '@angular/core';
+import { Component, Output, EventEmitter, Input, OnInit, ViewChild, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ConfirmationDialogComponent } from '../../../../components/confirmation-dialog/confirmation-dialog.component';
-import { faChevronRight, faChevronLeft, faRotate } from '@fortawesome/free-solid-svg-icons';
+import {
+  faChevronRight,
+  faChevronLeft,
+  faRotate,
+  faChevronDown,
+  faCheck,
+  faPlus,
+  faGraduationCap,
+  faUser,
+} from '@fortawesome/free-solid-svg-icons';
+import { OrganizationContextService } from '../../../../../core/services/organization-context.service';
+import { UserProfileService } from '../../../../../core/services/user-profile.service';
+import { APP_ROUTES } from '../../../../../core/services/home-route.service';
+import { ORGANIZATION_ROLE_LABELS } from '../../../../interfaces/organization.interface';
+import { initialsOf } from '../../../../interfaces/user.interface';
+import { ToastService } from '../../../../services/toast.service';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [FontAwesomeModule, ConfirmationDialogComponent],
+  imports: [FontAwesomeModule, ConfirmationDialogComponent, RouterLink],
   templateUrl: './topbar.component.html',
-  styleUrl: './topbar.component.css'
+  styleUrl: './topbar.component.css',
 })
-export class TopbarComponent {
+export class TopbarComponent implements OnInit {
   @ViewChild(ConfirmationDialogComponent) private confirmationDialog?: ConfirmationDialogComponent;
 
   @Output() toggleCollapse = new EventEmitter<void>();
   @Input() isCollapsed = false;
 
+  readonly context = inject(OrganizationContextService);
+  readonly profile = inject(UserProfileService);
+  private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+
+  readonly routes = APP_ROUTES;
+  readonly roleLabels = ORGANIZATION_ROLE_LABELS;
+  readonly initialsOf = initialsOf;
+
   faChevronRight = faChevronRight;
   faChevronLeft = faChevronLeft;
   faRotate = faRotate;
+  faChevronDown = faChevronDown;
+  faCheck = faCheck;
+  faPlus = faPlus;
+  faGraduationCap = faGraduationCap;
+  faUser = faUser;
+
+  ngOnInit(): void {
+    this.profile.load().catch(() => undefined);
+  }
+
+  async switchAcademy(organizationId: string): Promise<void> {
+    (document.activeElement as HTMLElement | null)?.blur();
+    if (organizationId === this.context.activeOrganizationId()) return;
+    if (this.context.select(organizationId)) {
+      this.toast.info(`Ahora trabajas con ${this.context.activeOrganization()?.name}.`);
+      await this.router.navigateByUrl(this.routes.academy);
+    }
+  }
 
   clearData(): void {
     this.confirmationDialog?.open({
       title: 'Empezar de cero',
-      message: 'Se borrarán los alumnos, las clases, las matrículas y la actividad guardados.',
+      message:
+        'Se borrarán los alumnos demo, las clases, las matrículas y la actividad guardados en este navegador. Los datos de Danzi (academias, fichas y solicitudes) no se modifican.',
       confirmLabel: 'Sí, limpiar datos',
       cancelLabel: 'Cancelar',
     });

@@ -1,0 +1,77 @@
+<section class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-[var(--color-text)] sm:text-3xl">
+      Elige una academia
+    </h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">
+      Selecciona con qué academia quieres trabajar. Podrás cambiarla cuando quieras.
+    </p>
+  </div>
+  <a [routerLink]="routes.onboarding" class="danzi-btn-ghost px-4 py-2 text-sm">
+    <fa-icon [icon]="faPlus"></fa-icon>
+    Registrar otra academia
+  </a>
+</section>
+
+<div class="danzi-card">
+  @if (context.status() === 'loading' && !context.memberships().length) {
+    <app-state-message kind="loading" title="Cargando tus academias..." />
+  } @else if (error()) {
+    <app-state-message kind="error" title="Algo ha fallado" [message]="error()">
+      <button type="button" class="danzi-btn-ghost px-4 py-2 text-sm" (click)="reload()">
+        Reintentar
+      </button>
+    </app-state-message>
+  } @else if (!context.memberships().length) {
+    <app-state-message
+      title="Todavía no perteneces a ninguna academia"
+      message="Registra tu academia o accede a Danzi Students para solicitar unirte a una."
+      [icon]="faBuilding"
+    >
+      <div class="flex flex-wrap justify-center gap-2">
+        <a [routerLink]="routes.onboarding" class="danzi-btn-primary px-4 py-2 text-sm">
+          Registrar academia
+        </a>
+        <a [routerLink]="routes.studentSpace" class="danzi-btn-ghost px-4 py-2 text-sm">
+          Ir a Danzi Students
+        </a>
+      </div>
+    </app-state-message>
+  } @else {
+    <ul class="divide-y divide-[var(--color-border-light)]">
+      @for (item of context.memberships(); track item.organization.id) {
+        <li>
+          <button
+            type="button"
+            class="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-black/[0.02]"
+            (click)="choose(item.organization.id)"
+          >
+            <span
+              class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+            >
+              <fa-icon [icon]="faBuilding"></fa-icon>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate font-semibold text-[var(--color-text)]">
+                {{ item.organization.name }}
+              </span>
+              <span class="block truncate text-xs text-[var(--color-text-muted)]">
+                {{ typeLabels[item.organization.type] }} · {{ item.organization.slug }}
+              </span>
+            </span>
+            <span
+              class="rounded-full bg-[var(--color-surface-alt)] px-3 py-1 text-xs font-semibold text-[var(--color-text)]"
+            >
+              {{ roleLabels[item.member.role] }}
+            </span>
+            @if (context.activeOrganizationId() === item.organization.id) {
+              <fa-icon [icon]="faCheck" class="text-[var(--color-success)]" aria-label="Activa"></fa-icon>
+            } @else {
+              <fa-icon [icon]="faChevronRight" class="text-[var(--color-text-light)]"></fa-icon>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

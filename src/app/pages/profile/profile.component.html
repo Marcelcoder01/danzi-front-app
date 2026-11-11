@@ -1,0 +1,94 @@
+<section class="mb-8">
+  <h1 class="text-2xl font-bold tracking-tight text-[var(--color-text)] sm:text-3xl">Mi perfil</h1>
+  <p class="mt-1 text-sm text-[var(--color-text-muted)]">
+    Tu perfil es único para todas tus academias. Se usa, por ejemplo, al aprobar tus solicitudes.
+  </p>
+</section>
+
+<article class="danzi-card max-w-3xl">
+  @if (loading()) {
+    <app-state-message kind="loading" title="Cargando tu perfil..." />
+  } @else if (error()) {
+    <app-state-message kind="error" title="Algo ha fallado" [message]="error()">
+      <button type="button" class="danzi-btn-ghost px-4 py-2 text-sm" (click)="load()">Reintentar</button>
+    </app-state-message>
+  } @else if (notFound()) {
+    <app-state-message
+      kind="error"
+      title="Tu perfil todavía no está disponible"
+      message="Se crea automáticamente al registrarte. Vuelve a intentarlo en unos segundos."
+    >
+      <button type="button" class="danzi-btn-ghost px-4 py-2 text-sm" (click)="load()">Reintentar</button>
+    </app-state-message>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="save()" class="p-6 sm:p-7" novalidate>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="form-control md:col-span-2">
+          <label for="pf-email" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Email de acceso</label>
+          <div class="danzi-field">
+            <fa-icon [icon]="faEnvelope"></fa-icon>
+            <input id="pf-email" type="email" class="danzi-input opacity-70" [value]="auth.currentUser()?.email ?? ''" disabled />
+          </div>
+        </div>
+
+        <div class="form-control">
+          <label for="pf-first" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+            Nombre <span class="text-[var(--color-accent)]">*</span>
+          </label>
+          <div class="danzi-field">
+            <fa-icon [icon]="faUser"></fa-icon>
+            <input id="pf-first" type="text" class="danzi-input" formControlName="firstName" autocomplete="given-name" />
+          </div>
+          @if (hasError('firstName', 'required')) {
+            <p class="mt-1 text-xs text-red-500">El nombre es obligatorio.</p>
+          }
+        </div>
+
+        <div class="form-control">
+          <label for="pf-last" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+            Apellidos <span class="text-[var(--color-accent)]">*</span>
+          </label>
+          <div class="danzi-field">
+            <fa-icon [icon]="faUser"></fa-icon>
+            <input id="pf-last" type="text" class="danzi-input" formControlName="lastName" autocomplete="family-name" />
+          </div>
+          @if (hasError('lastName', 'required')) {
+            <p class="mt-1 text-xs text-red-500">Los apellidos son obligatorios.</p>
+          }
+        </div>
+
+        <div class="form-control md:col-span-2">
+          <label for="pf-display" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Nombre visible</label>
+          <input id="pf-display" type="text" class="danzi-input" formControlName="displayName" placeholder="Si lo dejas vacío, usaremos tu nombre y apellidos" />
+        </div>
+
+        <div class="form-control">
+          <label for="pf-phone" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Teléfono</label>
+          <div class="danzi-field">
+            <fa-icon [icon]="faPhone"></fa-icon>
+            <input id="pf-phone" type="tel" class="danzi-input" formControlName="phone" autocomplete="tel" />
+          </div>
+          @if (hasError('phone', 'pattern')) {
+            <p class="mt-1 text-xs text-red-500">Introduce un teléfono válido.</p>
+          }
+        </div>
+
+        <div class="form-control">
+          <label for="pf-birth" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Fecha de nacimiento</label>
+          <input id="pf-birth" type="date" class="danzi-input" formControlName="dateOfBirth" />
+        </div>
+      </div>
+
+      <div class="mt-7 flex justify-end border-t border-[var(--color-border)]/60 pt-5">
+        <button type="submit" class="danzi-btn-primary w-full px-8 py-3 text-sm sm:w-auto" [disabled]="saving()">
+          @if (saving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Guardando...
+          } @else {
+            Guardar cambios
+          }
+        </button>
+      </div>
+    </form>
+  }
+</article>

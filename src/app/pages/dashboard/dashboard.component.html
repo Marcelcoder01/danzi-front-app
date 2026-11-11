@@ -4,23 +4,12 @@
     class="dashboard-enter dashboard-enter-1 mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
   >
     <div>
-      <h1 class="text-2xl font-bold tracking-tight text-[#1a1a2e] sm:text-3xl">Panel principal</h1>
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="text-2xl font-bold tracking-tight text-[#1a1a2e] sm:text-3xl">Panel principal</h1>
+        <app-legacy-notice />
+      </div>
 
       <p class="mt-1 text-sm text-[#718096]">Aquí tienes un resumen de lo que está pasando hoy.</p>
-      <button (click)="testCreateOrganization()">crear academia</button>
-
-      <button type="button" (click)="testCreateStudent()" class="btn btn-primary">
-        insertar alumno
-      </button>
-      <button type="button" (click)="testJoinOrganization()" class="btn btn-primary">
-        solicitar acceso a academia
-      </button>
-      <button type="button" (click)="testReadJoinRequests()" class="btn btn-primary">
-        leer solicitudes
-      </button>
-      <button type="button" (click)="testApproveJoinRequest()" class="btn btn-primary">
-        aprobar solicitud
-      </button>
     </div>
   </div>
 

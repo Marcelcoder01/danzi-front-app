@@ -1,9 +1,15 @@
-<section class="auth-card unauthorized-card">
-  <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-    <path d="M12 8v4"></path>
-    <path d="M12 16h.01"></path>
-  </svg>
-  <h1>Acceso no autorizado</h1>
-  <p>Tu usuario no tiene permisos de administración para acceder a este panel.</p>
-</section>
+<div class="grid min-h-screen place-items-center bg-[var(--color-background)] p-6">
+  <section class="auth-card unauthorized-card">
+    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      <path d="M12 8v4"></path>
+      <path d="M12 16h.01"></path>
+    </svg>
+    <h1>Acceso no autorizado</h1>
+    <p>Tu rol en la academia activa no permite acceder a esta sección.</p>
+    <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+      <a routerLink="/start" class="danzi-btn-primary px-5 py-2.5 text-sm">Volver al inicio</a>
+      <a routerLink="/select-academy" class="danzi-btn-ghost px-5 py-2.5 text-sm">Cambiar de academia</a>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,124 @@
+<section class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-[var(--color-text)] sm:text-3xl">
+      Hola{{ profile.displayName() ? ', ' + profile.displayName() : '' }}
+    </h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">
+      Este es tu espacio en Danzi Students: tus academias, tus fichas y tus solicitudes.
+    </p>
+  </div>
+  @if (context.hasMemberships()) {
+    <a
+      [routerLink]="context.activeOrganizationId() ? routes.academy : routes.selectAcademy"
+      class="danzi-btn-ghost px-4 py-2 text-sm"
+    >
+      <fa-icon [icon]="faBuilding"></fa-icon>
+      Ir al panel Academy
+    </a>
+  }
+</section>
+
+@if (profileIncomplete()) {
+  <a
+    [routerLink]="routes.profile"
+    class="mb-6 flex items-center gap-3 rounded-2xl bg-[var(--color-accent)]/10 px-4 py-3 text-sm text-[var(--color-accent-dark)] transition-colors hover:bg-[var(--color-accent)]/15"
+  >
+    <fa-icon [icon]="faUserPen"></fa-icon>
+    <span>
+      Completa tu nombre y apellidos en tu perfil: tu academia los usará al aprobar tu solicitud.
+    </span>
+  </a>
+}
+
+@if (isNewcomer()) {
+  <div class="mb-6 rounded-2xl border border-dashed border-[var(--color-border-dark)] bg-white/60 px-5 py-4 text-sm text-[var(--color-text-muted)]">
+    <p class="font-semibold text-[var(--color-text)]">Aún no perteneces a ninguna academia</p>
+    <p class="mt-1">
+      Pide a tu academia su identificador y envía una solicitud. ¿Diriges una academia?
+      <a [routerLink]="routes.onboarding" class="font-semibold text-[var(--color-accent)] underline">Regístrala aquí</a>.
+    </p>
+  </div>
+}
+
+<div class="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+  <div class="flex flex-col gap-6">
+    <!-- Fichas -->
+    <article class="danzi-card overflow-hidden">
+      <header class="flex items-center gap-3 border-b border-[var(--color-border-light)] px-5 py-4">
+        <fa-icon [icon]="faIdCard" class="text-[var(--color-accent)]"></fa-icon>
+        <h2 class="font-semibold text-[var(--color-text)]">Mis fichas de alumno</h2>
+      </header>
+      @if (loading()) {
+        <app-state-message kind="loading" title="Cargando tus fichas..." />
+      } @else if (error()) {
+        <app-state-message kind="error" title="Algo ha fallado" [message]="error()">
+          <button type="button" class="danzi-btn-ghost px-4 py-2 text-sm" (click)="load()">Reintentar</button>
+        </app-state-message>
+      } @else if (!records().length) {
+        <app-state-message
+          [icon]="faIdCard"
+          title="Todavía no tienes fichas vinculadas"
+          message="Cuando una academia apruebe tu solicitud, tu ficha aparecerá aquí."
+        />
+      } @else {
+        <ul class="divide-y divide-[var(--color-border-light)]">
+          @for (record of records(); track record.id) {
+            <li class="px-5 py-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="font-semibold text-[var(--color-text)]">{{ organizationName(record.organizationId) }}</p>
+                <span class="rounded-lg bg-[var(--color-surface-alt)] px-2 py-0.5 text-xs font-medium text-[var(--color-text)]">
+                  {{ statusLabels[record.status] }}
+                </span>
+              </div>
+              <p class="mt-1 text-sm text-[var(--color-text-muted)]">
+                {{ fullName(record) }} · {{ danceRoleLabels[record.danceRole] }} · Alta el
+                {{ record.createdAt | dateLabel }}
+              </p>
+            </li>
+          }
+        </ul>
+      }
+    </article>
+
+    <!-- Solicitudes -->
+    <article class="danzi-card overflow-hidden">
+      <header class="flex items-center gap-3 border-b border-[var(--color-border-light)] px-5 py-4">
+        <fa-icon [icon]="faInbox" class="text-[var(--color-accent)]"></fa-icon>
+        <h2 class="font-semibold text-[var(--color-text)]">Mis solicitudes</h2>
+      </header>
+      @if (loading()) {
+        <app-state-message kind="loading" title="Cargando tus solicitudes..." />
+      } @else if (!error() && !requests().length) {
+        <app-state-message
+          [icon]="faInbox"
+          title="No has enviado solicitudes"
+          message="Usa el formulario para pedir acceso a una academia."
+        />
+      } @else if (!error()) {
+        <app-join-request-list
+          mode="student"
+          [requests]="requests()"
+          [organizationNames]="organizationNames()"
+        />
+      }
+    </article>
+  </div>
+
+  <!-- Solicitar acceso -->
+  <article class="danzi-card h-fit p-6">
+    <div class="mb-5 flex items-center gap-3">
+      <span class="grid h-10 w-10 place-items-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+        <fa-icon [icon]="faPaperPlane"></fa-icon>
+      </span>
+      <div>
+        <h2 class="font-semibold text-[var(--color-text)]">Unirme a una academia</h2>
+        <p class="text-xs text-[var(--color-text-muted)]">La academia revisará tu solicitud.</p>
+      </div>
+    </div>
+    <app-join-organization-form
+      [sending]="sending()"
+      [resetToken]="resetToken()"
+      (submitted)="requestJoin($event)"
+    />
+  </article>
+</div>

@@ -134,7 +134,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
 
       if (data.session) {
         this.toastService.success('¡Cuenta creada correctamente!');
-        await this.router.navigate(['/admin']);
+        await this.router.navigateByUrl('/start');
       } else {
         this.toastService.success('¡Cuenta creada! Revisa tu correo para confirmar tu dirección.');
         this.loginForm.reset();
@@ -165,7 +165,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
       }
 
       this.toastService.success('¡Bienvenido de nuevo!');
-      await this.router.navigate(['/admin']);
+      await this.router.navigateByUrl('/start');
     } catch (error) {
       console.error('Login error:', error);
       this.toastService.error('Ha ocurrido un error al iniciar sesión.');

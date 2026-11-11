@@ -26,15 +26,27 @@
       <span class="mobile-label">Inicio</span>
     </a>
     <a
-      routerLink="/admin/students"
+      [routerLink]="context.canManageStudents() ? '/admin/students' : '/admin/students/local'"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
+      [routerLinkActiveOptions]="{ exact: false }"
       class="flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
     >
       <fa-icon [icon]="faUsers" size="lg"></fa-icon>
       <span class="desktop-label" [class.hidden]="isCollapsed">Alumnos</span>
       <span class="mobile-label">Alumnos</span>
     </a>
+    @if (context.canManageStudents()) {
+      <a
+        routerLink="/admin/join-requests"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="desktop-only flex items-center gap-3 px-5 py-3 rounded-lg transition-colors"
+      >
+        <fa-icon [icon]="faInbox" size="lg"></fa-icon>
+        <span class="desktop-label" [class.hidden]="isCollapsed">Solicitudes</span>
+        <span class="mobile-label">Solicitudes</span>
+      </a>
+    }
     <a
       routerLink="/admin/classes"
       routerLinkActive="active"

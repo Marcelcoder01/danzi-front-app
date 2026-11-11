@@ -1,0 +1,49 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4" novalidate>
+  <div class="form-control">
+    <label for="join-slug" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+      Identificador de la academia <span class="text-[var(--color-accent)]">*</span>
+    </label>
+    <div class="danzi-field">
+      <fa-icon [icon]="faLink"></fa-icon>
+      <input
+        id="join-slug"
+        type="text"
+        class="danzi-input"
+        placeholder="academia-son-de-cuba"
+        formControlName="slug"
+        autocapitalize="off"
+        spellcheck="false"
+        (blur)="normalizeSlug()"
+      />
+    </div>
+    @if (hasError('required')) {
+      <p class="mt-1 text-xs text-red-500">Introduce el identificador que te ha dado tu academia.</p>
+    } @else if (hasError('slugLength') || hasError('slugFormat')) {
+      <p class="mt-1 text-xs text-red-500">El identificador solo admite minúsculas, números y guiones.</p>
+    }
+  </div>
+
+  <div class="form-control">
+    <label for="join-message" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+      Mensaje (opcional)
+    </label>
+    <textarea
+      id="join-message"
+      class="danzi-input danzi-textarea"
+      rows="3"
+      placeholder="Hola, me gustaría apuntarme a vuestras clases."
+      formControlName="message"
+      [attr.maxlength]="messageMaxLength"
+    ></textarea>
+  </div>
+
+  <button type="submit" class="danzi-btn-primary w-full px-6 py-3 text-sm" [disabled]="sending()">
+    @if (sending()) {
+      <span class="loading loading-spinner loading-sm"></span>
+      Enviando...
+    } @else {
+      <fa-icon [icon]="faPaperPlane"></fa-icon>
+      Enviar solicitud
+    }
+  </button>
+</form>

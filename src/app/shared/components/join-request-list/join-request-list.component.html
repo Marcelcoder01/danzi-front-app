@@ -1,0 +1,63 @@
+<ul class="divide-y divide-[var(--color-border-light)]">
+  @for (request of requests(); track request.id) {
+    <li class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center">
+      <span
+        class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+      >
+        <fa-icon [icon]="mode() === 'academy' ? faUser : faBuilding"></fa-icon>
+      </span>
+
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <p class="truncate font-semibold text-[var(--color-text)]">
+            {{ mode() === 'academy' ? requesterLabel(request) : organizationLabel(request) }}
+          </p>
+          <span
+            class="rounded-lg px-2 py-0.5 text-xs font-medium"
+            [class]="statusClasses[request.status]"
+          >
+            {{ statusLabels[request.status] }}
+          </span>
+        </div>
+        <p class="text-xs text-[var(--color-text-muted)]">
+          Enviada el {{ request.createdAt | dateLabel }}
+          @if (request.reviewedAt) {
+            · Revisada el {{ request.reviewedAt | dateLabel }}
+          }
+        </p>
+        @if (request.message) {
+          <p class="mt-2 whitespace-pre-line rounded-xl bg-[var(--color-surface-alt)] px-3 py-2 text-sm text-[var(--color-text)]">
+            {{ request.message }}
+          </p>
+        }
+      </div>
+
+      @if (mode() === 'academy' && canReview() && request.status === 'pending') {
+        <div class="flex shrink-0 gap-2 sm:flex-col lg:flex-row">
+          <button
+            type="button"
+            class="danzi-btn-primary flex-1 px-4 py-2 text-sm"
+            [disabled]="processingId() !== null"
+            (click)="approve.emit(request)"
+          >
+            @if (processingId() === request.id) {
+              <span class="loading loading-spinner loading-xs"></span>
+            } @else {
+              <fa-icon [icon]="faCheck"></fa-icon>
+            }
+            Aprobar
+          </button>
+          <button
+            type="button"
+            class="danzi-btn-ghost flex-1 px-4 py-2 text-sm text-[var(--color-error-dark)]"
+            [disabled]="processingId() !== null"
+            (click)="reject.emit(request)"
+          >
+            <fa-icon [icon]="faXmark"></fa-icon>
+            Rechazar
+          </button>
+        </div>
+      }
+    </li>
+  }
+</ul>

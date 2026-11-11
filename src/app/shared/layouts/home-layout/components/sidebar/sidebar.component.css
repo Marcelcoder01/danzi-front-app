@@ -124,4 +124,9 @@ nav button:hover {
     background: var(--color-accent);
     color: #fff !important;
   }
+
+  /* En móvil la barra inferior mantiene 5 accesos; el resto se alcanza desde las páginas. */
+  .sidebar-nav > a.desktop-only {
+    display: none;
+  }
 }

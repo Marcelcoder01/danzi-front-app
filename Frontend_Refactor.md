@@ -544,7 +544,7 @@ Separar responsabilidades en servicios de dominio como:
 
 Los nombres pueden adaptarse al estilo actual del proyecto.
 
-Los componentes deben concentrarse en presentación, formularios y eventos de usuario.
+Los componentes deben seguir el patrón de componentes puros y presentacionales y respetar el estilo de scaffolding que estamos usando. 
 
 Las llamadas Supabase deben estar encapsuladas en servicios.
 
@@ -624,8 +624,6 @@ Trabajar de manera incremental:
 
 **Fase 1 — Diagnóstico**
 - Revisar código y dependencias.
-- Leer `AGENTS.md`.
-- Comprobar cambios locales sin commitear.
 - Identificar componentes y servicios afectados.
 - Identificar dependencias con los módulos legacy.
 - Informar brevemente del plan.
@@ -686,7 +684,6 @@ La implementación estará terminada cuando:
 - [ ] No se permitan operaciones de modificación sin autorización backend.
 - [ ] No se rompan clases, horarios, asistencia ni pagos legacy.
 - [ ] `npm run build` complete correctamente, o se documenten los errores preexistentes y los bloqueos reales.
-- [ ] Se añadan o actualicen tests para la lógica modificada.
 
 ## 16. Entrega final
 
@@ -697,7 +694,7 @@ Al terminar, proporciona:
 3. Nueva estructura de servicios y relaciones entre componentes.
 4. Flujos implementados.
 5. Funcionalidades que han quedado pendientes por limitaciones del backend actual.
-6. Resultados de build y tests.
+6. Resultados de build.
 7. Posibles riesgos o incompatibilidades con los módulos legacy.
 
 **Objetivo final:** que Danzi Front refleje el modelo actual de usuarios, academias y alumnos que ya tenemos implementado en Supabase, respetando la arquitectura y la interfaz existentes, sin adelantar funcionalidades cuyo backend todavía no hemos construido.

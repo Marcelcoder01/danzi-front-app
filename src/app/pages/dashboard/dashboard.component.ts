@@ -25,20 +25,25 @@ import {
   ClassActivity,
   RegularClassActivity,
 } from '../../shared/interfaces/class-activity.interface';
-import { SupabaseService } from '../../core/services/supabase.service';
+import { LegacyNoticeComponent } from '../../shared/components/legacy-notice/legacy-notice.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
-  imports: [CommonModule, FaIconComponent, DecimalPipe, PaymentDueDialogComponent],
+  imports: [
+    CommonModule,
+    FaIconComponent,
+    DecimalPipe,
+    PaymentDueDialogComponent,
+    LegacyNoticeComponent,
+  ],
 })
 export class DashboardComponent implements OnInit {
   private readonly academyData = inject(AcademyDataService);
   private readonly attendanceService = inject(AttendanceService);
   private readonly activityService = inject(AcademyActivityService);
-  private readonly supabase = inject(SupabaseService);
   private readonly router = inject(Router);
 
   faPlus = faPlus;
@@ -295,171 +300,5 @@ export class DashboardComponent implements OnInit {
     if (activity.capacity - this.getEnrollmentCount(activity) <= 3)
       return 'bg-orange-50 text-orange-700';
     return 'bg-emerald-50 text-emerald-700';
-  }
-
-  async testCreateOrganization(): Promise<void> {
-    // Utiliza tu instancia actual de SupabaseClient
-    const supabase = this.supabase.client;
-
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !authData.user) {
-      console.error('No hay un usuario autenticado', authError);
-      return;
-    }
-
-    console.log('Usuario autenticado:', authData.user.id);
-
-    const { data: organizationId, error } = await supabase.rpc('create_organization', {
-      p_name: 'Academia Danzi Test',
-      p_slug: 'academia-danzi-test',
-      p_type: 'academy',
-    });
-
-    if (error) {
-      console.error('Error creando academia:', error);
-      return;
-    }
-
-    console.log('Academia creada:', organizationId);
-  }
-
-  async testReadOrganizations(): Promise<void> {
-    const supabase = this.supabase.client;
-
-    // 1. Obtener academias accesibles
-    const { data: organizations, error: orgError } = await supabase
-      .from('organizations')
-      .select('id, name, slug, type');
-
-    if (orgError) {
-      console.error('Error consultando academias:', orgError);
-    } else {
-      console.log('Mis academias:', organizations);
-    }
-
-    // 2. Obtener los roles del usuario
-    const { data: memberships, error: memberError } = await supabase
-      .from('organization_members')
-      .select('organization_id, role, is_active');
-
-    if (memberError) {
-      console.error('Error consultando roles:', memberError);
-    } else {
-      console.log('Mis roles:', memberships);
-    }
-  }
-
-  async testDirectOrganizationInsert(): Promise<void> {
-    const { data, error } = await this.supabase.client
-      .from('organizations')
-      .insert({
-        name: 'Academia No Autorizada',
-        slug: 'academia-no-autorizada',
-        type: 'academy',
-      })
-      .select();
-
-    console.log('Inserción directa:', data);
-    console.log('Error esperado:', error);
-  }
-
-  async testCreateStudent(): Promise<void> {
-    const supabase = this.supabase.client;
-
-    const { data: studentId, error } = await supabase.rpc('create_student', {
-      p_organization_id: 'c2812d8e-1229-48fa-bf1d-a59dc75f9fc3',
-      p_first_name: 'Alumno',
-      p_last_name: 'Prueba',
-      p_email: 'alumno.prueba@example.com',
-      p_dance_role: 'leader',
-    });
-
-    if (error) {
-      console.error('Error creando alumno:', error);
-      return;
-    }
-
-    console.log('Alumno creado correctamente:', studentId);
-
-    const { data: students, error: readError } = await supabase
-      .from('students')
-      .select('id, first_name, last_name, dance_role, user_id')
-      .eq('organization_id', 'c2812d8e-1229-48fa-bf1d-a59dc75f9fc3');
-
-    console.log('Alumnos de mi academia:', students);
-    console.log('Error de lectura:', readError);
-  }
-
-  async testJoinOrganization(): Promise<void> {
-    const supabase = this.supabase.client;
-
-    // Solicitar acceso a la academia
-    const { data: requestId, error } = await supabase.rpc('request_join_organization', {
-      p_organization_slug: 'academia-danzi-test',
-      p_message: 'Hola, me gustaría apuntarme a vuestra academia.',
-    });
-
-    if (error) {
-      console.error('Error solicitando acceso:', error);
-      return;
-    }
-
-    console.log('Solicitud creada:', requestId);
-
-    // Consultar mis solicitudes
-    const { data: requests, error: readError } = await supabase
-      .from('join_requests')
-      .select('id, organization_id, status, message, created_at');
-
-    console.log('Mis solicitudes:', requests);
-    console.log('Error de lectura:', readError);
-  }
-
-  async testReadJoinRequests(): Promise<void> {
-    const { data, error } = await this.supabase.client
-      .from('join_requests')
-      .select('id, organization_id, user_id, status, message');
-
-    console.log('Solicitudes recibidas:', data);
-    console.log('Error:', error);
-  }
-
-  async testApproveJoinRequest(): Promise<void> {
-    const supabase = this.supabase.client;
-    const organizationId = 'c2812d8e-1229-48fa-bf1d-a59dc75f9fc3';
-
-    // 1. Obtener una solicitud pendiente de la academia
-    const { data: request, error: requestError } = await supabase
-      .from('join_requests')
-      .select('id, organization_id, user_id, status')
-      .eq('organization_id', organizationId)
-      .eq('status', 'pending')
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
-
-    if (requestError) {
-      console.error('Error consultando solicitudes:', requestError);
-      return;
-    }
-
-    if (!request) {
-      console.warn('No hay solicitudes pendientes para esta academia');
-      return;
-    }
-
-    // Aprobar solicitud y crear ficha de alumno
-    const { data: studentId, error } = await this.supabase.client.rpc('review_join_request', {
-      p_request_id: request.id,
-      p_decision: 'approved',
-    });
-
-    if (error) {
-      console.error('Error aprobando solicitud:', error);
-      return;
-    }
-
-    console.log('Alumno aprobado correctamente:', studentId);
   }
 }

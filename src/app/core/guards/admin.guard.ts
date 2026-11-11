@@ -1,14 +1,25 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-// import { AuthService } from '../services/auth.service';
+import { OrganizationContextService } from '../services/organization-context.service';
+import { APP_ROUTES } from '../services/home-route.service';
+import { ToastService } from '../../shared/services/toast.service';
 
-export const adminGuard: CanActivateFn = (route, state) => {
-  // const authService = inject(AuthService);
-  // const router = inject(Router);
+/**
+ * Acceso al panel Academy: requiere una relación activa con al menos una organización
+ * y una academia seleccionada. Es solo una capa de navegación; RLS aplica la autorización.
+ */
+export const adminGuard: CanActivateFn = async () => {
+  const context = inject(OrganizationContextService);
+  const router = inject(Router);
+  const toast = inject(ToastService);
 
-  // if (!authService.isAdmin()) {
-  //   return router.createUrlTree(['/unauthorized']);
-  // }
-
-  return true;
+  try {
+    const memberships = await context.ensureLoaded();
+    if (!memberships.length) return router.parseUrl(APP_ROUTES.studentSpace);
+    if (!context.activeOrganizationId()) return router.parseUrl(APP_ROUTES.selectAcademy);
+    return true;
+  } catch {
+    toast.error('No se han podido cargar tus academias. Inténtalo de nuevo.');
+    return router.parseUrl(APP_ROUTES.studentSpace);
+  }
 };

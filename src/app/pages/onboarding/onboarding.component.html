@@ -1,0 +1,59 @@
+<section class="mb-8">
+  <h1 class="text-2xl font-bold tracking-tight text-[var(--color-text)] sm:text-3xl">
+    Te damos la bienvenida a Danzi{{ profile.displayName() ? ', ' + profile.displayName() : '' }}
+  </h1>
+  <p class="mt-1 text-sm text-[var(--color-text-muted)]">
+    Tu cuenta es personal: puedes gestionar una academia y, a la vez, ser alumno en otras.
+  </p>
+</section>
+
+<div class="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+  <article class="danzi-card p-6 sm:p-7">
+    <div class="mb-6 flex items-center gap-4">
+      <span
+        class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+      >
+        <fa-icon [icon]="faBuilding" class="text-lg"></fa-icon>
+      </span>
+      <div>
+        <h2 class="text-lg font-semibold text-[var(--color-text)]">Registra tu academia</h2>
+        <p class="text-sm text-[var(--color-text-muted)]">
+          Gestiona alumnos y solicitudes con Danzi Academy.
+        </p>
+      </div>
+    </div>
+
+    @if (error()) {
+      <div role="alert" class="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+        {{ error() }}
+      </div>
+    }
+
+    <app-create-organization-form
+      [saving]="saving()"
+      [danceStyles]="danceStyles()"
+      (submitted)="createOrganization($event)"
+    ></app-create-organization-form>
+  </article>
+
+  <article class="danzi-card flex flex-col p-6 sm:p-7">
+    <div class="mb-4 flex items-center gap-4">
+      <span
+        class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[var(--color-secondary)]/10 text-[var(--color-secondary)]"
+      >
+        <fa-icon [icon]="faGraduationCap" class="text-lg"></fa-icon>
+      </span>
+      <div>
+        <h2 class="text-lg font-semibold text-[var(--color-text)]">Soy alumno</h2>
+        <p class="text-sm text-[var(--color-text-muted)]">Únete a tu academia con Danzi Students.</p>
+      </div>
+    </div>
+    <p class="flex-1 text-sm leading-6 text-[var(--color-text-muted)]">
+      Pide a tu academia su identificador (por ejemplo <code>academia-son-de-cuba</code>) y envía
+      una solicitud. Cuando la aprueben, verás tu ficha de alumno en tu espacio.
+    </p>
+    <a [routerLink]="routes.studentSpace" class="danzi-btn-ghost mt-6 w-full px-6 py-3 text-sm">
+      Ir a Danzi Students
+    </a>
+  </article>
+</div>

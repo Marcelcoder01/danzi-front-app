@@ -76,6 +76,12 @@ export class AuthService {
     return await this.supabase.auth.getUser();
   }
 
+  // ID del usuario de la sesión actual (Supabase Auth), sin petición de red
+  async getCurrentUserId(): Promise<string | null> {
+    const { data } = await this.supabase.auth.getSession();
+    return data.session?.user.id ?? null;
+  }
+
   // Recuperación de contraseña
   async resetPassword(email: string) {
     return await this.supabase.auth.resetPasswordForEmail(email, {

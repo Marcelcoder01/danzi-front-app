@@ -1,0 +1,110 @@
+<dialog #dialog class="modal modal-middle danzi-modal" aria-labelledby="create-student-title">
+  <div
+    class="modal-box w-[calc(100%-2rem)] max-w-2xl max-h-[90vh] overflow-y-auto rounded-[28px] border border-white/10 bg-white p-0 shadow-[0_25px_80px_rgba(0,0,0,0.18),inset_1px_1px_0_rgba(255,255,255,0.45)]"
+  >
+    <div class="flex items-start justify-between border-b border-[var(--color-border)]/60 px-7 pt-7 pb-6">
+      <div class="flex items-center gap-4">
+        <div
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.04),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]"
+        >
+          <fa-icon [icon]="faUserPlus" class="text-lg"></fa-icon>
+        </div>
+        <div>
+          <h3 id="create-student-title" class="text-xl font-semibold tracking-tight text-[var(--color-text)]">
+            Nuevo alumno
+          </h3>
+          <p class="mt-1 text-sm text-[var(--color-text-muted)]">
+            Crea una ficha manual en {{ organizationName() ?? 'tu academia' }}. Podrá vincularse a una
+            cuenta Danzi más adelante.
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        aria-label="Cerrar diálogo"
+        class="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface-alt)]/70 text-[var(--color-text-muted)] transition-all duration-200 hover:-translate-y-0.5 hover:text-[var(--color-text)] hover:shadow-md"
+        (click)="close()"
+      >
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="px-7 py-6" novalidate>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="form-control">
+          <label for="cs-first-name" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+            Nombre <span class="text-[var(--color-accent)]">*</span>
+          </label>
+          <div class="danzi-field">
+            <fa-icon [icon]="faUser"></fa-icon>
+            <input id="cs-first-name" type="text" class="danzi-input" placeholder="Nombre del alumno" formControlName="firstName" />
+          </div>
+          @if (hasError('firstName', 'required')) {
+            <p class="mt-1 text-xs text-red-500">El nombre es obligatorio.</p>
+          }
+        </div>
+
+        <div class="form-control">
+          <label for="cs-last-name" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Apellidos</label>
+          <div class="danzi-field">
+            <fa-icon [icon]="faUser"></fa-icon>
+            <input id="cs-last-name" type="text" class="danzi-input" placeholder="Apellidos del alumno" formControlName="lastName" />
+          </div>
+        </div>
+
+        <div class="form-control">
+          <label for="cs-email" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Email</label>
+          <div class="danzi-field">
+            <fa-icon [icon]="faEnvelope"></fa-icon>
+            <input id="cs-email" type="email" class="danzi-input" placeholder="correo@ejemplo.com" formControlName="email" />
+          </div>
+          @if (hasError('email', 'email')) {
+            <p class="mt-1 text-xs text-red-500">Introduce un email válido.</p>
+          }
+        </div>
+
+        <div class="form-control">
+          <label for="cs-phone" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Teléfono</label>
+          <div class="danzi-field">
+            <fa-icon [icon]="faPhone"></fa-icon>
+            <input id="cs-phone" type="tel" class="danzi-input" placeholder="+34 600 000 000" formControlName="phone" />
+          </div>
+          @if (hasError('phone', 'pattern')) {
+            <p class="mt-1 text-xs text-red-500">Introduce un teléfono válido.</p>
+          }
+        </div>
+
+        <div class="form-control md:col-span-2">
+          <label for="cs-role" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Rol de baile</label>
+          <select id="cs-role" class="danzi-select" formControlName="danceRole">
+            @for (role of danceRoles; track role) {
+              <option [value]="role">{{ danceRoleLabels[role] }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-7 flex flex-col items-center justify-end gap-3 border-t border-[var(--color-border)]/60 pt-5 sm:flex-row">
+        <button
+          type="button"
+          class="w-full rounded-xl px-5 py-2.5 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-text)] sm:w-auto"
+          (click)="close()"
+        >
+          Cancelar
+        </button>
+        <button type="submit" class="danzi-btn-primary group w-full px-8 py-3.5 text-sm sm:w-auto" [disabled]="saving()">
+          @if (saving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Guardando...
+          } @else {
+            Crear alumno
+            <fa-icon [icon]="faArrowRight" class="text-xs transition-transform duration-200 group-hover:translate-x-0.5"></fa-icon>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar diálogo">cerrar</button>
+  </form>
+</dialog>

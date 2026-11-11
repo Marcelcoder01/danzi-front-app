@@ -29,12 +29,15 @@ import { ClassDialogComponent } from './class-dialog/class-dialog.component';
 import { ParticipantsDialogComponent } from './participants-dialog/participants-dialog.component';
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
+import { LegacyNoticeComponent } from '../../shared/components/legacy-notice/legacy-notice.component';
+
 @Component({
   selector: 'app-classes',
   standalone: true,
   templateUrl: './classes.component.html',
   styleUrl: './classes.component.css',
   imports: [
+    LegacyNoticeComponent,
     CommonModule,
     FormsModule,
     FaIconComponent,

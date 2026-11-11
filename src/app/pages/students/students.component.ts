@@ -1,5 +1,6 @@
 import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faPlus,
@@ -22,13 +23,23 @@ import { ToastService } from '../../shared/services/toast.service';
 import { StudentsService } from './services/students.service';
 import { StudentDialogComponent } from './student-dialog/student-dialog.component';
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { LegacyNoticeComponent } from '../../shared/components/legacy-notice/legacy-notice.component';
+import { OrganizationContextService } from '../../core/services/organization-context.service';
 
+/** Alumnos demo (localStorage) usados por clases, matrículas, asistencia y pagos legacy. */
 @Component({
   selector: 'app-students',
   standalone: true,
   templateUrl: './students.component.html',
   styleUrl: './students.component.css',
-  imports: [FormsModule, FaIconComponent, StudentDialogComponent, ConfirmationDialogComponent],
+  imports: [
+    FormsModule,
+    RouterLink,
+    FaIconComponent,
+    StudentDialogComponent,
+    ConfirmationDialogComponent,
+    LegacyNoticeComponent,
+  ],
 })
 export class StudentsComponent {
   @ViewChild(StudentDialogComponent) private studentDialog?: StudentDialogComponent;
@@ -50,6 +61,7 @@ export class StudentsComponent {
   studentsService = inject(StudentsService);
   private readonly academyData = inject(AcademyDataService);
   private readonly toastService = inject(ToastService);
+  readonly context = inject(OrganizationContextService);
   isFiltersVisible = false;
 
   filterStatus = '';

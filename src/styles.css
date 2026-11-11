@@ -402,3 +402,83 @@ body {
     transform: translateY(0) scale(1);
   }
 }
+
+
+/* =========================================================
+   DANZI SHARED SURFACES (módulos conectados a Supabase)
+   ========================================================= */
+
+.danzi-card {
+  background: var(--color-surface);
+  box-shadow: 6px 6px 12px var(--color-border), -6px -6px 12px #ffffff;
+  border: 1px solid var(--color-border-light);
+  border-radius: 1rem;
+}
+
+.danzi-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  font-weight: 600;
+  box-shadow: 0 4px 6px -1px rgba(108, 99, 168, 0.2);
+  transition: all 0.2s ease;
+}
+
+.danzi-btn-primary:hover:not(:disabled) {
+  box-shadow: 0 10px 15px -3px rgba(108, 99, 168, 0.3);
+  filter: brightness(1.05);
+}
+
+.danzi-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.danzi-btn-ghost:hover:not(:disabled) {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.danzi-btn-primary:disabled,
+.danzi-btn-ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.danzi-modal {
+  background: transparent;
+}
+
+.danzi-modal::backdrop {
+  background: rgba(10, 10, 20, 0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.danzi-modal[open] .modal-box {
+  animation: danzi-modal-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.danzi-modal input,
+.danzi-modal select,
+.danzi-modal textarea {
+  font-size: 16px !important;
+}
+
+.danzi-textarea {
+  height: auto;
+  min-height: 88px;
+  padding: 0.65rem 0.85rem;
+  line-height: 1.5;
+  resize: vertical;
+}

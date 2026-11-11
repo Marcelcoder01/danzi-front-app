@@ -46,12 +46,15 @@ import { AttendanceStudentComponent } from './components/attendance-student/atte
 import { AttendanceMatrixComponent } from './components/attendance-matrix/attendance-matrix.component';
 import { ToastService } from '../../shared/services/toast.service';
 
+import { LegacyNoticeComponent } from '../../shared/components/legacy-notice/legacy-notice.component';
+
 @Component({
   selector: 'app-attendance',
   standalone: true,
   templateUrl: './attendance.component.html',
   styleUrl: './attendance.component.css',
   imports: [
+    LegacyNoticeComponent,
     CommonModule,
     FormsModule,
     FaIconComponent,

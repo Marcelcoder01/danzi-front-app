@@ -1,0 +1,120 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5" novalidate>
+  <div class="form-control">
+    <label for="org-name" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+      Nombre de la academia <span class="text-[var(--color-accent)]">*</span>
+    </label>
+    <div class="danzi-field">
+      <fa-icon [icon]="faBuilding"></fa-icon>
+      <input
+        id="org-name"
+        type="text"
+        class="danzi-input"
+        placeholder="Ej. Academia Son de Cuba"
+        formControlName="name"
+        autocomplete="organization"
+      />
+    </div>
+    @if (hasError('name', 'required')) {
+      <p class="mt-1 text-xs text-red-500">El nombre es obligatorio.</p>
+    } @else if (hasError('name', 'minlength') || hasError('name', 'maxlength')) {
+      <p class="mt-1 text-xs text-red-500">El nombre debe tener entre 2 y 120 caracteres.</p>
+    }
+  </div>
+
+  <div class="form-control">
+    <label for="org-slug" class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+      Identificador público (slug) <span class="text-[var(--color-accent)]">*</span>
+    </label>
+    <div class="danzi-field">
+      <fa-icon [icon]="faLink"></fa-icon>
+      <input
+        id="org-slug"
+        type="text"
+        class="danzi-input"
+        placeholder="academia-son-de-cuba"
+        formControlName="slug"
+        autocapitalize="off"
+        spellcheck="false"
+        (input)="onSlugInput()"
+        (blur)="normalizeSlug()"
+      />
+    </div>
+    @if (hasError('slug', 'required')) {
+      <p class="mt-1 text-xs text-red-500">El identificador es obligatorio.</p>
+    } @else if (hasError('slug', 'slugLength')) {
+      <p class="mt-1 text-xs text-red-500">
+        Debe tener entre {{ slugMinLength }} y {{ slugMaxLength }} caracteres.
+      </p>
+    } @else if (hasError('slug', 'slugFormat')) {
+      <p class="mt-1 text-xs text-red-500">
+        Usa solo minúsculas, números y guiones (sin espacios ni tildes).
+      </p>
+    } @else {
+      <p class="mt-1 text-xs text-[var(--color-text-muted)]">
+        Tus alumnos lo usarán para solicitar unirse. Debe ser único.
+      </p>
+    }
+  </div>
+
+  <fieldset class="form-control">
+    <legend class="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Tipo</legend>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      @for (type of types; track type[0]) {
+        <label
+          class="flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm transition-colors"
+          [class.border-[var(--color-accent)]]="form.controls.type.value === type[0]"
+          [class.bg-[var(--color-accent)]/5]="form.controls.type.value === type[0]"
+          [class.border-[var(--color-border)]]="form.controls.type.value !== type[0]"
+        >
+          <input
+            type="radio"
+            class="radio radio-sm"
+            formControlName="type"
+            [value]="type[0]"
+          />
+          <span class="font-medium text-[var(--color-text)]">{{ type[1] }}</span>
+        </label>
+      }
+    </div>
+  </fieldset>
+
+  @if (danceStyles().length) {
+    <fieldset class="form-control">
+      <legend class="mb-2 flex items-center gap-2 text-xs font-medium text-[var(--color-text-muted)]">
+        Estilos de baile
+        <span class="rounded-full bg-[var(--color-surface-alt)] px-2 py-0.5 text-[0.65rem] font-semibold">
+          Próximamente
+        </span>
+      </legend>
+      <div class="flex flex-wrap gap-2" aria-disabled="true">
+        @for (style of danceStyles(); track style.id) {
+          <span
+            class="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-muted)] opacity-70"
+          >
+            {{ style.name }}
+          </span>
+        }
+      </div>
+      <p class="mt-2 text-xs text-[var(--color-text-muted)]">
+        Podrás asociar estilos a tu academia cuando esté disponible. Ahora no se guardan.
+      </p>
+    </fieldset>
+  }
+
+  <button
+    type="submit"
+    class="danzi-btn-primary group mt-2 w-full px-6 py-3.5 text-sm"
+    [disabled]="saving()"
+  >
+    @if (saving()) {
+      <span class="loading loading-spinner loading-sm"></span>
+      Creando academia...
+    } @else {
+      Crear academia
+      <fa-icon
+        [icon]="faArrowRight"
+        class="text-xs transition-transform duration-200 group-hover:translate-x-0.5"
+      ></fa-icon>
+    }
+  </button>
+</form>

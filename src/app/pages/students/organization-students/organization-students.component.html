@@ -1,0 +1,249 @@
+<div class="min-h-full p-4 sm:p-6 lg:p-8">
+  <!-- Header -->
+  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight sm:text-3xl text-primary">Alumnos</h1>
+      <p class="mt-1 text-sm text-light">
+        Fichas de alumno de {{ context.activeOrganization()?.name ?? 'la academia' }}.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <a
+        routerLink="/admin/join-requests"
+        class="btn-ghost-custom px-4 py-2 rounded-xl font-medium flex items-center gap-2"
+      >
+        <fa-icon [icon]="faInbox"></fa-icon>
+        Solicitudes
+        @if (pendingRequests()) {
+          <span class="rounded-full bg-[var(--color-accent)] px-2 text-xs text-white">
+            {{ pendingRequests() }}
+          </span>
+        }
+      </a>
+      <button
+        type="button"
+        class="btn-primary-custom px-4 py-2 rounded-xl font-medium flex items-center gap-2"
+        (click)="openCreateDialog()"
+      >
+        <fa-icon [icon]="faPlus"></fa-icon>
+        Nuevo alumno
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card-neo p-4 mb-6">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-3 flex-1">
+          <div class="relative flex-1 max-w-md">
+            <fa-icon [icon]="faSearch" class="search-icon"></fa-icon>
+            <input
+              type="text"
+              placeholder="Buscar alumno..."
+              class="search-input"
+              aria-label="Buscar alumno"
+              [ngModel]="searchTerm()"
+              (ngModelChange)="searchTerm.set($event)"
+            />
+          </div>
+          <button
+            type="button"
+            class="btn-ghost-custom px-4 py-2 rounded-lg flex items-center gap-2"
+            (click)="toggleFilters()"
+          >
+            <fa-icon [icon]="faFilter"></fa-icon>
+            Filtrar
+          </button>
+        </div>
+        <div class="text-sm text-muted">
+          Mostrando
+          <span class="font-semibold text-primary">{{ filteredStudents().length }}</span>
+          de {{ students().length }} alumnos
+        </div>
+      </div>
+
+      @if (isFiltersVisible()) {
+        <div class="pt-4 border-t divider-custom">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
+            <div class="flex-1">
+              <label for="os-status" class="block text-[0.78rem] font-semibold text-muted mb-2">Estado</label>
+              <select
+                id="os-status"
+                class="filter-select"
+                [ngModel]="filterStatus()"
+                (ngModelChange)="filterStatus.set($event)"
+              >
+                <option value="">Todos</option>
+                @for (status of statuses; track status) {
+                  <option [value]="status">{{ statusLabels[status] }}</option>
+                }
+              </select>
+            </div>
+            <div class="flex-1">
+              <label for="os-role" class="block text-[0.78rem] font-semibold text-muted mb-2">Rol</label>
+              <select
+                id="os-role"
+                class="filter-select"
+                [ngModel]="filterRole()"
+                (ngModelChange)="filterRole.set($event)"
+              >
+                <option value="">Todos</option>
+                @for (role of danceRoles; track role) {
+                  <option [value]="role">{{ danceRoleLabels[role] }}</option>
+                }
+              </select>
+            </div>
+            <button
+              type="button"
+              class="clear-filters-btn flex items-center gap-2 text-sm"
+              (click)="clearFilters()"
+            >
+              <fa-icon [icon]="faXmark"></fa-icon>
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (loading() && !students().length) {
+    <div class="card-neo"><app-state-message kind="loading" title="Cargando alumnos..." /></div>
+  } @else if (error()) {
+    <div class="card-neo">
+      <app-state-message kind="error" title="No se han podido cargar los alumnos" [message]="error()">
+        <button type="button" class="btn-ghost-custom px-4 py-2 rounded-lg text-sm" (click)="load()">
+          Reintentar
+        </button>
+      </app-state-message>
+    </div>
+  } @else if (!students().length) {
+    <div class="card-neo">
+      <app-state-message
+        [icon]="faUserGroup"
+        title="Todavía no hay alumnos"
+        message="Crea una ficha manual o comparte el identificador de tu academia para que tus alumnos soliciten unirse."
+      >
+        <button type="button" class="btn-primary-custom px-4 py-2 rounded-xl text-sm" (click)="openCreateDialog()">
+          Crear el primer alumno
+        </button>
+      </app-state-message>
+    </div>
+  } @else if (!filteredStudents().length) {
+    <div class="card-neo">
+      <app-state-message title="Ningún alumno coincide con los filtros">
+        <button type="button" class="btn-ghost-custom px-4 py-2 rounded-lg text-sm" (click)="clearFilters()">
+          Limpiar filtros
+        </button>
+      </app-state-message>
+    </div>
+  } @else {
+    <!-- Table for desktop -->
+    <div class="card-neo overflow-hidden hidden md:block">
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Alumno</th>
+              <th>Contacto</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Cuenta</th>
+              <th>Alta</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (student of filteredStudents(); track student.id) {
+              <tr>
+                <td>
+                  <div class="flex items-center gap-3">
+                    <div class="avatar-circle">{{ initials(student) }}</div>
+                    <div>
+                      <p class="font-semibold text-primary">{{ fullName(student) }}</p>
+                      <p class="text-sm text-muted">{{ student.email ?? '—' }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td><p class="text-sm text-primary">{{ student.phone ?? '—' }}</p></td>
+                <td>
+                  <span class="level-badge whitespace-nowrap">{{ danceRoleLabels[student.danceRole] }}</span>
+                </td>
+                <td>
+                  <span class="px-2 py-0.5 rounded-lg text-xs font-medium" [class]="statusClasses[student.status]">
+                    {{ statusLabels[student.status] }}
+                  </span>
+                </td>
+                <td>
+                  @if (student.userId) {
+                    <span class="inline-flex items-center gap-1.5 text-sm text-primary">
+                      <fa-icon [icon]="faLink" class="text-xs text-[var(--color-success)]"></fa-icon>
+                      Vinculada
+                    </span>
+                  } @else {
+                    <span class="text-sm text-muted">Ficha manual</span>
+                  }
+                </td>
+                <td><p class="text-sm text-muted">{{ student.createdAt | dateLabel }}</p></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Cards for mobile -->
+    <div class="md:hidden space-y-4">
+      @for (student of filteredStudents(); track student.id) {
+        <div class="card-neo p-4">
+          <div class="flex items-start gap-3 mb-4">
+            <div class="avatar-circle shrink-0">{{ initials(student) }}</div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-primary truncate">{{ fullName(student) }}</p>
+              <p class="text-sm text-muted truncate">{{ student.email ?? '—' }}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <p class="text-xs text-muted mb-1">Contacto</p>
+              <p class="text-sm text-primary">{{ student.phone ?? '—' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted mb-1">Alta</p>
+              <p class="text-sm text-muted">{{ student.createdAt | dateLabel }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted mb-1">Rol</p>
+              <span class="level-badge whitespace-nowrap">{{ danceRoleLabels[student.danceRole] }}</span>
+            </div>
+            <div>
+              <p class="text-xs text-muted mb-1">Estado</p>
+              <span class="px-2 py-0.5 rounded-lg text-xs font-medium" [class]="statusClasses[student.status]">
+                {{ statusLabels[student.status] }}
+              </span>
+            </div>
+            <div class="col-span-2">
+              <p class="text-xs text-muted mb-1">Cuenta</p>
+              <p class="text-sm" [class.text-primary]="student.userId" [class.text-muted]="!student.userId">
+                {{ student.userId ? 'Vinculada a una cuenta Danzi' : 'Ficha manual' }}
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <p class="mt-6 text-xs text-muted">
+    La edición y baja de fichas todavía no están disponibles. Los datos de clases, matrículas y pagos
+    siguen en la
+    <a routerLink="/admin/students/local" class="font-semibold underline">versión demo local</a>.
+  </p>
+</div>
+
+<app-create-student-dialog
+  [saving]="saving()"
+  [organizationName]="context.activeOrganization()?.name ?? null"
+  (submitted)="createStudent($event)"
+></app-create-student-dialog>

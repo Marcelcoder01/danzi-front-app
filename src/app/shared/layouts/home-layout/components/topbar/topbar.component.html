@@ -1,7 +1,7 @@
 <header
-  class="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between px-6 shadow-lg topbar-header"
+  class="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between gap-3 px-4 shadow-lg topbar-header sm:px-6"
 >
-  <div class="flex items-center gap-4">
+  <div class="flex min-w-0 items-center gap-4">
     <!-- Desktop Sidebar Toggle Button -->
     <button
       class="hidden lg:flex p-2 rounded-lg hover:bg-base-200 transition-all hover:shadow-md toggle-btn-bg"
@@ -15,32 +15,81 @@
       }
     </button>
 
-    <!-- Brand -->
-    <div class="flex items-center gap-2">
-      <span class="text-2xl brand-accent">✦</span>
-      <div>
-        <strong class="text-lg block brand-text">Bienvenido Maxi</strong>
-        <small class="text-sm brand-muted">Admin baile</small>
+    <!-- Academia activa / selector -->
+    <div class="dropdown min-w-0">
+      <div
+        tabindex="0"
+        role="button"
+        class="flex min-w-0 items-center gap-2 rounded-lg px-2 py-1 hover:bg-base-200"
+        [attr.aria-label]="'Academia activa: ' + (context.activeOrganization()?.name ?? '')"
+      >
+        <span class="text-2xl brand-accent">✦</span>
+        <div class="min-w-0 text-left">
+          <strong class="block truncate text-base brand-text sm:text-lg">
+            {{ context.activeOrganization()?.name ?? 'Danzi Academy' }}
+          </strong>
+          <small class="block truncate text-xs brand-muted sm:text-sm">
+            {{ profile.displayName() }}
+            @if (context.activeRole(); as role) {
+              · {{ roleLabels[role] }}
+            }
+          </small>
+        </div>
+        <fa-icon [icon]="faChevronDown" class="text-xs brand-muted"></fa-icon>
       </div>
+      <ul
+        tabindex="0"
+        class="dropdown-content menu z-50 mt-2 w-72 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-xl"
+      >
+        <li class="menu-title text-xs">Tus academias</li>
+        @for (item of context.memberships(); track item.organization.id) {
+          <li>
+            <button type="button" (click)="switchAcademy(item.organization.id)">
+              <span class="min-w-0 flex-1 text-left">
+                <span class="block truncate font-medium">{{ item.organization.name }}</span>
+                <span class="block text-xs opacity-60">{{ roleLabels[item.member.role] }}</span>
+              </span>
+              @if (item.organization.id === context.activeOrganizationId()) {
+                <fa-icon [icon]="faCheck" class="text-[var(--color-success)]"></fa-icon>
+              }
+            </button>
+          </li>
+        }
+        <li class="mt-1 border-t border-[var(--color-border-light)] pt-1">
+          <a [routerLink]="routes.onboarding"
+            ><fa-icon [icon]="faPlus"></fa-icon> Registrar academia</a
+          >
+        </li>
+        <li>
+          <a [routerLink]="routes.studentSpace"
+            ><fa-icon [icon]="faGraduationCap"></fa-icon> Danzi Students</a
+          >
+        </li>
+        <li>
+          <a [routerLink]="routes.profile"><fa-icon [icon]="faUser"></fa-icon> Mi perfil</a>
+        </li>
+      </ul>
     </div>
   </div>
 
-  <!-- Right side content (placeholder for future user menu) -->
-  <div class="flex items-center gap-2">
+  <div class="flex shrink-0 items-center gap-2">
     <button
       type="button"
       class="rounded-lg p-2 transition-colors hover:bg-base-200"
       (click)="clearData()"
-      aria-label="Borrar los datos guardados y empezar de cero"
-      title="Limpiar datos"
+      aria-label="Borrar los datos demo guardados y empezar de cero"
+      title="Limpiar datos demo locales"
     >
       <fa-icon [icon]="faRotate" aria-hidden="true"></fa-icon>
     </button>
-    <div
+    <a
+      [routerLink]="routes.profile"
       class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold shadow-md avatar-bg"
+      [attr.title]="profile.displayName()"
+      aria-label="Mi perfil"
     >
-      AD
-    </div>
+      {{ initialsOf(profile.displayName()) }}
+    </a>
   </div>
 </header>
 <app-confirmation-dialog (confirmed)="confirmClearData()"></app-confirmation-dialog>

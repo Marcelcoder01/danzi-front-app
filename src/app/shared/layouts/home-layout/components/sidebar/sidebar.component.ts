@@ -1,5 +1,5 @@
 import { Component, Input, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import {
@@ -12,9 +12,10 @@ import {
   faShieldHalved,
   faGear,
   faRightFromBracket,
+  faInbox,
 } from '@fortawesome/free-solid-svg-icons';
-import { ToastService } from '../../../../services/toast.service';
-import { AuthService } from '../../../../../core/services/auth.service';
+import { SessionService } from '../../../../../core/services/session.service';
+import { OrganizationContextService } from '../../../../../core/services/organization-context.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -26,9 +27,8 @@ import { AuthService } from '../../../../../core/services/auth.service';
 export class SidebarComponent {
   @Input() isCollapsed = false;
 
-  private readonly authService = inject(AuthService);
-  private readonly toastService = inject(ToastService);
-  private readonly router = inject(Router);
+  private readonly session = inject(SessionService);
+  readonly context = inject(OrganizationContextService);
 
   faGauge = faGauge;
   faUsers = faUsers;
@@ -39,15 +39,9 @@ export class SidebarComponent {
   faShieldHalved = faShieldHalved;
   faGear = faGear;
   faRightFromBracket = faRightFromBracket;
+  faInbox = faInbox;
 
-  async logout(): Promise<void> {
-    try {
-      await this.authService.signOut();
-      this.toastService.info('Has cerrado sesión correctamente.');
-      await this.router.navigate(['/login']);
-    } catch (error) {
-      console.error('Logout error:', error);
-      this.toastService.error('No se ha podido cerrar la sesión.');
-    }
+  logout(): Promise<void> {
+    return this.session.signOut();
   }
 }

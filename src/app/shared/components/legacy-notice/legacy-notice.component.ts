@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faFlask } from '@fortawesome/free-solid-svg-icons';
 
@@ -6,6 +6,7 @@ import { faFlask } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-legacy-notice',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FaIconComponent],
   template: `
     <span

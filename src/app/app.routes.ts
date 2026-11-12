@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { HomeLayoutComponent } from './shared/layouts/home-layout/home-layout.component';
-import { AccountLayoutComponent } from './shared/layouts/account-layout/account-layout.component';
+import { HomeLayoutComponent } from './app-shell/home-layout/home-layout.component';
+import { AccountLayoutComponent } from './app-shell/account-layout/account-layout.component';
 import { LoginComponent } from './auth/login/login.component';
 import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -12,10 +12,10 @@ import { ValidationsComponent } from './pages/validations/validations.component'
 import { SettingsComponent } from './pages/settings/settings.component';
 import { UnauthorizedComponent } from './auth/unauthorized/unauthorized.component';
 import { authGuard } from './core/guards/auth.guard';
-import { adminGuard } from './core/guards/admin.guard';
-import { homeRedirectGuard } from './core/guards/home-redirect.guard';
-import { organizationRoleGuard } from './core/guards/organization-role.guard';
-import { STUDENT_MANAGER_ROLES } from './shared/interfaces/organization.interface';
+import { academyGuard } from './features/organizations/guards/academy.guard';
+import { homeRedirectGuard } from './app-shell/guards/home-redirect.guard';
+import { organizationRoleGuard } from './features/organizations/guards/organization-role.guard';
+import { STUDENT_MANAGER_ROLES } from './features/organizations/models/organization.model';
 
 const studentManagerGuard = organizationRoleGuard(STUDENT_MANAGER_ROLES);
 
@@ -32,14 +32,14 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: HomeLayoutComponent,
-    canActivate: [authGuard, adminGuard],
+    canActivate: [authGuard, academyGuard],
     canActivateChild: [authGuard],
     children: [
       { path: '', component: DashboardComponent },
       {
         path: 'students',
         loadComponent: () =>
-          import('./pages/students/organization-students/organization-students.component').then(
+          import('./features/students/pages/organization-students/organization-students.component').then(
             (m) => m.OrganizationStudentsComponent,
           ),
         canActivate: [studentManagerGuard],
@@ -49,7 +49,7 @@ export const routes: Routes = [
       {
         path: 'join-requests',
         loadComponent: () =>
-          import('./pages/join-requests/join-requests.component').then(
+          import('./features/join-requests/pages/join-requests/join-requests.component').then(
             (m) => m.JoinRequestsComponent,
           ),
         canActivate: [studentManagerGuard],
@@ -76,12 +76,14 @@ export const routes: Routes = [
       {
         path: 'onboarding',
         loadComponent: () =>
-          import('./pages/onboarding/onboarding.component').then((m) => m.OnboardingComponent),
+          import('./features/organizations/pages/onboarding/onboarding.component').then(
+            (m) => m.OnboardingComponent,
+          ),
       },
       {
         path: 'select-academy',
         loadComponent: () =>
-          import('./pages/organizations/select-academy/select-academy.component').then(
+          import('./features/organizations/pages/select-academy/select-academy.component').then(
             (m) => m.SelectAcademyComponent,
           ),
       },
@@ -89,14 +91,16 @@ export const routes: Routes = [
       {
         path: 'me',
         loadComponent: () =>
-          import('./pages/student-space/student-home/student-home.component').then(
+          import('./features/student-space/pages/student-home/student-home.component').then(
             (m) => m.StudentHomeComponent,
           ),
       },
       {
         path: 'me/profile',
         loadComponent: () =>
-          import('./pages/profile/profile.component').then((m) => m.ProfileComponent),
+          import('./features/profile/pages/profile/profile.component').then(
+            (m) => m.ProfileComponent,
+          ),
       },
     ],
   },

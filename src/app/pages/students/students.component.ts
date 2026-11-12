@@ -24,7 +24,7 @@ import { StudentsService } from './services/students.service';
 import { StudentDialogComponent } from './student-dialog/student-dialog.component';
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { LegacyNoticeComponent } from '../../shared/components/legacy-notice/legacy-notice.component';
-import { OrganizationContextService } from '../../core/services/organization-context.service';
+import { OrganizationContextService } from '../../features/organizations/services/organization-context.service';
 
 /** Alumnos demo (localStorage) usados por clases, matrículas, asistencia y pagos legacy. */
 @Component({

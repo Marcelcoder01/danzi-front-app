@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   IconDefinition,
@@ -13,16 +13,14 @@ export type StateMessageKind = 'loading' | 'error' | 'empty';
 @Component({
   selector: 'app-state-message',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FaIconComponent],
   template: `
     <div
       class="flex flex-col items-center justify-center gap-3 px-6 py-10 text-center"
       [attr.role]="kind() === 'error' ? 'alert' : 'status'"
     >
-      <span
-        class="grid h-12 w-12 place-items-center rounded-2xl"
-        [class]="iconClass()"
-      >
+      <span class="grid h-12 w-12 place-items-center rounded-2xl" [class]="iconClass()">
         <fa-icon [icon]="resolvedIcon()" [animation]="kind() === 'loading' ? 'spin' : undefined" />
       </span>
       <div>

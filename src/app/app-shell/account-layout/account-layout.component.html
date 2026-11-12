@@ -1,0 +1,70 @@
+<div class="flex min-h-screen flex-col bg-[var(--color-background)]">
+  <header class="sticky top-0 z-40 bg-[var(--color-primary)] text-white shadow-lg">
+    <div class="mx-auto flex h-16 max-w-5xl items-center justify-between gap-3 px-4 sm:px-6">
+      <a
+        [routerLink]="routes.studentSpace"
+        class="flex items-center gap-2"
+        aria-label="Danzi Students"
+      >
+        <img
+          src="/assets/img/Danzi-logo-white.png"
+          alt="Danzi"
+          class="h-9 w-auto scale-[2.8] origin-left object-contain ml-4"
+        />
+        <span
+          class="hidden ml-4 pl-6 text-xs font-semibold uppercase tracking-[0.14em] text-white/60 sm:inline"
+        >
+          Students
+        </span>
+      </a>
+
+      <nav class="flex items-center gap-1 text-sm">
+        <a
+          [routerLink]="routes.studentSpace"
+          routerLinkActive="bg-white/10 text-white"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+        >
+          <fa-icon [icon]="faHouse"></fa-icon>
+          <span class="hidden sm:inline">Mi espacio</span>
+        </a>
+        <a
+          [routerLink]="routes.profile"
+          routerLinkActive="bg-white/10 text-white"
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+        >
+          <fa-icon [icon]="faUser"></fa-icon>
+          <span class="hidden sm:inline">Perfil</span>
+        </a>
+        @if (context.hasMemberships()) {
+          <a
+            [routerLink]="context.activeOrganizationId() ? routes.academy : routes.selectAcademy"
+            class="flex items-center gap-2 rounded-lg px-3 py-2 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <fa-icon [icon]="faBuilding"></fa-icon>
+            <span class="hidden sm:inline">Panel Academy</span>
+          </a>
+        }
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+          (click)="logout()"
+          aria-label="Cerrar sesión"
+        >
+          <fa-icon [icon]="faRightFromBracket"></fa-icon>
+          <span class="hidden sm:inline">Salir</span>
+        </button>
+        <span
+          class="ml-1 grid h-9 w-9 place-items-center rounded-full bg-[var(--color-accent)] text-xs font-semibold"
+          [attr.title]="profile.displayName()"
+        >
+          {{ initialsOf(profile.displayName()) }}
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-5xl flex-1 p-4 sm:p-6 lg:p-8">
+    <router-outlet></router-outlet>
+  </main>
+</div>

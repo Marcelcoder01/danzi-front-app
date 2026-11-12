@@ -26,8 +26,8 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import { AuthService } from '../../core/services/auth.service';
-import { ToastService } from '../../shared/services/toast.service';
+import { AuthService } from '@core/services/auth.service';
+import { ToastService } from '@shared/services/toast.service';
 
 @Component({
   selector: 'app-login',

@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { OrganizationContextService } from '../../features/organizations/services/organization-context.service';
-import { UserProfileService } from '../../features/profile/services/user-profile.service';
-import { ToastService } from '../../shared/services/toast.service';
+import { AuthService } from '@core/services/auth.service';
+import { OrganizationContextService } from '@domain/organizations/services/organization-context.service';
+import { UserProfileService } from '@domain/profile/services/user-profile.service';
+import { ToastService } from '@shared/services/toast.service';
 
 /** Cierre de sesión coordinado: Supabase Auth + limpieza del contexto de Danzi. */
 @Injectable({ providedIn: 'root' })

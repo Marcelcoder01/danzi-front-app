@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, Input, OnInit, ViewChild, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ConfirmationDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import {
   faChevronRight,
   faChevronLeft,
@@ -12,12 +12,12 @@ import {
   faGraduationCap,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
-import { OrganizationContextService } from '../../../../features/organizations/services/organization-context.service';
-import { UserProfileService } from '../../../../features/profile/services/user-profile.service';
-import { APP_ROUTES } from '../../../../core/routing/app-routes';
-import { ORGANIZATION_ROLE_LABELS } from '../../../../features/organizations/models/organization.model';
-import { initialsOf } from '../../../../shared/utils/text.util';
-import { ToastService } from '../../../../shared/services/toast.service';
+import { OrganizationContextService } from '@domain/organizations/services/organization-context.service';
+import { UserProfileService } from '@domain/profile/services/user-profile.service';
+import { APP_ROUTES } from '@core/routing/app-routes';
+import { ORGANIZATION_ROLE_LABELS } from '@domain/organizations/models/organization.model';
+import { initialsOf } from '@shared/utils/text.util';
+import { ToastService } from '@shared/services/toast.service';
 
 @Component({
   selector: 'app-topbar',

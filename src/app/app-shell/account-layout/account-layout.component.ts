@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faBuilding, faHouse, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
-import { OrganizationContextService } from '../../features/organizations/services/organization-context.service';
+import { OrganizationContextService } from '@domain/organizations/services/organization-context.service';
 import { SessionService } from '../services/session.service';
-import { UserProfileService } from '../../features/profile/services/user-profile.service';
-import { APP_ROUTES } from '../../core/routing/app-routes';
-import { initialsOf } from '../../shared/utils/text.util';
+import { UserProfileService } from '@domain/profile/services/user-profile.service';
+import { APP_ROUTES } from '@core/routing/app-routes';
+import { initialsOf } from '@shared/utils/text.util';
 
 /** Layout de la experiencia personal (Danzi Students, perfil, onboarding y selector). */
 @Component({

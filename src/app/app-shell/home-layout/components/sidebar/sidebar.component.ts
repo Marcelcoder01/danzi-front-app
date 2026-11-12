@@ -15,7 +15,7 @@ import {
   faInbox,
 } from '@fortawesome/free-solid-svg-icons';
 import { SessionService } from '../../../services/session.service';
-import { OrganizationContextService } from '../../../../features/organizations/services/organization-context.service';
+import { OrganizationContextService } from '@domain/organizations/services/organization-context.service';
 
 @Component({
   selector: 'app-sidebar',

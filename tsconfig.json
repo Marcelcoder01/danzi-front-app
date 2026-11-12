@@ -13,7 +13,16 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "paths": {
+      "@academy/*": ["./src/app/features/academy/*"],
+      "@danzi-students/*": ["./src/app/features/danzi-students/*"],
+      "@domain/*": ["./src/app/domain/*"],
+      "@shared/*": ["./src/app/shared/*"],
+      "@core/*": ["./src/app/core/*"],
+      "@app-shell/*": ["./src/app/app-shell/*"],
+      "@auth/*": ["./src/app/auth/*"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

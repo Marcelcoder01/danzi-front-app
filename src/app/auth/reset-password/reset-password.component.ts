@@ -18,8 +18,8 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { ToastService } from '../../shared/services/toast.service';
+import { AuthService } from '@core/services/auth.service';
+import { ToastService } from '@shared/services/toast.service';
 
 @Component({
   selector: 'app-reset-password',

@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { AuthService } from '../../core/services/auth.service';
-import { APP_ROUTES } from '../../core/routing/app-routes';
-import { JoinRequestService } from '../../features/join-requests/services/join-request.service';
-import { OrganizationContextService } from '../../features/organizations/services/organization-context.service';
-import { OrganizationStudentsService } from '../../features/students/services/organization-students.service';
+import { AuthService } from '@core/services/auth.service';
+import { APP_ROUTES } from '@core/routing/app-routes';
+import { JoinRequestService } from '@domain/join-requests/services/join-request.service';
+import { OrganizationContextService } from '@domain/organizations/services/organization-context.service';
+import { OrganizationStudentsService } from '@domain/organization-students/services/organization-students.service';
 
 /**
  * Decide la experiencia inicial según las relaciones reales del usuario:

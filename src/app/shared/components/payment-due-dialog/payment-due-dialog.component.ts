@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import type { Student } from '../../interfaces/student.interface';
-import { PaymentCheckboxComponent } from '../../../pages/students/student-dialog/payment-checkbox/payment-checkbox.component';
+import { PaymentCheckboxComponent } from '../payment-checkbox/payment-checkbox.component';
 
 @Component({
   selector: 'app-payment-due-dialog',

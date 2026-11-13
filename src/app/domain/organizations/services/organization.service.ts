@@ -4,6 +4,7 @@ import { toDanziRequestError } from '@core/supabase/supabase-error';
 import {
   CreateOrganizationInput,
   Organization,
+  OrganizationMember,
   OrganizationMembership,
 } from '../models/organization.model';
 import { ORGANIZATION_COLUMNS, OrganizationMapper } from '../mappers/organization.mapper';
@@ -56,5 +57,17 @@ export class OrganizationService {
       .in('id', uniqueIds);
     if (error) throw toDanziRequestError(error, 'read');
     return data.map(OrganizationMapper.toModel);
+  }
+
+  /** Miembros activos de una organización visibles por RLS para el usuario actual. */
+  async getMembers(organizationId: string): Promise<OrganizationMember[]> {
+    const { data, error } = await this.supabase.client
+      .from('organization_members')
+      .select(ORGANIZATION_MEMBER_COLUMNS)
+      .eq('organization_id', organizationId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: true });
+    if (error) throw toDanziRequestError(error, 'read');
+    return data.map(OrganizationMemberMapper.toModel);
   }
 }

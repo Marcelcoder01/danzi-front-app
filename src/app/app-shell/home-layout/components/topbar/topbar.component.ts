@@ -11,23 +11,32 @@ import {
   faPlus,
   faGraduationCap,
   faUser,
+  faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons';
 import { OrganizationContextService } from '@domain/organizations/services/organization-context.service';
 import { UserProfileService } from '@domain/profile/services/user-profile.service';
 import { APP_ROUTES } from '@core/routing/app-routes';
 import { ORGANIZATION_ROLE_LABELS } from '@domain/organizations/models/organization.model';
+import { OrganizationInfoDialogComponent } from '@shared/components/organization-info-dialog/organization-info-dialog.component';
 import { initialsOf } from '@shared/utils/text.util';
 import { ToastService } from '@shared/services/toast.service';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [FontAwesomeModule, ConfirmationDialogComponent, RouterLink],
+  imports: [
+    FontAwesomeModule,
+    ConfirmationDialogComponent,
+    OrganizationInfoDialogComponent,
+    RouterLink,
+  ],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.css',
 })
 export class TopbarComponent implements OnInit {
   @ViewChild(ConfirmationDialogComponent) private confirmationDialog?: ConfirmationDialogComponent;
+
+  @ViewChild(OrganizationInfoDialogComponent) private infoDialog?: OrganizationInfoDialogComponent;
 
   @Output() toggleCollapse = new EventEmitter<void>();
   @Input() isCollapsed = false;
@@ -49,6 +58,7 @@ export class TopbarComponent implements OnInit {
   faPlus = faPlus;
   faGraduationCap = faGraduationCap;
   faUser = faUser;
+  faCircleInfo = faCircleInfo;
 
   ngOnInit(): void {
     this.profile.load().catch(() => undefined);
@@ -61,6 +71,10 @@ export class TopbarComponent implements OnInit {
       this.toast.info(`Ahora trabajas con ${this.context.activeOrganization()?.name}.`);
       await this.router.navigateByUrl(this.routes.academy);
     }
+  }
+
+  openAcademyInfo(): void {
+    this.infoDialog?.open();
   }
 
   clearData(): void {

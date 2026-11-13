@@ -33,6 +33,18 @@ export class UserProfileService {
     });
   }
 
+  /** Perfiles de otros usuarios; devuelve solo los que RLS permite leer. */
+  async getByIds(ids: string[]): Promise<UserProfile[]> {
+    const uniqueIds = [...new Set(ids)];
+    if (!uniqueIds.length) return [];
+    const { data, error } = await this.supabase.client
+      .from('users')
+      .select(USER_PROFILE_COLUMNS)
+      .in('id', uniqueIds);
+    if (error) throw toDanziRequestError(error, 'read');
+    return data.map(UserProfileMapper.toModel);
+  }
+
   async load(force = false): Promise<UserProfile | null> {
     const userId = await this.auth.getCurrentUserId();
     if (!userId) {

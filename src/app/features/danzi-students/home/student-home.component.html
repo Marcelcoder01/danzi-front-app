@@ -31,11 +31,15 @@
 }
 
 @if (isNewcomer()) {
-  <div class="mb-6 rounded-2xl border border-dashed border-[var(--color-border-dark)] bg-white/60 px-5 py-4 text-sm text-[var(--color-text-muted)]">
+  <div
+    class="mb-6 rounded-2xl border border-dashed border-[var(--color-border-dark)] bg-white/60 px-5 py-4 text-sm text-[var(--color-text-muted)]"
+  >
     <p class="font-semibold text-[var(--color-text)]">Aún no perteneces a ninguna academia</p>
     <p class="mt-1">
       Pide a tu academia su identificador y envía una solicitud. ¿Diriges una academia?
-      <a [routerLink]="routes.onboarding" class="font-semibold text-[var(--color-accent)] underline">Regístrala aquí</a>.
+      <a [routerLink]="routes.onboarding" class="font-semibold text-[var(--color-accent)] underline"
+        >Regístrala aquí</a
+      >.
     </p>
   </div>
 }
@@ -52,7 +56,9 @@
         <app-state-message kind="loading" title="Cargando tus fichas..." />
       } @else if (error()) {
         <app-state-message kind="error" title="Algo ha fallado" [message]="error()">
-          <button type="button" class="danzi-btn-ghost px-4 py-2 text-sm" (click)="load()">Reintentar</button>
+          <button type="button" class="danzi-btn-ghost px-4 py-2 text-sm" (click)="load()">
+            Reintentar
+          </button>
         </app-state-message>
       } @else if (!records().length) {
         <app-state-message
@@ -65,8 +71,12 @@
           @for (record of records(); track record.id) {
             <li class="px-5 py-4">
               <div class="flex flex-wrap items-center justify-between gap-2">
-                <p class="font-semibold text-[var(--color-text)]">{{ organizationName(record.organizationId) }}</p>
-                <span class="rounded-lg bg-[var(--color-surface-alt)] px-2 py-0.5 text-xs font-medium text-[var(--color-text)]">
+                <p class="font-semibold text-[var(--color-text)]">
+                  {{ organizationName(record.organizationId) }}
+                </p>
+                <span
+                  class="rounded-lg bg-[var(--color-surface-alt)] px-2 py-0.5 text-xs font-medium text-[var(--color-text)]"
+                >
                   {{ statusLabels[record.status] }}
                 </span>
               </div>
@@ -107,7 +117,9 @@
   <!-- Solicitar acceso -->
   <article class="danzi-card h-fit p-6">
     <div class="mb-5 flex items-center gap-3">
-      <span class="grid h-10 w-10 place-items-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+      <span
+        class="grid h-10 w-10 place-items-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+      >
         <fa-icon [icon]="faPaperPlane"></fa-icon>
       </span>
       <div>

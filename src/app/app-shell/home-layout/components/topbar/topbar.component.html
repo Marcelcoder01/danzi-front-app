@@ -73,7 +73,18 @@
   </div>
 
   <div class="flex shrink-0 items-center gap-2">
-    <button
+    @if (context.activeOrganization()) {
+      <button
+        type="button"
+        class="rounded-lg p-2 transition-colors hover:bg-base-200"
+        (click)="openAcademyInfo()"
+        aria-label="Ver información de la academia"
+        title="Información de la academia"
+      >
+        <fa-icon [icon]="faCircleInfo" aria-hidden="true"></fa-icon>
+      </button>
+    }
+    <!-- <button
       type="button"
       class="rounded-lg p-2 transition-colors hover:bg-base-200"
       (click)="clearData()"
@@ -81,7 +92,7 @@
       title="Limpiar datos demo locales"
     >
       <fa-icon [icon]="faRotate" aria-hidden="true"></fa-icon>
-    </button>
+    </button> -->
     <a
       [routerLink]="routes.profile"
       class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold shadow-md avatar-bg"
@@ -93,3 +104,4 @@
   </div>
 </header>
 <app-confirmation-dialog (confirmed)="confirmClearData()"></app-confirmation-dialog>
+<app-organization-info-dialog></app-organization-info-dialog>

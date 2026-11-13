@@ -1,5 +1,13 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
@@ -21,10 +29,7 @@ import type { Student } from '@shared/interfaces/student.interface';
 import { getPaymentPeriodMonths } from '@shared/utils/payment-period.util';
 import { PaymentDueDialogComponent } from '@shared/components/payment-due-dialog/payment-due-dialog.component';
 import { AcademyActivityService } from '@shared/services/academy-activity.service';
-import {
-  ClassActivity,
-  RegularClassActivity,
-} from '@shared/interfaces/class-activity.interface';
+import { ClassActivity } from '@shared/interfaces/class-activity.interface';
 import { LegacyNoticeComponent } from '@shared/components/legacy-notice/legacy-notice.component';
 
 @Component({
@@ -227,13 +232,21 @@ export class DashboardComponent implements OnInit {
       .join('-');
   }
 
-  constructor(private cdr: ChangeDetectorRef) {
-    globalThis.setInterval(() => {
+  private animationFrameId = 0;
+
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  constructor() {
+    const intervalId = globalThis.setInterval(() => {
       const date = localDateKey(new Date());
       if (date !== this.today()) this.today.set(date);
       const month = date.slice(0, 7);
       if (month !== this.currentMonth()) this.currentMonth.set(month);
     }, 60_000);
+    inject(DestroyRef).onDestroy(() => {
+      globalThis.clearInterval(intervalId);
+      cancelAnimationFrame(this.animationFrameId);
+    });
   }
 
   ngOnInit(): void {
@@ -273,11 +286,11 @@ export class DashboardComponent implements OnInit {
       this.cdr.detectChanges();
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        this.animationFrameId = requestAnimationFrame(animate);
       }
     };
 
-    requestAnimationFrame(animate);
+    this.animationFrameId = requestAnimationFrame(animate);
   }
 
   getEnrollmentCount(activity: ClassActivity): number {

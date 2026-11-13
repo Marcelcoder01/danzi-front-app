@@ -1,0 +1,203 @@
+<dialog #dialog class="modal modal-middle danzi-modal" aria-labelledby="org-info-title">
+  <div
+    class="modal-box w-[calc(100%-2rem)] max-w-2xl max-h-[90vh] overflow-y-auto rounded-[28px] border border-white/10 bg-white p-0 shadow-[0_25px_80px_rgba(0,0,0,0.18),inset_1px_1px_0_rgba(255,255,255,0.45)]"
+  >
+    @if (organization(); as org) {
+      <div
+        class="flex items-start justify-between border-b border-[var(--color-border)]/60 px-7 pt-7 pb-6"
+      >
+        <div class="flex min-w-0 items-center gap-4">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.04),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]"
+          >
+            <fa-icon [icon]="faBuilding" class="text-lg"></fa-icon>
+          </div>
+          <div class="min-w-0">
+            <h3
+              id="org-info-title"
+              class="truncate text-xl font-semibold tracking-tight text-[var(--color-text)]"
+            >
+              {{ org.name }}
+            </h3>
+            <div
+              class="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--color-text-muted)]"
+            >
+              <span>{{ typeLabels[org.type] }}</span>
+              <span
+                class="rounded-full px-2 py-0.5 text-xs font-medium"
+                [class]="
+                  org.isActive
+                    ? 'bg-[var(--color-success)]/10 text-[var(--color-success-dark)]'
+                    : 'bg-[var(--color-error)]/10 text-[var(--color-error-dark)]'
+                "
+              >
+                {{ org.isActive ? 'Activa' : 'Inactiva' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          aria-label="Cerrar diálogo"
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface-alt)]/70 text-[var(--color-text-muted)] transition-all duration-200 hover:-translate-y-0.5 hover:text-[var(--color-text)] hover:shadow-md"
+          (click)="close()"
+        >
+          <fa-icon [icon]="faXmark"></fa-icon>
+        </button>
+      </div>
+
+      <div class="space-y-6 px-7 py-6">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div class="rounded-2xl bg-[var(--color-surface-alt)]/70 p-4">
+            <p class="text-xs font-medium text-[var(--color-text-muted)]">Creada en</p>
+            <p class="mt-1 text-2xl font-semibold text-[var(--color-text)]">
+              {{ yearOf(org.createdAt) }}
+            </p>
+          </div>
+          <div class="rounded-2xl bg-[var(--color-surface-alt)]/70 p-4">
+            <p class="text-xs font-medium text-[var(--color-text-muted)]">Equipo</p>
+            <p class="mt-1 text-2xl font-semibold text-[var(--color-text)]">{{ team().length }}</p>
+          </div>
+          <div class="rounded-2xl bg-[var(--color-surface-alt)]/70 p-4">
+            <p class="text-xs font-medium text-[var(--color-text-muted)]">Tu rol</p>
+            <p class="mt-1 text-lg font-semibold text-[var(--color-text)]">
+              {{ role() ? roleLabels[role()!] : '—' }}
+            </p>
+          </div>
+        </div>
+
+        @if (org.description) {
+          <p class="text-sm leading-6 text-[var(--color-text-muted)]">{{ org.description }}</p>
+        }
+
+        <section>
+          <h4 class="mb-3 text-sm font-semibold text-[var(--color-text)]">Datos de la academia</h4>
+          <dl class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+            <div class="flex items-start gap-3">
+              <fa-icon [icon]="faCalendarDays" class="mt-1 text-[var(--color-accent)]"></fa-icon>
+              <div>
+                <dt class="text-xs text-[var(--color-text-muted)]">Fecha de creación</dt>
+                <dd class="text-sm font-medium text-[var(--color-text)]">
+                  {{ formatDate(org.createdAt) }}
+                </dd>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <fa-icon [icon]="faClockRotateLeft" class="mt-1 text-[var(--color-accent)]"></fa-icon>
+              <div>
+                <dt class="text-xs text-[var(--color-text-muted)]">Última actualización</dt>
+                <dd class="text-sm font-medium text-[var(--color-text)]">
+                  {{ formatDate(org.updatedAt) }}
+                </dd>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <fa-icon [icon]="faHashtag" class="mt-1 text-[var(--color-accent)]"></fa-icon>
+              <div class="min-w-0">
+                <dt class="text-xs text-[var(--color-text-muted)]">Identificador</dt>
+                <dd class="truncate text-sm font-medium text-[var(--color-text)]">
+                  {{ org.slug }}
+                </dd>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <fa-icon [icon]="faGlobe" class="mt-1 text-[var(--color-accent)]"></fa-icon>
+              <div>
+                <dt class="text-xs text-[var(--color-text-muted)]">Zona horaria</dt>
+                <dd class="text-sm font-medium text-[var(--color-text)]">{{ org.timezone }}</dd>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <fa-icon [icon]="faEnvelope" class="mt-1 text-[var(--color-accent)]"></fa-icon>
+              <div class="min-w-0">
+                <dt class="text-xs text-[var(--color-text-muted)]">Email</dt>
+                <dd class="truncate text-sm font-medium text-[var(--color-text)]">
+                  {{ org.email || '—' }}
+                </dd>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <fa-icon [icon]="faPhone" class="mt-1 text-[var(--color-accent)]"></fa-icon>
+              <div>
+                <dt class="text-xs text-[var(--color-text-muted)]">Teléfono</dt>
+                <dd class="text-sm font-medium text-[var(--color-text)]">{{ org.phone || '—' }}</dd>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 sm:col-span-2">
+              <fa-icon [icon]="faLocationDot" class="mt-1 text-[var(--color-accent)]"></fa-icon>
+              <div>
+                <dt class="text-xs text-[var(--color-text-muted)]">Ubicación</dt>
+                <dd class="text-sm font-medium text-[var(--color-text)]">{{ location() }}</dd>
+              </div>
+            </div>
+          </dl>
+        </section>
+
+        <section>
+          <h4 class="mb-3 flex items-center gap-2 text-sm font-semibold text-[var(--color-text)]">
+            <fa-icon [icon]="faUsers" class="text-[var(--color-accent)]"></fa-icon>
+            Equipo y roles
+          </h4>
+          @if (isLoading()) {
+            <p class="text-sm text-[var(--color-text-muted)]">Cargando equipo…</p>
+          } @else if (hasError()) {
+            <p class="text-sm text-[var(--color-error-dark)]">
+              No se ha podido cargar el equipo. Inténtalo de nuevo.
+            </p>
+          } @else {
+            <ul class="divide-y divide-[var(--color-border-light)]">
+              @for (member of team(); track member.id) {
+                <li class="flex items-center gap-3 py-3">
+                  <span
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-sm font-semibold text-white shadow-md"
+                  >
+                    {{ initialsOf(member.name) }}
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-medium text-[var(--color-text)]">
+                      {{ member.name }}
+                      @if (member.isCurrentUser) {
+                        <span class="ml-1 text-xs font-normal text-[var(--color-text-muted)]"
+                          >(tú)</span
+                        >
+                      }
+                    </p>
+                    <p class="text-xs text-[var(--color-text-muted)]">
+                      Desde {{ formatDate(member.since) }}
+                    </p>
+                  </div>
+                  <span
+                    class="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+                    [class]="roleBadgeClasses[member.role]"
+                  >
+                    @if (member.role === 'owner') {
+                      <fa-icon [icon]="faCrown"></fa-icon>
+                    }
+                    {{ roleLabels[member.role] }}
+                  </span>
+                </li>
+              } @empty {
+                <li class="py-3 text-sm text-[var(--color-text-muted)]">
+                  Sin miembros que mostrar.
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      </div>
+
+      <div class="flex justify-end border-t border-[var(--color-border)]/60 px-7 py-4">
+        <button
+          type="button"
+          class="rounded-xl bg-[var(--color-accent)] px-8 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(108,99,168,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_12px_25px_rgba(108,99,168,0.32)] active:translate-y-0"
+          (click)="close()"
+        >
+          Cerrar
+        </button>
+      </div>
+    }
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar diálogo">cerrar</button>
+  </form>
+</dialog>
